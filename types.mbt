@@ -1,11 +1,11 @@
 ///|
-pub(all) type Size UInt derive(Eq, Show)
+pub(all) struct Size(UInt) derive(Eq, Show)
 
 ///| Non-negative file size or length of a region within a file.
-pub(all) type FileSize UInt64 derive(Eq, Show)
+pub(all) struct FileSize(UInt64) derive(Eq, Show)
 
 ///| Timestamp in nanoseconds.
-pub(all) type TimeStamp UInt64 derive(Eq, Show)
+pub(all) struct TimeStamp(UInt64) derive(Eq, Show)
 
 ///| Identifiers for clocks.
 /// 
@@ -306,7 +306,7 @@ test "errno" {
 }
 
 ///|  File descriptor rights, determining which actions may be performed.
-pub(all) type Rights UInt64 derive(Eq, Show)
+pub(all) struct Rights(UInt64) derive(Eq, Show)
 
 ///|
 pub fn Rights::new() -> Rights {
@@ -399,7 +399,7 @@ pub fn Rights::is_set(self : Rights, right : Right) -> Bool {
 }
 
 ///| A file descriptor handle
-pub(all) type Fd Int derive(Eq, Show)
+pub(all) struct Fd(Int) derive(Eq, Show)
 
 ///| A region of memory for scatter/gather reads.
 /// 
@@ -420,7 +420,7 @@ pub(all) struct CIOVec {
 } derive(Eq, Show)
 
 ///| Relative offset within a file.
-pub(all) type FileDelta Int64 derive(Eq, Show)
+pub(all) struct FileDelta(Int64) derive(Eq, Show)
 
 ///| The position relative to which to set the offset of the file descriptor
 pub(all) enum Whence {
@@ -451,13 +451,13 @@ pub fn Whence::from_value(value : UInt) -> Whence? {
 ///| A reference to the offset of a directory entry.
 /// 
 /// The value 0 signifies the start of the directory.
-pub(all) type DirCookie UInt64 derive(Eq, Show)
+pub(all) struct DirCookie(UInt64) derive(Eq, Show)
 
 ///| The type for the `dirent::d_namlen` field of `dirent` struct.
-pub(all) type DirNamlen UInt derive(Eq, Show)
+pub(all) struct DirNamlen(UInt) derive(Eq, Show)
 
 ///| File serial number that is unique within its file system.
-pub(all) type Inode UInt64 derive(Eq, Show)
+pub(all) struct Inode(UInt64) derive(Eq, Show)
 
 ///| The type of a file descriptor or file.
 /// 
@@ -565,7 +565,7 @@ pub fn Advice::from_value(value : UInt) -> Advice? {
 }
 
 ///| File descriptor flag.
-pub(all) type FdFlags UInt derive(Eq, Show)
+pub(all) struct FdFlags(UInt) derive(Eq, Show)
 
 ///|
 pub fn FdFlags::new() -> FdFlags {
@@ -628,10 +628,10 @@ pub(all) struct FdStat {
 
 ///| Identifier for a device containing a file system. Can be used in combination
 /// with `inode` to uniquely identify a file or directory in the filesystem.
-pub(all) type Device UInt64 derive(Eq, Show)
+pub(all) struct Device(UInt64) derive(Eq, Show)
 
 ///| Which file time attributes to adjust
-pub(all) type FstFlags UInt derive(Eq, Show)
+pub(all) struct FstFlags(UInt) derive(Eq, Show)
 
 ///|
 pub fn FstFlags::new() -> FstFlags {
@@ -677,7 +677,7 @@ pub fn FstFlags::is_set(self : FstFlags, flag : FstFlag) -> Bool {
 }
 
 ///| Flags dermining the method of how paths are resolved.
-pub(all) type LookupFlags UInt derive(Eq, Show)
+pub(all) struct LookupFlags(UInt) derive(Eq, Show)
 
 ///|
 pub fn LookupFlags::new() -> LookupFlags {
@@ -712,7 +712,7 @@ pub fn LookupFlags::is_set(self : LookupFlags, flag : LookupFlag) -> Bool {
 }
 
 ///| Open flags used by `path_open`.
-pub(all) type OpenFlags UInt derive(Eq, Show)
+pub(all) struct OpenFlags(UInt) derive(Eq, Show)
 
 ///|
 pub fn OpenFlags::new() -> OpenFlags {
@@ -758,7 +758,7 @@ pub fn OpenFlags::is_set(self : OpenFlags, flag : OpenFlag) -> Bool {
 }
 
 ///| Number of hard links to an inode.
-pub(all) type LinkCount UInt64 derive(Eq, Show)
+pub(all) struct LinkCount(UInt64) derive(Eq, Show)
 
 ///| File attributes.
 /// 
@@ -783,7 +783,7 @@ pub(all) struct FileStat {
 
 ///| User-provided value that may be attached to objects that is retained when
 /// extracted from the implementation.
-pub(all) type Userdata UInt64 derive(Eq, Show)
+pub(all) struct Userdata(UInt64) derive(Eq, Show)
 
 ///| Type of a subscription to an event or its occurrence.
 /// 
@@ -816,7 +816,7 @@ pub fn EventType::from_value(value : UInt) -> EventType? {
 }
 
 ///| The state of the file descriptor subscribed to with `eventtype::fd_read` or `eventtype::fd_write`.
-pub(all) type EventRWFlags UInt derive(Eq, Show)
+pub(all) struct EventRWFlags(UInt) derive(Eq, Show)
 
 ///|
 pub fn EventRWFlags::new() -> EventRWFlags {
@@ -840,7 +840,7 @@ pub fn EventRWFlag::value(self : EventRWFlag) -> UInt {
 ///|
 pub fn EventRWFlags::set(
   self : EventRWFlags,
-  flag : EventRWFlag
+  flag : EventRWFlag,
 ) -> EventRWFlags {
   EventRWFlags(self.inner() | flag.value())
 }
@@ -848,7 +848,7 @@ pub fn EventRWFlags::set(
 ///|
 pub fn EventRWFlags::unset(
   self : EventRWFlags,
-  flag : EventRWFlag
+  flag : EventRWFlag,
 ) -> EventRWFlags {
   EventRWFlags(self.inner() & (flag.value() ^ 0))
 }
@@ -882,7 +882,7 @@ pub(all) struct Event {
 } derive(Eq, Show)
 
 ///| Flags determining how to interpret the timestamp provided in `subscription::timeout`.
-pub(all) type SubclockFlags UInt derive(Eq, Show)
+pub(all) struct SubclockFlags(UInt) derive(Eq, Show)
 
 ///|
 pub fn SubclockFlags::new() -> SubclockFlags {
@@ -911,7 +911,7 @@ pub fn SubclockFlag::value(self : SubclockFlag) -> UInt {
 ///|
 pub fn SubclockFlags::set(
   self : SubclockFlags,
-  flag : SubclockFlag
+  flag : SubclockFlag,
 ) -> SubclockFlags {
   self.inner() | flag.value()
 }
@@ -919,7 +919,7 @@ pub fn SubclockFlags::set(
 ///|
 pub fn SubclockFlags::unset(
   self : SubclockFlags,
-  flag : SubclockFlag
+  flag : SubclockFlag,
 ) -> SubclockFlags {
   self.inner() & (flag.value() ^ 0)
 }
@@ -966,7 +966,7 @@ pub(all) struct Subscription {
 } derive(Eq, Show)
 
 ///| Exit code generated by a process when exiting.
-pub(all) type ExitCode UInt derive(Eq, Show)
+pub(all) struct ExitCode(UInt) derive(Eq, Show)
 
 ///| Signal condition.
 /// 
@@ -1110,7 +1110,7 @@ pub fn Signal::from_value(value : UInt) -> Signal? {
 }
 
 ///| Flags provided to `sock_recv`.
-pub(all) type RiFlags UInt derive(Eq, Show)
+pub(all) struct RiFlags(UInt) derive(Eq, Show)
 
 ///|
 pub fn RiFlags::new() -> RiFlags {
@@ -1150,7 +1150,7 @@ pub fn RiFlags::is_set(self : RiFlags, flag : RiFlag) -> Bool {
 }
 
 ///| Flags returned by `sock_recv`.
-pub(all) type RoFlags UInt derive(Eq, Show)
+pub(all) struct RoFlags(UInt) derive(Eq, Show)
 
 ///|
 pub fn RoFlags::new() -> RoFlags {
@@ -1187,7 +1187,7 @@ pub fn RoFlags::is_set(self : RoFlags, flag : RoFlag) -> Bool {
 }
 
 ///| Flags provided to `sock_send`. As there are currently no flags defined, it must be set to zero.
-pub(all) type SiFlags UInt derive(Eq, Show)
+pub(all) struct SiFlags(UInt) derive(Eq, Show)
 
 ///|
 pub fn SiFlags::new() -> SiFlags {
@@ -1220,7 +1220,7 @@ pub fn SiFlags::is_set(self : SiFlags, flag : SiFlag) -> Bool {
 }
 
 ///| Which channels on a socket to shut down.
-pub(all) type SdFlags UInt derive(Eq, Show)
+pub(all) struct SdFlags(UInt) derive(Eq, Show)
 
 ///|
 pub fn SdFlags::new() -> SdFlags {

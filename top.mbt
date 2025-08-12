@@ -165,7 +165,7 @@ fn clock_time_get_ffi(clock_id : UInt, precision : UInt64, time : Int) -> UInt =
 /// @return The time value of the clock.
 pub fn clock_time_get(
   self : ClockId,
-  precision : TimeStamp
+  precision : TimeStamp,
 ) -> TimeStamp raise Errno {
   let time_ptr = @ffi.malloc(8)
   let ret = clock_time_get_ffi(self.value(), precision.inner(), time_ptr)
@@ -183,7 +183,7 @@ fn fd_advise_ffi(
   fd : Int,
   offset : UInt64,
   len : UInt64,
-  advice : UInt
+  advice : UInt,
 ) -> UInt = "wasi_snapshot_preview1" "fd_advise"
 
 ///| Provide file advisory information on a file ddescriptor
@@ -197,7 +197,7 @@ pub fn fd_advise(
   self : Fd,
   offset : FileSize,
   len : FileSize,
-  advice : Advice
+  advice : Advice,
 ) -> Unit raise Errno {
   let ret = fd_advise_ffi(
     self.inner(),
@@ -224,7 +224,7 @@ fn fd_allocate_ffi(fd : Int, offset : UInt64, len : UInt64) -> UInt = "wasi_snap
 pub fn fd_allocate(
   self : Fd,
   offset : FileSize,
-  len : FileSize
+  len : FileSize,
 ) -> Unit raise Errno {
   let ret = fd_allocate_ffi(self.inner(), offset.inner(), len.inner())
   let ret = Errno::from_value(ret).unwrap()
@@ -311,7 +311,7 @@ pub fn fd_fdstat_set_flags(self : Fd, flags : FdFlags) -> Unit raise Errno {
 fn fd_fdstat_set_rights_ffi(
   fd : Int,
   fs_rights_base : UInt64,
-  fs_rights_inheriting : UInt64
+  fs_rights_inheriting : UInt64,
 ) -> UInt = "wasi_snapshot_preview1" "fd_fdstat_set_rights"
 
 ///| Adjust the rights associated with a file descriptor.
@@ -322,7 +322,7 @@ fn fd_fdstat_set_rights_ffi(
 pub fn fd_fdstat_set_rights(
   self : Fd,
   fs_rights_base : Rights,
-  fs_rights_inheriting : Rights
+  fs_rights_inheriting : Rights,
 ) -> Unit raise Errno {
   let ret = fd_fdstat_set_rights_ffi(
     self.inner(),
@@ -382,7 +382,7 @@ fn fd_filestat_set_times_ffi(
   fd : Int,
   atim : UInt64,
   mtim : UInt64,
-  fst_flags : UInt
+  fst_flags : UInt,
 ) -> UInt = "wasi_snapshot_preview1" "fd_filestat_set_times"
 
 ///| Adjust the timestamps of an open file or directory.
@@ -396,7 +396,7 @@ pub fn fd_filestat_set_times(
   self : Fd,
   atim : TimeStamp,
   mtim : TimeStamp,
-  fst_flags : FstFlags
+  fst_flags : FstFlags,
 ) -> Unit raise Errno {
   let ret = fd_filestat_set_times_ffi(
     self.inner(),
@@ -416,7 +416,7 @@ fn fd_pread_ffi(
   iovs : Int,
   iovs_len : Int,
   offset : UInt64,
-  nread : Int
+  nread : Int,
 ) -> UInt = "wasi_snapshot_preview1" "fd_pread"
 
 ///| Read from a file descriptor, without using and updating the file descriptor's offset.
@@ -425,7 +425,7 @@ fn fd_pread_ffi(
 pub fn fd_pread(
   self : Fd,
   iovs : Array[FixedArray[Byte]],
-  offset : FileSize
+  offset : FileSize,
 ) -> Size raise Errno {
   let iovs_len = iovs.length()
   let iovs_ptr = @ffi.malloc(iovs_len * 8)
@@ -532,7 +532,7 @@ fn fd_readdir_ffi(
   buf : Int,
   buf_len : Int,
   cookie : UInt64,
-  buf_used : Int
+  buf_used : Int,
 ) -> UInt = "wasi_snapshot_preview1" "fd_readdir"
 
 ///| Read directory entries from a directory.
@@ -555,7 +555,7 @@ fn fd_readdir_ffi(
 pub fn fd_readdir(
   self : Fd,
   cookie~ : DirCookie = DirCookie(0),
-  buffer~ : Bytes = Bytes::make(4096, 0)
+  buffer~ : Bytes = Bytes::make(4096, 0),
 ) -> (Array[(String, DirEnt)], Bool) raise Errno {
   let buf_len = buffer.length()
   let buf_ptr = @ffi.bytes2ptr(buffer)
@@ -629,7 +629,7 @@ fn fd_seek_ffi(
   fd : Int,
   offset : Int64,
   whence : UInt,
-  newoffset : Int
+  newoffset : Int,
 ) -> UInt = "wasi_snapshot_preview1" "fd_seek"
 
 ///| Move the offset of a file descriptor.
@@ -642,7 +642,7 @@ fn fd_seek_ffi(
 pub fn fd_seek(
   self : Fd,
   offset : FileDelta,
-  whence : Whence
+  whence : Whence,
 ) -> FileSize raise Errno {
   let newoffset_ptr = @ffi.malloc(8)
   let ret = fd_seek_ffi(
@@ -754,7 +754,7 @@ fn path_filestat_get_ffi(
   flags : UInt,
   path : Int,
   path_len : Int,
-  buf : Int
+  buf : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_filestat_get"
 
 ///| Return the attributes of a file or directory.
@@ -766,7 +766,7 @@ fn path_filestat_get_ffi(
 pub fn path_filestat_get(
   self : Fd,
   flags : LookupFlags,
-  path : String
+  path : String,
 ) -> FileStat raise Errno {
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
@@ -808,7 +808,7 @@ fn path_filestat_set_times_ffi(
   path_len : Int,
   atim : UInt64,
   mtim : UInt64,
-  fst_flags : UInt
+  fst_flags : UInt,
 ) -> UInt = "wasi_snapshot_preview1" "path_filestat_set_times"
 
 ///| Adjust the timestamps of a file or directory.
@@ -826,7 +826,7 @@ pub fn path_filestat_set_times(
   path : String,
   atim : TimeStamp,
   mtim : TimeStamp,
-  fst_flags : FstFlags
+  fst_flags : FstFlags,
 ) -> Unit raise Errno {
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
@@ -855,7 +855,7 @@ fn path_link_ffi(
   old_path_len : Int,
   new_fd : Int,
   new_path : Int,
-  new_path_len : Int
+  new_path_len : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_link"
 
 ///| Create a hard link.
@@ -871,7 +871,7 @@ pub fn path_link(
   old_flags : LookupFlags,
   old_path : String,
   new_fd : Fd,
-  new_path : String
+  new_path : String,
 ) -> Unit raise Errno {
   let old_path_bytes = old_path |> @encoding.encode(encoding=UTF8)
   let old_path_len = old_path_bytes.length()
@@ -906,7 +906,7 @@ fn path_open_ffi(
   fs_rights_base : UInt64,
   fs_rights_inheriting : UInt64,
   fs_flags : UInt,
-  fd : Int
+  fd : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_open"
 
 ///| Open a file or directory.
@@ -940,7 +940,7 @@ pub fn path_open(
   oflags : OpenFlags,
   fs_rights_base : Rights,
   fs_rights_inheriting : Rights,
-  fs_flags : FdFlags
+  fs_flags : FdFlags,
 ) -> Fd raise Errno {
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
@@ -974,7 +974,7 @@ fn path_readlink_ffi(
   path_len : Int,
   buf : Int,
   buf_len : Int,
-  buf_used : Int
+  buf_used : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_readlink"
 
 ///| Read the contents of a symbolic link.
@@ -985,7 +985,7 @@ fn path_readlink_ffi(
 pub fn path_readlink(
   self : Fd,
   path : String,
-  buffer~ : FixedArray[Byte] = FixedArray::make(4096, 0)
+  buffer~ : FixedArray[Byte] = FixedArray::make(4096, 0),
 ) -> Size raise Errno {
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
@@ -1039,7 +1039,7 @@ fn path_rename_ffi(
   old_path_len : Int,
   new_fd : Int,
   new_path : Int,
-  new_path_len : Int
+  new_path_len : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_rename"
 
 ///| Rename a file or directory.
@@ -1053,7 +1053,7 @@ pub fn path_rename(
   self : Fd,
   old_path : String,
   new_fd : Fd,
-  new_path : String
+  new_path : String,
 ) -> Unit raise Errno {
   let old_path_bytes = old_path |> @encoding.encode(encoding=UTF8)
   let old_path_len = old_path_bytes.length()
@@ -1083,7 +1083,7 @@ fn path_symlink_ffi(
   old_path_len : Int,
   fd : Int,
   new_path : Int,
-  new_path_len : Int
+  new_path_len : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_symlink"
 
 ///| Create a symbolic link.
@@ -1092,7 +1092,7 @@ fn path_symlink_ffi(
 pub fn path_symlink(
   old_path : String,
   fd : Fd,
-  new_path : String
+  new_path : String,
 ) -> Unit raise Errno {
   let old_path_bytes = old_path |> @encoding.encode(encoding=UTF8)
   let old_path_len = old_path_bytes.length()
@@ -1140,7 +1140,7 @@ fn poll_oneoff_ffi(
   in_ : Int,
   out : Int,
   nsubscriptions : Int,
-  nevents : Int
+  nevents : Int,
 ) -> UInt = "wasi_snapshot_preview1" "poll_oneoff"
 
 ///| Concurrently poll for the occurrence of a set of events.
@@ -1296,7 +1296,7 @@ fn sock_recv_ffi(
   ri_data_len : Int,
   ri_flags : UInt,
   size : Int,
-  ro_flags : Int
+  ro_flags : Int,
 ) -> UInt = "wasi_snapshot_preview1" "sock_recv"
 
 ///| Receive a message from a socket.
@@ -1310,7 +1310,7 @@ fn sock_recv_ffi(
 pub fn sock_recv(
   self : Fd,
   contents : Array[FixedArray[Byte]],
-  flags : RiFlags
+  flags : RiFlags,
 ) -> (Size, RoFlags) raise Errno {
   let ri_data_len = contents.length()
   let ri_data_ptr = @ffi.malloc(ri_data_len * 8)
@@ -1349,7 +1349,7 @@ fn sock_send_ffi(
   si_data : Int,
   si_data_len : Int,
   si_flags : UInt,
-  size : Int
+  size : Int,
 ) -> UInt = "wasi_snapshot_preview1" "sock_send"
 
 ///| Send a message on a socket.
@@ -1363,7 +1363,7 @@ fn sock_send_ffi(
 pub fn sock_send(
   self : Fd,
   contents : Array[@bytes.View],
-  flags : SiFlags
+  flags : SiFlags,
 ) -> Size raise Errno {
   let si_data_len = contents.length()
   let si_data_ptr = @ffi.malloc(si_data_len * 8)

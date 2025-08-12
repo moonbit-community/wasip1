@@ -1,3 +1,4 @@
+// Generated using `moon info`, DON'T EDIT IT
 package "peter-jerry-ye/wasi"
 
 import(
@@ -31,64 +32,7 @@ let stdin : Fd
 
 let stdout : Fd
 
-// Types and methods
-pub(all) enum Advice {
-  Normal
-  Sequential
-  Random
-  Willneed
-  Dontneed
-  Noreuse
-}
-fn Advice::from_value(UInt) -> Self?
-fn Advice::value(Self) -> UInt
-impl Eq for Advice
-impl Show for Advice
-
-pub(all) struct CIOVec {
-  buf : Int
-  buf_len : Size
-}
-impl Eq for CIOVec
-impl Show for CIOVec
-
-pub(all) enum ClockId {
-  RealTime
-  Monotonic
-  ProcessCPUTimeId
-  ThreadCPUTimeId
-}
-fn ClockId::clock_res_get(Self) -> TimeStamp raise Errno
-fn ClockId::clock_time_get(Self, TimeStamp) -> TimeStamp raise Errno
-fn ClockId::from_value(UInt) -> Self?
-fn ClockId::value(Self) -> UInt
-impl Eq for ClockId
-impl Show for ClockId
-
-pub(all) type Device UInt64
-fn Device::inner(Self) -> UInt64
-impl Eq for Device
-impl Show for Device
-
-pub(all) type DirCookie UInt64
-fn DirCookie::inner(Self) -> UInt64
-impl Eq for DirCookie
-impl Show for DirCookie
-
-pub(all) struct DirEnt {
-  d_next : DirCookie
-  d_ino : Inode
-  d_namlen : DirNamlen
-  d_type : FileType
-}
-impl Eq for DirEnt
-impl Show for DirEnt
-
-pub(all) type DirNamlen UInt
-fn DirNamlen::inner(Self) -> UInt
-impl Eq for DirNamlen
-impl Show for DirNamlen
-
+// Errors
 pub(all) suberror Errno {
   Success
   TooBig
@@ -173,6 +117,64 @@ fn Errno::value(Self) -> UInt
 impl Eq for Errno
 impl Show for Errno
 
+// Types and methods
+pub(all) enum Advice {
+  Normal
+  Sequential
+  Random
+  Willneed
+  Dontneed
+  Noreuse
+}
+fn Advice::from_value(UInt) -> Self?
+fn Advice::value(Self) -> UInt
+impl Eq for Advice
+impl Show for Advice
+
+pub(all) struct CIOVec {
+  buf : Int
+  buf_len : Size
+}
+impl Eq for CIOVec
+impl Show for CIOVec
+
+pub(all) enum ClockId {
+  RealTime
+  Monotonic
+  ProcessCPUTimeId
+  ThreadCPUTimeId
+}
+fn ClockId::clock_res_get(Self) -> TimeStamp raise Errno
+fn ClockId::clock_time_get(Self, TimeStamp) -> TimeStamp raise Errno
+fn ClockId::from_value(UInt) -> Self?
+fn ClockId::value(Self) -> UInt
+impl Eq for ClockId
+impl Show for ClockId
+
+pub(all) struct Device(UInt64)
+fn Device::inner(Self) -> UInt64
+impl Eq for Device
+impl Show for Device
+
+pub(all) struct DirCookie(UInt64)
+fn DirCookie::inner(Self) -> UInt64
+impl Eq for DirCookie
+impl Show for DirCookie
+
+pub(all) struct DirEnt {
+  d_next : DirCookie
+  d_ino : Inode
+  d_namlen : DirNamlen
+  d_type : FileType
+}
+impl Eq for DirEnt
+impl Show for DirEnt
+
+pub(all) struct DirNamlen(UInt)
+fn DirNamlen::inner(Self) -> UInt
+impl Eq for DirNamlen
+impl Show for DirNamlen
+
 pub(all) struct Event {
   userdata : Userdata
   error : Errno
@@ -189,7 +191,7 @@ fn EventRWFlag::value(Self) -> UInt
 impl Eq for EventRWFlag
 impl Show for EventRWFlag
 
-pub(all) type EventRWFlags UInt
+pub(all) struct EventRWFlags(UInt)
 fn EventRWFlags::inner(Self) -> UInt
 fn EventRWFlags::is_set(Self, EventRWFlag) -> Bool
 fn EventRWFlags::new() -> Self
@@ -215,12 +217,12 @@ pub(all) struct Event_fd_readwrite {
 impl Eq for Event_fd_readwrite
 impl Show for Event_fd_readwrite
 
-pub(all) type ExitCode UInt
+pub(all) struct ExitCode(UInt)
 fn ExitCode::inner(Self) -> UInt
 impl Eq for ExitCode
 impl Show for ExitCode
 
-pub(all) type Fd Int
+pub(all) struct Fd(Int)
 fn Fd::fd_advise(Self, FileSize, FileSize, Advice) -> Unit raise Errno
 fn Fd::fd_allocate(Self, FileSize, FileSize) -> Unit raise Errno
 fn Fd::fd_close(Self) -> Unit raise Errno
@@ -235,7 +237,7 @@ fn Fd::fd_pread(Self, Array[FixedArray[Byte]], FileSize) -> Size raise Errno
 fn Fd::fd_prestat_dir_name(Self) -> String raise Errno
 fn Fd::fd_prestat_get(Self) -> PreStat raise Errno
 fn Fd::fd_read(Self, Array[FixedArray[Byte]]) -> Size raise Errno
-fn Fd::fd_readdir(Self, cookie~ : DirCookie = .., buffer~ : Bytes = ..) -> (Array[(String, DirEnt)], Bool) raise Errno
+fn Fd::fd_readdir(Self, cookie? : DirCookie, buffer? : Bytes) -> (Array[(String, DirEnt)], Bool) raise Errno
 fn Fd::fd_renumber(Self, Self) -> Unit raise Errno
 fn Fd::fd_seek(Self, FileDelta, Whence) -> FileSize raise Errno
 fn Fd::fd_sync(Self) -> Unit raise Errno
@@ -247,7 +249,7 @@ fn Fd::path_filestat_get(Self, LookupFlags, String) -> FileStat raise Errno
 fn Fd::path_filestat_set_times(Self, LookupFlags, String, TimeStamp, TimeStamp, FstFlags) -> Unit raise Errno
 fn Fd::path_link(Self, LookupFlags, String, Self, String) -> Unit raise Errno
 fn Fd::path_open(Self, LookupFlags, String, OpenFlags, Rights, Rights, FdFlags) -> Self raise Errno
-fn Fd::path_readlink(Self, String, buffer~ : FixedArray[Byte] = ..) -> Size raise Errno
+fn Fd::path_readlink(Self, String, buffer? : FixedArray[Byte]) -> Size raise Errno
 fn Fd::path_remove_directory(Self, String) -> Unit raise Errno
 fn Fd::path_rename(Self, String, Self, String) -> Unit raise Errno
 fn Fd::path_unlink_file(Self, String) -> Unit raise Errno
@@ -269,7 +271,7 @@ fn FdFlag::value(Self) -> UInt
 impl Eq for FdFlag
 impl Show for FdFlag
 
-pub(all) type FdFlags UInt
+pub(all) struct FdFlags(UInt)
 fn FdFlags::inner(Self) -> UInt
 fn FdFlags::is_set(Self, FdFlag) -> Bool
 fn FdFlags::new() -> Self
@@ -287,12 +289,12 @@ pub(all) struct FdStat {
 impl Eq for FdStat
 impl Show for FdStat
 
-pub(all) type FileDelta Int64
+pub(all) struct FileDelta(Int64)
 fn FileDelta::inner(Self) -> Int64
 impl Eq for FileDelta
 impl Show for FileDelta
 
-pub(all) type FileSize UInt64
+pub(all) struct FileSize(UInt64)
 fn FileSize::inner(Self) -> UInt64
 impl Eq for FileSize
 impl Show for FileSize
@@ -335,7 +337,7 @@ fn FstFlag::value(Self) -> UInt
 impl Eq for FstFlag
 impl Show for FstFlag
 
-pub(all) type FstFlags UInt
+pub(all) struct FstFlags(UInt)
 fn FstFlags::inner(Self) -> UInt
 fn FstFlags::is_set(Self, FstFlag) -> Bool
 fn FstFlags::new() -> Self
@@ -351,12 +353,12 @@ pub(all) struct IOVec {
 impl Eq for IOVec
 impl Show for IOVec
 
-pub(all) type Inode UInt64
+pub(all) struct Inode(UInt64)
 fn Inode::inner(Self) -> UInt64
 impl Eq for Inode
 impl Show for Inode
 
-pub(all) type LinkCount UInt64
+pub(all) struct LinkCount(UInt64)
 fn LinkCount::inner(Self) -> UInt64
 impl Eq for LinkCount
 impl Show for LinkCount
@@ -368,7 +370,7 @@ fn LookupFlag::value(Self) -> UInt
 impl Eq for LookupFlag
 impl Show for LookupFlag
 
-pub(all) type LookupFlags UInt
+pub(all) struct LookupFlags(UInt)
 fn LookupFlags::inner(Self) -> UInt
 fn LookupFlags::is_set(Self, LookupFlag) -> Bool
 fn LookupFlags::new() -> Self
@@ -387,7 +389,7 @@ fn OpenFlag::value(Self) -> UInt
 impl Eq for OpenFlag
 impl Show for OpenFlag
 
-pub(all) type OpenFlags UInt
+pub(all) struct OpenFlags(UInt)
 fn OpenFlags::inner(Self) -> UInt
 fn OpenFlags::is_set(Self, OpenFlag) -> Bool
 fn OpenFlags::new() -> Self
@@ -424,7 +426,7 @@ fn RiFlag::value(Self) -> UInt
 impl Eq for RiFlag
 impl Show for RiFlag
 
-pub(all) type RiFlags UInt
+pub(all) struct RiFlags(UInt)
 fn RiFlags::inner(Self) -> UInt
 fn RiFlags::is_set(Self, RiFlag) -> Bool
 fn RiFlags::new() -> Self
@@ -469,7 +471,7 @@ fn Right::value(Self) -> UInt64
 impl Eq for Right
 impl Show for Right
 
-pub(all) type Rights UInt64
+pub(all) struct Rights(UInt64)
 fn Rights::inner(Self) -> UInt64
 fn Rights::is_set(Self, Right) -> Bool
 fn Rights::new() -> Self
@@ -485,7 +487,7 @@ fn RoFlag::value(Self) -> UInt
 impl Eq for RoFlag
 impl Show for RoFlag
 
-pub(all) type RoFlags UInt
+pub(all) struct RoFlags(UInt)
 fn RoFlags::inner(Self) -> UInt
 fn RoFlags::is_set(Self, RoFlag) -> Bool
 fn RoFlags::new() -> Self
@@ -502,7 +504,7 @@ fn SdFlag::value(Self) -> UInt
 impl Eq for SdFlag
 impl Show for SdFlag
 
-pub(all) type SdFlags UInt
+pub(all) struct SdFlags(UInt)
 fn SdFlags::inner(Self) -> UInt
 fn SdFlags::is_set(Self, SdFlag) -> Bool
 fn SdFlags::new() -> Self
@@ -517,7 +519,7 @@ fn SiFlag::value(Self) -> UInt
 impl Eq for SiFlag
 impl Show for SiFlag
 
-pub(all) type SiFlags UInt
+pub(all) struct SiFlags(UInt)
 fn SiFlags::inner(Self) -> UInt
 fn SiFlags::is_set(Self, SiFlag) -> Bool
 fn SiFlags::new() -> Self
@@ -564,7 +566,7 @@ fn Signal::value(Self) -> UInt
 impl Eq for Signal
 impl Show for Signal
 
-pub(all) type Size UInt
+pub(all) struct Size(UInt)
 fn Size::inner(Self) -> UInt
 impl Eq for Size
 impl Show for Size
@@ -576,7 +578,7 @@ fn SubclockFlag::value(Self) -> UInt
 impl Eq for SubclockFlag
 impl Show for SubclockFlag
 
-pub(all) type SubclockFlags UInt
+pub(all) struct SubclockFlags(UInt)
 fn SubclockFlags::inner(Self) -> UInt
 fn SubclockFlags::is_set(Self, SubclockFlag) -> Bool
 fn SubclockFlags::new() -> Self
@@ -615,12 +617,12 @@ pub(all) enum Subscription_u {
 impl Eq for Subscription_u
 impl Show for Subscription_u
 
-pub(all) type TimeStamp UInt64
+pub(all) struct TimeStamp(UInt64)
 fn TimeStamp::inner(Self) -> UInt64
 impl Eq for TimeStamp
 impl Show for TimeStamp
 
-pub(all) type Userdata UInt64
+pub(all) struct Userdata(UInt64)
 fn Userdata::inner(Self) -> UInt64
 impl Eq for Userdata
 impl Show for Userdata

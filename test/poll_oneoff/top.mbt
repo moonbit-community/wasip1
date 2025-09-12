@@ -8,7 +8,7 @@ pub fn start() -> Unit {
         precision: @wasi.TimeStamp(1),
         flags: @wasi.SubclockFlags::new(),
       }),
-      userdata: 0,
+      userdata: 42,
     },
     @wasi.Subscription::{
       u: @wasi.Subscription_u::Clock(@wasi.Subscription_clock::{
@@ -22,6 +22,5 @@ pub fn start() -> Unit {
   ]
   let result = try? @wasi.poll_oneoff(subscriptions)
   guard result is Ok([event])
-  guard event.type_ is Clock && event.userdata == 0
-
+  guard event.type_ is Clock && event.userdata == 42
 }

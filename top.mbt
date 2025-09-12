@@ -1,18 +1,18 @@
 ///|
 fn args_sizes_get_ffi(argc : Int, size : Int) -> UInt = "wasi_snapshot_preview1" "args_sizes_get"
 
-///| Return command-line argument data sizes.
+///|
+/// Return command-line argument data sizes.
 /// 
 /// @return Returns the number of arguments and the size of the argument string data, or an error.
 pub fn args_sizes_get() -> (Int, Int) raise Errno {
-  let argc_ptr = @ffi.malloc(4)
-  let size_ptr = @ffi.malloc(4)
-  let ret = args_sizes_get_ffi(argc_ptr, size_ptr)
+  let array : FixedArray[Int] = FixedArray::make(2, 0)
+  let ptr = @ffi.int_array2ptr(array)
+  defer @ffi.free(ptr)
+  let ret = args_sizes_get_ffi(ptr, ptr + 4)
   let ret = Errno::from_value(ret).unwrap()
-  let argc = @ffi.load32(argc_ptr)
-  @ffi.free(argc_ptr)
-  let size = @ffi.load32(size_ptr)
-  @ffi.free(size_ptr)
+  let argc = array[0]
+  let size = array[1]
   if ret != Success {
     raise ret
   }
@@ -22,7 +22,8 @@ pub fn args_sizes_get() -> (Int, Int) raise Errno {
 ///|
 fn args_get_ffi(argv : Int, argv_buf : Int) -> UInt = "wasi_snapshot_preview1" "args_get"
 
-///| Read command-line argument data.
+///|
+/// Read command-line argument data.
 ///
 /// The size of the array should match that returned by `args_sizes_get`.
 ///
@@ -37,23 +38,24 @@ pub fn args_get() -> Array[String] raise Errno {
   if argc == 0 {
     return []
   }
-  let arg_ptr_ptr = @ffi.malloc(argc * 4)
+  let arg_ptr = FixedArray::make(argc, 0)
+  let arg_ptr_ptr = @ffi.int_array2ptr(arg_ptr)
+  defer @ffi.free(arg_ptr_ptr)
   let arg_buf = Bytes::make(size, b'\x00')
   let arg_buf_ptr = @ffi.bytes2ptr(arg_buf)
+  defer @ffi.free(arg_buf_ptr)
   let ret = args_get_ffi(arg_ptr_ptr, arg_buf_ptr)
   let ret = Errno::from_value(ret).unwrap()
   if ret != Success {
-    @ffi.free(arg_ptr_ptr)
-    @ffi.free(arg_buf_ptr)
     raise ret
   }
   let args = []
   for i in 0..<argc {
-    let arg_start = @ffi.load32(arg_ptr_ptr + i * 4) - arg_buf_ptr
+    let arg_start = arg_ptr[i] - arg_buf_ptr
     let arg_end = if i == argc - 1 {
       size
     } else {
-      @ffi.load32(arg_ptr_ptr + (i + 1) * 4) - arg_buf_ptr
+      arg_ptr[i + 1] - arg_buf_ptr
     }
     let len = arg_end - arg_start - 1 // remove trailing zero
     args.push(
@@ -61,26 +63,24 @@ pub fn args_get() -> Array[String] raise Errno {
       |> @encoding.decode_lossy(encoding=UTF8),
     )
   }
-  @ffi.free(arg_ptr_ptr)
-  @ffi.free(arg_buf_ptr)
   args
 }
 
 ///|
 fn environ_sizes_get_ffi(argc : Int, size : Int) -> UInt = "wasi_snapshot_preview1" "environ_sizes_get"
 
-///| Return environment variable data sizes.
+///|
+/// Return environment variable data sizes.
 /// 
 /// @return Returns the number of environment variables arguments and the size of the environment variable data.
 pub fn environ_sizes_get() -> (Int, Int) raise Errno {
-  let argc_ptr = @ffi.malloc(4)
-  let size_ptr = @ffi.malloc(4)
-  let ret = environ_sizes_get_ffi(argc_ptr, size_ptr)
+  let args : FixedArray[Int] = FixedArray::make(2, 0)
+  let ptr = @ffi.int_array2ptr(args)
+  defer @ffi.free(ptr)
+  let ret = environ_sizes_get_ffi(ptr, ptr + 4)
   let ret = Errno::from_value(ret).unwrap()
-  let argc = @ffi.load32(argc_ptr)
-  let size = @ffi.load32(size_ptr)
-  @ffi.free(argc_ptr)
-  @ffi.free(size_ptr)
+  let argc = args[0]
+  let size = args[1]
   if ret != Success {
     raise ret
   }
@@ -90,7 +90,8 @@ pub fn environ_sizes_get() -> (Int, Int) raise Errno {
 ///|
 fn environ_get_ffi(environ : Int, environ_buf : Int) -> UInt = "wasi_snapshot_preview1" "environ_get"
 
-///| Read environment variable data.
+///|
+/// Read environment variable data.
 /// 
 /// The size of the array should match that returned by `environ_sizes_get`.
 pub fn environ_get() -> Array[(String, String)] raise Errno {
@@ -98,23 +99,24 @@ pub fn environ_get() -> Array[(String, String)] raise Errno {
   if argc == 0 {
     return []
   }
-  let environ_ptr_ptr = @ffi.malloc(argc * 4)
+  let environ_ptr = FixedArray::make(argc, 0)
+  let environ_ptr_ptr = @ffi.int_array2ptr(environ_ptr)
+  defer @ffi.free(environ_ptr_ptr)
   let environ_buf = Bytes::make(size, b'\x00')
   let environ_buf_ptr = @ffi.bytes2ptr(environ_buf)
+  defer @ffi.free(environ_buf_ptr)
   let ret = environ_get_ffi(environ_ptr_ptr, environ_buf_ptr)
   let ret = Errno::from_value(ret).unwrap()
   if ret != Success {
-    @ffi.free(environ_ptr_ptr)
-    @ffi.free(environ_buf_ptr)
     raise ret
   }
   let envs = []
   for i in 0..<argc {
-    let env_start = @ffi.load32(environ_ptr_ptr + i * 4) - environ_buf_ptr
+    let env_start = environ_ptr[i] - environ_buf_ptr
     let env_end = if i == argc - 1 {
       size
     } else {
-      @ffi.load32(environ_ptr_ptr + (i + 1) * 4) - environ_buf_ptr
+      environ_ptr[i + 1] - environ_buf_ptr
     }
     let len = env_end - env_start - 1 // remove trailing zero
     let str = environ_buf[env_start:env_start + len]
@@ -124,15 +126,14 @@ pub fn environ_get() -> Array[(String, String)] raise Errno {
       (key.to_string(), value.iter().map(@string.View::to_string).join("=")),
     )
   }
-  @ffi.free(environ_ptr_ptr)
-  @ffi.free(environ_buf_ptr)
   envs
 }
 
 ///|
 fn clock_res_get_ffi(clock_id : UInt, resolution : Int) -> UInt = "wasi_snapshot_preview1" "clock_res_get"
 
-///| Return the resolution of a clock.
+///|
+/// Return the resolution of a clock.
 /// 
 /// Implementations are required to provide a non-zero value for supported clocks.
 /// For unsupported clocks, return `errno::inval`.
@@ -142,21 +143,22 @@ fn clock_res_get_ffi(clock_id : UInt, resolution : Int) -> UInt = "wasi_snapshot
 /// @param `self` The clock for which to return the resolution.  
 /// @return The resolution of the clock, or an error if one happened.
 pub fn clock_res_get(self : ClockId) -> TimeStamp raise Errno {
-  let resolution_ptr = @ffi.malloc(8)
+  let resolution = FixedArray::make(1, 0UL)
+  let resolution_ptr = @ffi.uint64_array2ptr(resolution)
+  defer @ffi.free(resolution_ptr)
   let ret = clock_res_get_ffi(self.value(), resolution_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let resolution = @ffi.load64_u(resolution_ptr)
-  @ffi.free(resolution_ptr)
   if ret != Success {
     raise ret
   }
-  resolution
+  resolution[0]
 }
 
 ///|
 fn clock_time_get_ffi(clock_id : UInt, precision : UInt64, time : Int) -> UInt = "wasi_snapshot_preview1" "clock_time_get"
 
-///| Return the time value of a clock
+///|
+/// Return the time value of a clock
 /// 
 /// Note: This is similar to `clock_gettime` in POSIX.
 /// 
@@ -167,15 +169,15 @@ pub fn clock_time_get(
   self : ClockId,
   precision : TimeStamp,
 ) -> TimeStamp raise Errno {
-  let time_ptr = @ffi.malloc(8)
-  let ret = clock_time_get_ffi(self.value(), precision.inner(), time_ptr)
+  let time = FixedArray::make(1, 0UL)
+  let time_ptr = @ffi.uint64_array2ptr(time)
+  defer @ffi.free(time_ptr)
+  let ret = clock_time_get_ffi(self.value(), precision.0, time_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let time = @ffi.load64_u(time_ptr)
-  @ffi.free(time_ptr)
   if ret != Success {
     raise ret
   }
-  time
+  time[0]
 }
 
 ///|
@@ -186,7 +188,8 @@ fn fd_advise_ffi(
   advice : UInt,
 ) -> UInt = "wasi_snapshot_preview1" "fd_advise"
 
-///| Provide file advisory information on a file ddescriptor
+///|
+/// Provide file advisory information on a file ddescriptor
 /// 
 /// Note: This is similar to `posix_fadvise` in POSIX.
 /// 
@@ -214,7 +217,8 @@ pub fn fd_advise(
 ///|
 fn fd_allocate_ffi(fd : Int, offset : UInt64, len : UInt64) -> UInt = "wasi_snapshot_preview1" "fd_allocate"
 
-///| Force the allocaiton of space in a file.
+///|
+/// Force the allocaiton of space in a file.
 /// 
 /// Note: This is similar to `posix_fallocate` in POSIX.
 /// 
@@ -236,7 +240,8 @@ pub fn fd_allocate(
 ///|
 fn fd_close_ffi(fd : Int) -> UInt = "wasi_snapshot_preview1" "fd_close"
 
-///| Close a file descriptor.
+///|
+/// Close a file descriptor.
 /// 
 /// Note: This is similar to `close` in POSIX.
 pub fn fd_close(self : Fd) -> Unit raise Errno {
@@ -250,7 +255,8 @@ pub fn fd_close(self : Fd) -> Unit raise Errno {
 ///|
 fn fd_datasync_ffi(fd : Int) -> UInt = "wasi_snapshot_preview1" "fd_datasync"
 
-///| Synchronize the data of a file to disk.
+///|
+/// Synchronize the data of a file to disk.
 /// 
 /// Note: This is similar to `fdatasync` in POSIX.
 pub fn fd_datasync(self : Fd) -> Unit raise Errno {
@@ -264,37 +270,45 @@ pub fn fd_datasync(self : Fd) -> Unit raise Errno {
 ///|
 fn fd_fdstat_get_ffi(fd : Int, buf : Int) -> UInt = "wasi_snapshot_preview1" "fd_fdstat_get"
 
-///| Get the attributes of a file descriptor.
+///|
+fn @bytes.View::to_uint16_le(bytes : Self) -> UInt16 {
+  bytes[0].to_uint16() | (bytes[1].to_uint16() << 8)
+}
+
+///|
+/// Get the attributes of a file descriptor.
 /// 
 /// Note: This returns similar flags to `fcntl(fd, F_GETFL)` in POSIX, as well as additional fields.
 pub fn fd_fdstat_get(self : Fd) -> FdStat raise Errno {
-  let buf_ptr = @ffi.malloc(24)
+  let buf = FixedArray::make(24, b'\x00')
+  let buf_ptr = @ffi.byte_array2ptr(buf)
+  defer @ffi.free(buf_ptr)
   let ret = fd_fdstat_get_ffi(self.inner(), buf_ptr)
   let ret = Errno::from_value(ret).unwrap()
   if ret != Success {
-    @ffi.free(buf_ptr)
     raise ret
   }
-  let fs_filetype : FileType = @ffi.load8_u(buf_ptr)
+  let buf = buf.unsafe_reinterpret_as_bytes()
+  let fs_filetype : FileType = buf[0].to_int()
     |> FileType::from_value
     |> Option::unwrap
-  let fs_flags : FdFlags = @ffi.load16_u(buf_ptr + 2)
-  let fs_rights_base : Rights = @ffi.load64_u(buf_ptr + 8)
-  let fs_rights_inheriting : Rights = @ffi.load64_u(buf_ptr + 16)
+  let fs_flags : FdFlags = buf[2:].to_uint16_le().to_uint()
+  let fs_rights_base : Rights = buf[8:].to_uint64_le()
+  let fs_rights_inheriting : Rights = buf[16:].to_uint64_le()
   let buf = FdStat::{
     fs_filetype,
     fs_flags,
     fs_rights_base,
     fs_rights_inheriting,
   }
-  @ffi.free(buf_ptr)
   buf
 }
 
 ///|
 fn fd_fdstat_set_flags_ffi(fd : Int, flags : UInt) -> UInt = "wasi_snapshot_preview1" "fd_fdstat_set_flags"
 
-///| Adjust the flags associated with a file descriptor.
+///|
+/// Adjust the flags associated with a file descriptor.
 /// 
 /// Note: This is similar to `fcntl(fd, F_SETFL, flags)` in POSIX.
 /// 
@@ -314,7 +328,8 @@ fn fd_fdstat_set_rights_ffi(
   fs_rights_inheriting : UInt64,
 ) -> UInt = "wasi_snapshot_preview1" "fd_fdstat_set_rights"
 
-///| Adjust the rights associated with a file descriptor.
+///|
+/// Adjust the rights associated with a file descriptor.
 /// 
 /// This can only be used to remove rights, and returns `errno::notcapable` if called in a way that would attempt to add rights.
 /// 
@@ -338,23 +353,26 @@ pub fn fd_fdstat_set_rights(
 ///|
 fn fd_filestat_get_ffi(fd : Int, buf : Int) -> UInt = "wasi_snapshot_preview1" "fd_filestat_get"
 
-///| Return the attributes of an open file
+///|
+/// Return the attributes of an open file
 pub fn fd_filestat_get(self : Fd) -> FileStat raise Errno {
-  let buf_ptr = @ffi.malloc(24)
+  let buf = FixedArray::make(24, b'\x00')
+  let buf_ptr = @ffi.byte_array2ptr(buf)
+  defer @ffi.free(buf_ptr)
   let ret = fd_filestat_get_ffi(self.inner(), buf_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let dev : Device = @ffi.load64_u(buf_ptr)
-  let ino : Inode = @ffi.load64_u(buf_ptr + 8)
-  let filetype : FileType = @ffi.load8_u(buf_ptr + 16)
+  let buf = buf.unsafe_reinterpret_as_bytes()
+  let dev : Device = buf[0:].to_uint64_le()
+  let ino : Inode = buf[8:].to_uint64_le()
+  let filetype : FileType = buf[16].to_int()
     |> FileType::from_value
     |> Option::unwrap
-  let nlink : LinkCount = @ffi.load64_u(buf_ptr + 24)
-  let size : FileSize = @ffi.load64_u(buf_ptr + 32)
-  let atim : TimeStamp = @ffi.load64_u(buf_ptr + 40)
-  let mtim : TimeStamp = @ffi.load64_u(buf_ptr + 48)
-  let ctim : TimeStamp = @ffi.load64_u(buf_ptr + 56)
+  let nlink : LinkCount = buf[24:].to_uint64_le()
+  let size : FileSize = buf[32:].to_uint64_le()
+  let atim : TimeStamp = buf[40:].to_uint64_le()
+  let mtim : TimeStamp = buf[48:].to_uint64_le()
+  let ctim : TimeStamp = buf[56:].to_uint64_le()
   let buf = FileStat::{ dev, ino, filetype, nlink, size, atim, mtim, ctim }
-  @ffi.free(buf_ptr)
   if ret != Success {
     raise ret
   }
@@ -364,7 +382,8 @@ pub fn fd_filestat_get(self : Fd) -> FileStat raise Errno {
 ///|
 fn fd_filestat_set_size_ffi(ffi : Int, size : UInt64) -> UInt = "wasi_snapshot_preview1" "fd_filestat_set_size"
 
-///| Adjust the size of an open file. If this increases the file's size, the extra bytes are filled with zeros.
+///|
+/// Adjust the size of an open file. If this increases the file's size, the extra bytes are filled with zeros.
 /// 
 /// Note: This is similar to `ftruncate` in POSIX.
 /// 
@@ -385,7 +404,8 @@ fn fd_filestat_set_times_ffi(
   fst_flags : UInt,
 ) -> UInt = "wasi_snapshot_preview1" "fd_filestat_set_times"
 
-///| Adjust the timestamps of an open file or directory.
+///|
+/// Adjust the timestamps of an open file or directory.
 /// 
 /// Note: This is similar to `futimens` in POSIX.
 /// 
@@ -419,7 +439,8 @@ fn fd_pread_ffi(
   nread : Int,
 ) -> UInt = "wasi_snapshot_preview1" "fd_pread"
 
-///| Read from a file descriptor, without using and updating the file descriptor's offset.
+///|
+/// Read from a file descriptor, without using and updating the file descriptor's offset.
 /// 
 /// Note: This is similar to `preadv` in Linux (and other Unix-es).
 pub fn fd_pread(
@@ -428,14 +449,20 @@ pub fn fd_pread(
   offset : FileSize,
 ) -> Size raise Errno {
   let iovs_len = iovs.length()
-  let iovs_ptr = @ffi.malloc(iovs_len * 8)
+  let iovs_data = FixedArray::make(iovs_len * 2, 0)
+  let iovs_ptr = @ffi.int_array2ptr(iovs_data)
+  defer @ffi.free(iovs_ptr)
   for i, byte in iovs {
     let ptr = @ffi.byte_array2ptr(byte)
-    @ffi.store32(iovs_ptr + i * 8, ptr)
-    @ffi.store32(iovs_ptr + i * 8 + 4, byte.length())
-    @ffi.free(ptr)
+    iovs_data[i * 2] = ptr
+    iovs_data[i * 2 + 1] = byte.length()
   }
-  let nread_ptr = @ffi.malloc(4)
+  defer (for i in 0..<iovs_len {
+    @ffi.free(iovs_data[i * 2])
+  })
+  let nread = FixedArray::make(1, 0U)
+  let nread_ptr = @ffi.uint_array2ptr(nread)
+  defer @ffi.free(nread_ptr)
   let ret = fd_pread_ffi(
     self.inner(),
     iovs_ptr,
@@ -444,42 +471,40 @@ pub fn fd_pread(
     nread_ptr,
   )
   let ret = Errno::from_value(ret).unwrap()
-  let nread = @ffi.load32_u(nread_ptr)
-  @ffi.free(nread_ptr)
-  @ffi.free(iovs_ptr)
   if ret != Success {
     raise ret
   }
-  ignore(iovs)
-  nread
+  nread[0]
 }
 
 ///|
 fn fd_prestat_get_ffi(fd : Int, buf : Int) -> UInt = "wasi_snapshot_preview1" "fd_prestat_get"
 
-///| Return a description of the given preopened file descriptor.
+///|
+/// Return a description of the given preopened file descriptor.
 /// 
 /// Note: consider using `fd_prestat_dir_name` directly.
 pub fn fd_prestat_get(self : Fd) -> PreStat raise Errno {
-  let buf_ptr = @ffi.malloc(8)
+  let buf = FixedArray::make(2, 0U)
+  let buf_ptr = @ffi.uint_array2ptr(buf)
+  defer @ffi.free(buf_ptr)
   let ret = fd_prestat_get_ffi(self.inner(), buf_ptr)
   let ret = Errno::from_value(ret).unwrap()
   if ret != Success {
-    @ffi.free(buf_ptr)
     raise ret
   }
   // There's no other possibility of tag...
-  guard @ffi.load8_u(buf_ptr) is 0
-  let size : Size = @ffi.load32_u(buf_ptr + 4)
+  guard buf[0] is 0
+  let size : Size = buf[1]
   let buf = PreStat::Dir(PreStat_dir::{ pr_name_len: size })
-  @ffi.free(buf_ptr)
   buf
 }
 
 ///|
 fn fd_prestat_dir_name_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wasi_snapshot_preview1" "fd_prestat_dir_name"
 
-///| Return a description of the given preopened file descriptor.
+///|
+/// Return a description of the given preopened file descriptor.
 pub fn fd_prestat_dir_name(self : Fd) -> String raise Errno {
   let prestat = self.fd_prestat_get()
   guard prestat is Dir({ pr_name_len: Size(size) })
@@ -501,29 +526,32 @@ pub fn fd_prestat_dir_name(self : Fd) -> String raise Errno {
 ///|
 fn fd_read_ffi(fd : Int, iovs : Int, iovs_len : Int, nread : Int) -> UInt = "wasi_snapshot_preview1" "fd_read"
 
-///| Read from a file descriptor.
+///|
+/// Read from a file descriptor.
 /// 
 /// Note: This is similar to `readv` in POSIX.
 pub fn fd_read(self : Fd, iovs : Array[FixedArray[Byte]]) -> Size raise Errno {
   let iovs_len = iovs.length()
-  let iovs_ptr = @ffi.malloc(iovs_len * 8)
+  let iovs_data = FixedArray::make(iovs_len * 2, 0)
+  let iovs_ptr = @ffi.int_array2ptr(iovs_data)
+  defer @ffi.free(iovs_ptr)
   for i, byte in iovs {
     let ptr = @ffi.byte_array2ptr(byte)
-    @ffi.store32(iovs_ptr + i * 8, ptr)
-    @ffi.store32(iovs_ptr + i * 8 + 4, byte.length())
-    @ffi.free(ptr)
+    iovs_data[i * 2] = ptr
+    iovs_data[i * 2 + 1] = byte.length()
   }
-  let nread_ptr = @ffi.malloc(4)
+  defer (for i in 0..<iovs_len {
+    @ffi.free(iovs_data[i * 2])
+  })
+  let nread = FixedArray::make(1, 0U)
+  let nread_ptr = @ffi.uint_array2ptr(nread)
+  defer @ffi.free(nread_ptr)
   let ret = fd_read_ffi(self.inner(), iovs_ptr, iovs_len, nread_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let nread = @ffi.load32_u(nread_ptr)
-  @ffi.free(nread_ptr)
-  @ffi.free(iovs_ptr)
   if ret != Success {
     raise ret
   }
-  ignore(iovs)
-  nread
+  nread[0]
 }
 
 ///|
@@ -535,7 +563,8 @@ fn fd_readdir_ffi(
   buf_used : Int,
 ) -> UInt = "wasi_snapshot_preview1" "fd_readdir"
 
-///| Read directory entries from a directory.
+///|
+/// Read directory entries from a directory.
 /// When successful, the contents of the output buffer consist of a sequence of
 /// directory entries. Each directory entry consists of a `dirent` object,
 /// followed by `dirent::d_namlen` bytes holding the name of the directory
@@ -554,12 +583,15 @@ fn fd_readdir_ffi(
 /// @return The entries untruncated and whether there's still other entries.
 pub fn fd_readdir(
   self : Fd,
-  cookie~ : DirCookie = DirCookie(0),
-  buffer~ : Bytes = Bytes::make(4096, 0),
+  cookie? : DirCookie = DirCookie(0),
+  buffer? : Bytes = Bytes::make(4096, 0),
 ) -> (Array[(String, DirEnt)], Bool) raise Errno {
   let buf_len = buffer.length()
   let buf_ptr = @ffi.bytes2ptr(buffer)
-  let buf_used_ptr = @ffi.malloc(4)
+  defer @ffi.free(buf_ptr)
+  let buf_used = FixedArray::make(1, 0)
+  let buf_used_ptr = @ffi.int_array2ptr(buf_used)
+  defer @ffi.free(buf_used_ptr)
   let ret = fd_readdir_ffi(
     self.inner(),
     buf_ptr,
@@ -568,9 +600,7 @@ pub fn fd_readdir(
     buf_used_ptr,
   )
   let ret = Errno::from_value(ret).unwrap()
-  let buf_used = @ffi.load32(buf_used_ptr)
-  @ffi.free(buf_used_ptr)
-  @ffi.free(buf_ptr)
+  let buf_used = buf_used[0]
   if ret != Success {
     raise ret
   }
@@ -580,11 +610,11 @@ pub fn fd_readdir(
       // truncated
       break (entries, true)
     }
-    let d_next : DirCookie = @ffi.load64_u(buf_ptr + i)
-    let d_ino : Inode = @ffi.load64_u(buf_ptr + i + 8)
-    let namlen = @ffi.load32(buf_ptr + i + 16)
+    let d_next : DirCookie = buffer[i:].to_uint64_le()
+    let d_ino : Inode = buffer[i + 8:].to_uint64_le()
+    let namlen = buffer[i + 16:].to_int_le()
     let d_namlen : DirNamlen = namlen.reinterpret_as_uint()
-    let d_type : FileType = @ffi.load8_u(buf_ptr + i + 20)
+    let d_type : FileType = buffer[i + 20].to_int()
       |> FileType::from_value
       |> Option::unwrap
     if i + 24 + namlen > buf_used {
@@ -606,7 +636,8 @@ pub fn fd_readdir(
 ///|
 fn fd_renumber_ffi(fd : Int, to : Int) -> UInt = "wasi_snapshot_preview1" "fd_renumber"
 
-///| Atomically replace a file descriptor by renumbering another file descriptor.
+///|
+/// Atomically replace a file descriptor by renumbering another file descriptor.
 ///
 /// Due to the strong focus on thread safety, this environment does not provide
 /// a mechanism to duplicate or renumber a file descriptor to an arbitrary
@@ -632,7 +663,8 @@ fn fd_seek_ffi(
   newoffset : Int,
 ) -> UInt = "wasi_snapshot_preview1" "fd_seek"
 
-///| Move the offset of a file descriptor.
+///|
+/// Move the offset of a file descriptor.
 /// 
 /// Note: This is similar to `lseek` in POSIX.
 /// 
@@ -644,7 +676,9 @@ pub fn fd_seek(
   offset : FileDelta,
   whence : Whence,
 ) -> FileSize raise Errno {
-  let newoffset_ptr = @ffi.malloc(8)
+  let newoffset = FixedArray::make(1, 0UL)
+  let newoffset_ptr = @ffi.uint64_array2ptr(newoffset)
+  defer @ffi.free(newoffset_ptr)
   let ret = fd_seek_ffi(
     self.inner(),
     offset.inner(),
@@ -652,18 +686,17 @@ pub fn fd_seek(
     newoffset_ptr,
   )
   let ret = Errno::from_value(ret).unwrap()
-  let newoffset = @ffi.load64_u(newoffset_ptr)
-  @ffi.free(newoffset_ptr)
   if ret != Success {
     raise ret
   }
-  newoffset
+  newoffset[0]
 }
 
 ///|
 fn fd_sync_ffi(fd : Int) -> UInt = "wasi_snapshot_preview1" "fd_sync"
 
-///| Synchronize the data and metadata of a file to disk.
+///|
+/// Synchronize the data and metadata of a file to disk.
 /// 
 /// Note: This is similar to `fsync` in POSIX.
 pub fn fd_sync(self : Fd) -> Unit raise Errno {
@@ -677,27 +710,29 @@ pub fn fd_sync(self : Fd) -> Unit raise Errno {
 ///|
 fn fd_tell_ffi(fd : Int, newoffset : Int) -> UInt = "wasi_snapshot_preview1" "fd_tell"
 
-///| Return the current offset of a file descriptor.
+///|
+/// Return the current offset of a file descriptor.
 /// 
 /// Note: This is similar to `lseek(fd, 0, SEEK_CUR)` in POSIX.
 /// 
 /// @return The current offset of the file descriptor, relative to the start of the file.
 pub fn fd_tell(self : Fd) -> FileSize raise Errno {
-  let newoffset_ptr = @ffi.malloc(8)
+  let newoffset = FixedArray::make(1, 0UL)
+  let newoffset_ptr = @ffi.uint64_array2ptr(newoffset)
+  defer @ffi.free(newoffset_ptr)
   let ret = fd_tell_ffi(self.inner(), newoffset_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let newoffset = @ffi.load64_u(newoffset_ptr)
-  @ffi.free(newoffset_ptr)
   if ret != Success {
     raise ret
   }
-  newoffset
+  newoffset[0]
 }
 
 ///|
 fn fd_write_ffi(fd : Int, iovs : Int, iovs_len : Int, nwritten : Int) -> UInt = "wasi_snapshot_preview1" "fd_write"
 
-///| Write to a file descriptor.
+///|
+/// Write to a file descriptor.
 /// 
 /// Note: This is similar to `writev` in POSIX.
 /// 
@@ -708,30 +743,34 @@ fn fd_write_ffi(fd : Int, iovs : Int, iovs_len : Int, nwritten : Int) -> UInt = 
 /// Note: it may write less than demanded.
 pub fn fd_write(self : Fd, contents : Array[@bytes.View]) -> Size raise Errno {
   let iovs_len = contents.length()
-  let iovs_ptr = @ffi.malloc(iovs_len * 8)
+  let iovs_data = FixedArray::make(iovs_len * 2, 0)
+  let iovs_ptr = @ffi.int_array2ptr(iovs_data)
+  defer @ffi.free(iovs_ptr)
   for i, byte in contents {
     let ptr = @ffi.bytes2ptr(byte.data())
-    @ffi.store32(iovs_ptr + i * 8, ptr + byte.start_offset())
-    @ffi.store32(iovs_ptr + i * 8 + 4, byte.length())
-    @ffi.free(ptr)
+    iovs_data[i * 2] = ptr + byte.start_offset()
+    iovs_data[i * 2 + 1] = byte.length()
   }
-  let nwritten_ptr = @ffi.malloc(4)
+  defer (for i in 0..<iovs_len {
+    @ffi.free(iovs_data[i * 2])
+  })
+  let nwritten = FixedArray::make(1, 0U)
+  let nwritten_ptr = @ffi.uint_array2ptr(nwritten)
+  defer @ffi.free(nwritten_ptr)
   let ret = fd_write_ffi(self.inner(), iovs_ptr, iovs_len, nwritten_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let nwritten = @ffi.load32_u(nwritten_ptr)
-  @ffi.free(nwritten_ptr)
-  @ffi.free(iovs_ptr)
   ignore(contents)
   if ret != Success {
     raise ret
   }
-  nwritten
+  nwritten[0]
 }
 
 ///|
 fn path_create_directory_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wasi_snapshot_preview1" "path_create_directory"
 
-///| Create a directory.
+///|
+/// Create a directory.
 /// 
 /// Note: This is similar to `mkdirat` in POSIX.
 /// 
@@ -757,7 +796,8 @@ fn path_filestat_get_ffi(
   buf : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_filestat_get"
 
-///| Return the attributes of a file or directory.
+///|
+/// Return the attributes of a file or directory.
 /// 
 /// Note: This is similar to `stat` in POSIX.
 /// 
@@ -771,7 +811,10 @@ pub fn path_filestat_get(
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
-  let buf_ptr = @ffi.malloc(24)
+  defer @ffi.free(path_ptr)
+  let buf = FixedArray::make(8, 0UL)
+  let buf_ptr = @ffi.uint64_array2ptr(buf)
+  defer @ffi.free(buf_ptr)
   let ret = path_filestat_get_ffi(
     self.inner(),
     flags.inner(),
@@ -780,23 +823,20 @@ pub fn path_filestat_get(
     buf_ptr,
   )
   let ret = Errno::from_value(ret).unwrap()
-  @ffi.free(path_ptr)
   if ret != Success {
-    @ffi.free(buf_ptr)
     raise ret
   }
-  let dev : Device = @ffi.load64_u(buf_ptr)
-  let ino : Inode = @ffi.load64_u(buf_ptr + 8)
-  let filetype : FileType = @ffi.load8_u(buf_ptr + 16)
+  let dev : Device = buf[0]
+  let ino : Inode = buf[1]
+  let filetype : FileType = buf[2].to_int()
     |> FileType::from_value
     |> Option::unwrap
-  let nlink : LinkCount = @ffi.load64_u(buf_ptr + 24)
-  let size : FileSize = @ffi.load64_u(buf_ptr + 32)
-  let atim : TimeStamp = @ffi.load64_u(buf_ptr + 40)
-  let mtim : TimeStamp = @ffi.load64_u(buf_ptr + 48)
-  let ctim : TimeStamp = @ffi.load64_u(buf_ptr + 56)
+  let nlink : LinkCount = buf[3]
+  let size : FileSize = buf[4]
+  let atim : TimeStamp = buf[5]
+  let mtim : TimeStamp = buf[6]
+  let ctim : TimeStamp = buf[7]
   let buf = FileStat::{ dev, ino, filetype, nlink, size, atim, mtim, ctim }
-  @ffi.free(buf_ptr)
   buf
 }
 
@@ -811,7 +851,8 @@ fn path_filestat_set_times_ffi(
   fst_flags : UInt,
 ) -> UInt = "wasi_snapshot_preview1" "path_filestat_set_times"
 
-///| Adjust the timestamps of a file or directory.
+///|
+/// Adjust the timestamps of a file or directory.
 /// 
 /// Note: This is similar to `utimensat` in POSIX.
 /// 
@@ -831,6 +872,7 @@ pub fn path_filestat_set_times(
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
+  defer @ffi.free(path_ptr)
   let ret = path_filestat_set_times_ffi(
     self.inner(),
     flags.inner(),
@@ -841,7 +883,6 @@ pub fn path_filestat_set_times(
     fst_flags.inner(),
   )
   let ret = Errno::from_value(ret).unwrap()
-  @ffi.free(path_ptr)
   if ret != Success {
     raise ret
   }
@@ -858,7 +899,8 @@ fn path_link_ffi(
   new_path_len : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_link"
 
-///| Create a hard link.
+///|
+/// Create a hard link.
 /// 
 /// Note: This is similar to `linkat` in POSIX.
 /// 
@@ -876,9 +918,11 @@ pub fn path_link(
   let old_path_bytes = old_path |> @encoding.encode(encoding=UTF8)
   let old_path_len = old_path_bytes.length()
   let old_path_ptr = @ffi.bytes2ptr(old_path_bytes)
+  defer @ffi.free(old_path_ptr)
   let new_path_bytes = new_path |> @encoding.encode(encoding=UTF8)
   let new_path_len = new_path_bytes.length()
   let new_path_ptr = @ffi.bytes2ptr(new_path_bytes)
+  defer @ffi.free(new_path_ptr)
   let ret = path_link_ffi(
     self.inner(),
     old_flags.inner(),
@@ -889,8 +933,6 @@ pub fn path_link(
     new_path_len,
   )
   let ret = Errno::from_value(ret).unwrap()
-  @ffi.free(old_path_ptr)
-  @ffi.free(new_path_ptr)
   if ret != Success {
     raise ret
   }
@@ -909,7 +951,8 @@ fn path_open_ffi(
   fd : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_open"
 
-///| Open a file or directory.
+///|
+/// Open a file or directory.
 /// 
 /// The returned file descriptor is not guaranteed to be the lowest-numbered
 /// file descriptor not currently open; it is randomized to prevent
@@ -945,7 +988,10 @@ pub fn path_open(
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
-  let fd_ptr = @ffi.malloc(4)
+  defer @ffi.free(path_ptr)
+  let fd = FixedArray::make(1, 0)
+  let fd_ptr = @ffi.int_array2ptr(fd)
+  defer @ffi.free(fd_ptr)
   let ret = path_open_ffi(
     self.inner(),
     dirflags.inner(),
@@ -958,13 +1004,10 @@ pub fn path_open(
     fd_ptr,
   )
   let ret = Errno::from_value(ret).unwrap()
-  @ffi.free(path_ptr)
-  let fd = @ffi.load32(fd_ptr)
-  @ffi.free(fd_ptr)
   if ret != Success {
     raise ret
   }
-  Fd(fd)
+  Fd(fd[0])
 }
 
 ///|
@@ -977,7 +1020,8 @@ fn path_readlink_ffi(
   buf_used : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_readlink"
 
-///| Read the contents of a symbolic link.
+///|
+/// Read the contents of a symbolic link.
 /// 
 /// Note: This is similar to `readlinkat` in POSIX. If `buf` is not large
 /// enough to store the contents of the link, the first `buf_len` bytes will be
@@ -985,14 +1029,18 @@ fn path_readlink_ffi(
 pub fn path_readlink(
   self : Fd,
   path : String,
-  buffer~ : FixedArray[Byte] = FixedArray::make(4096, 0),
+  buffer? : FixedArray[Byte] = FixedArray::make(4096, 0),
 ) -> Size raise Errno {
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
+  defer @ffi.free(path_ptr)
   let buf_len = buffer.length()
   let buf_ptr = @ffi.byte_array2ptr(buffer)
-  let buf_used_ptr = @ffi.malloc(4)
+  defer @ffi.free(buf_ptr)
+  let buf_used = FixedArray::make(1, 0U)
+  let buf_used_ptr = @ffi.uint_array2ptr(buf_used)
+  defer @ffi.free(buf_used_ptr)
   let ret = path_readlink_ffi(
     self.inner(),
     path_ptr,
@@ -1002,20 +1050,17 @@ pub fn path_readlink(
     buf_used_ptr,
   )
   let ret = Errno::from_value(ret).unwrap()
-  let buf_used = @ffi.load32_u(buf_used_ptr)
-  @ffi.free(buf_used_ptr)
-  @ffi.free(path_ptr)
-  @ffi.free(buf_ptr)
   if ret != Success {
     raise ret
   }
-  buf_used
+  buf_used[0]
 }
 
 ///|
 fn path_remove_directory_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wasi_snapshot_preview1" "path_remove_directory"
 
-///| Remove a directory.
+///|
+/// Remove a directory.
 /// 
 /// Return `errno::notempty` if the directory is not empty.
 /// 
@@ -1024,9 +1069,9 @@ pub fn path_remove_directory(self : Fd, path : String) -> Unit raise Errno {
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
+  defer @ffi.free(path_ptr)
   let ret = path_remove_directory_ffi(self.inner(), path_ptr, path_len)
   let ret = Errno::from_value(ret).unwrap()
-  @ffi.free(path_ptr)
   if ret != Success {
     raise ret
   }
@@ -1042,7 +1087,8 @@ fn path_rename_ffi(
   new_path_len : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_rename"
 
-///| Rename a file or directory.
+///|
+/// Rename a file or directory.
 /// 
 /// Note: This is similar to `renameat` in POSIX.
 /// 
@@ -1058,9 +1104,11 @@ pub fn path_rename(
   let old_path_bytes = old_path |> @encoding.encode(encoding=UTF8)
   let old_path_len = old_path_bytes.length()
   let old_path_ptr = @ffi.bytes2ptr(old_path_bytes)
+  defer @ffi.free(old_path_ptr)
   let new_path_bytes = new_path |> @encoding.encode(encoding=UTF8)
   let new_path_len = new_path_bytes.length()
   let new_path_ptr = @ffi.bytes2ptr(new_path_bytes)
+  defer @ffi.free(new_path_ptr)
   let ret = path_rename_ffi(
     self.inner(),
     old_path_ptr,
@@ -1070,8 +1118,6 @@ pub fn path_rename(
     new_path_len,
   )
   let ret = Errno::from_value(ret).unwrap()
-  @ffi.free(old_path_ptr)
-  @ffi.free(new_path_ptr)
   if ret != Success {
     raise ret
   }
@@ -1086,7 +1132,8 @@ fn path_symlink_ffi(
   new_path_len : Int,
 ) -> UInt = "wasi_snapshot_preview1" "path_symlink"
 
-///| Create a symbolic link.
+///|
+/// Create a symbolic link.
 /// 
 /// Note: This is similar to `symlinkat` in POSIX.
 pub fn path_symlink(
@@ -1097,9 +1144,11 @@ pub fn path_symlink(
   let old_path_bytes = old_path |> @encoding.encode(encoding=UTF8)
   let old_path_len = old_path_bytes.length()
   let old_path_ptr = @ffi.bytes2ptr(old_path_bytes)
+  defer @ffi.free(old_path_ptr)
   let new_path_bytes = new_path |> @encoding.encode(encoding=UTF8)
   let new_path_len = new_path_bytes.length()
   let new_path_ptr = @ffi.bytes2ptr(new_path_bytes)
+  defer @ffi.free(new_path_ptr)
   let ret = path_symlink_ffi(
     old_path_ptr,
     old_path_len,
@@ -1108,8 +1157,6 @@ pub fn path_symlink(
     new_path_len,
   )
   let ret = Errno::from_value(ret).unwrap()
-  @ffi.free(old_path_ptr)
-  @ffi.free(new_path_ptr)
   if ret != Success {
     raise ret
   }
@@ -1118,7 +1165,8 @@ pub fn path_symlink(
 ///|
 fn path_unlink_file_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wasi_snapshot_preview1" "path_unlink_file"
 
-///| Unlink a file.
+///|
+/// Unlink a file.
 /// 
 /// Return `errno::isdir` if the path refers to a directory.
 /// 
@@ -1143,7 +1191,8 @@ fn poll_oneoff_ffi(
   nevents : Int,
 ) -> UInt = "wasi_snapshot_preview1" "poll_oneoff"
 
-///| Concurrently poll for the occurrence of a set of events.
+///|
+/// Concurrently poll for the occurrence of a set of events.
 /// 
 /// If `nsubscriptions` is 0, returns `errno::inval`.
 /// 
@@ -1151,60 +1200,62 @@ fn poll_oneoff_ffi(
 /// @return The events that have occurred.
 pub fn poll_oneoff(in_ : Array[Subscription]) -> Array[Event] raise Errno {
   let nsubscriptions = in_.length()
-  let in_ptr = @ffi.malloc(nsubscriptions * 48)
-  let out_ptr = @ffi.malloc(nsubscriptions * 32)
+  let in_buf = FixedArray::make(nsubscriptions * 6, 0UL)
+  let in_ptr = @ffi.uint64_array2ptr(in_buf)
+  defer @ffi.free(in_ptr)
+  let out_buf = FixedArray::make(nsubscriptions * 4, 0UL)
+  let out_ptr = @ffi.uint64_array2ptr(out_buf)
+  defer @ffi.free(out_ptr)
   for i, sub in in_ {
-    @ffi.store64_u(in_ptr + i * 48, sub.userdata.inner())
+    in_buf[i * 6] = sub.userdata.inner()
     match sub.u {
       Clock({ id, timeout, precision, flags }) => {
-        @ffi.store32(in_ptr + i * 48 + 8, 0)
-        @ffi.store32_u(in_ptr + i * 48 + 8 + 8 + 0, id.value())
-        @ffi.store64_u(in_ptr + i * 48 + 8 + 8 + 8, timeout.inner())
-        @ffi.store64_u(in_ptr + i * 48 + 8 + 8 + 16, precision.inner())
-        @ffi.store32_u(in_ptr + i * 48 + 8 + 8 + 24, flags.inner())
+        in_buf[i * 6 + 1] = 0
+        in_buf[i * 6 + 2] = id.value().to_uint64()
+        in_buf[i * 6 + 3] = timeout.inner()
+        in_buf[i * 6 + 4] = precision.inner()
+        in_buf[i * 6 + 5] = flags.inner().to_uint64()
       }
       Fd_read({ file_descriptor }) => {
-        @ffi.store32(in_ptr + i * 48 + 8, 1)
-        @ffi.store32(in_ptr + i * 48 + 12, file_descriptor.inner())
+        in_buf[i * 6 + 1] = 1
+        in_buf[i * 6 + 2] = file_descriptor.inner().to_uint64()
       }
       Fd_write({ file_descriptor }) => {
-        @ffi.store32(in_ptr + i * 48 + 8, 2)
-        @ffi.store32(in_ptr + i * 48 + 12, file_descriptor.inner())
+        in_buf[i * 6 + 1] = 2
+        in_buf[i * 6 + 2] = file_descriptor.inner().to_uint64()
       }
     }
   }
-  let nevents_ptr = @ffi.malloc(4)
+  let nevents = FixedArray::make(1, 0)
+  let nevents_ptr = @ffi.int_array2ptr(nevents)
+  defer @ffi.free(nevents_ptr)
   let ret = poll_oneoff_ffi(in_ptr, out_ptr, nsubscriptions, nevents_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let nevents = @ffi.load32(nevents_ptr)
-  @ffi.free(nevents_ptr)
-  @ffi.free(in_ptr)
   if ret != Success {
-    @ffi.free(out_ptr)
     raise ret
   }
   let events = []
-  for i in 0..<nevents {
-    let userdata : Userdata = @ffi.load64_u(out_ptr + i * 32)
-    let errno : Errno = @ffi.load16_u(out_ptr + i * 32 + 8)
+  for i in 0..<nevents[0] {
+    let userdata : Userdata = out_buf[i * 4]
+    let errno : Errno = (out_buf[i * 4 + 1] & 0xFFFF).to_uint()
       |> Errno::from_value
       |> Option::unwrap
-    let type_ : EventType = @ffi.load16_u(out_ptr + i * 32 + 10)
+    let type_ : EventType = (out_buf[i * 4 + 1] >> 16).to_uint()
       |> EventType::from_value
       |> Option::unwrap
-    let nbytes : FileSize = @ffi.load64_u(out_ptr + i * 32 + 16)
-    let flags : EventRWFlags = @ffi.load32_u(out_ptr + i * 32 + 16 + 8)
+    let nbytes : FileSize = out_buf[i * 4 + 2]
+    let flags : EventRWFlags = out_buf[i * 4 + 3].to_uint()
     let fd_readwrite : Event_fd_readwrite = { nbytes, flags }
     events.push(Event::{ userdata, error: errno, type_, fd_readwrite })
   }
-  @ffi.free(out_ptr)
   events
 }
 
 ///|
 fn proc_exit_ffi(rval : UInt) = "wasi_snapshot_preview1" "proc_exit"
 
-///| Terminate the process normally. An exit code of 0 indicates successful
+///|
+/// Terminate the process normally. An exit code of 0 indicates successful
 /// termination of the program. The meanings of other values is dependent on
 /// the environment.
 /// 
@@ -1218,7 +1269,8 @@ pub fn proc_exit(rval : UInt) -> Unit {
 ///|
 fn proc_raise_ffi(sig : UInt) -> UInt = "wasi_snapshot_preview1" "proc_raise"
 
-///| Send a signal to the process of the calling thread.
+///|
+/// Send a signal to the process of the calling thread.
 /// 
 /// Note: This is similar to `raise` in POSIX.
 /// 
@@ -1234,7 +1286,8 @@ pub fn proc_raise(sig : Signal) -> Unit raise Errno {
 ///|
 fn sched_yield_ffi() -> UInt = "wasi_snapshot_preview1" "sched_yield"
 
-///| Temporarily yield execution of the calling thread.
+///|
+/// Temporarily yield execution of the calling thread.
 /// 
 /// Note: This is similar to `sched_yield` in POSIX.
 pub fn sched_yield() -> Unit raise Errno {
@@ -1248,7 +1301,8 @@ pub fn sched_yield() -> Unit raise Errno {
 ///|
 fn random_get_ffi(buf : Int, buf_len : Int) -> UInt = "wasi_snapshot_preview1" "random_get"
 
-///| Write high-quality random data into a buffer.
+///|
+/// Write high-quality random data into a buffer.
 /// 
 /// This function blocks when the implementaiton is unable to immediately
 /// provide sufficient high-quality random data.
@@ -1270,7 +1324,8 @@ pub fn random_get(buf : FixedArray[Byte]) -> Unit raise Errno {
 ///|
 fn sock_accept_ffi(sock : Int, flags : UInt, fd : Int) -> UInt = "wasi_snapshot_preview1" "sock_accept"
 
-///| Accept a new incoming connection on a socket.
+///|
+/// Accept a new incoming connection on a socket.
 /// 
 /// Note: This is similar to `accept` in POSIX.
 /// 
@@ -1278,15 +1333,15 @@ fn sock_accept_ffi(sock : Int, flags : UInt, fd : Int) -> UInt = "wasi_snapshot_
 /// @param `flags` The desired values of the file descriptor flags.  
 /// @return New socket connection.
 pub fn sock_accept(self : Fd, flags : FdFlags) -> Fd raise Errno {
-  let fd_ptr = @ffi.malloc(4)
+  let fd = FixedArray::make(1, 0)
+  let fd_ptr = @ffi.int_array2ptr(fd)
+  defer @ffi.free(fd_ptr)
   let ret = sock_accept_ffi(self.inner(), flags.inner(), fd_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let fd = @ffi.load32(fd_ptr)
-  @ffi.free(fd_ptr)
   if ret != Success {
     raise ret
   }
-  Fd(fd)
+  Fd(fd[0])
 }
 
 ///|
@@ -1299,7 +1354,8 @@ fn sock_recv_ffi(
   ro_flags : Int,
 ) -> UInt = "wasi_snapshot_preview1" "sock_recv"
 
-///| Receive a message from a socket.
+///|
+/// Receive a message from a socket.
 /// 
 /// Note: This is similar to `recv` in POSIX, though it also supports reading
 /// the data into multiple buffers in the manner of `readv`.
@@ -1313,34 +1369,33 @@ pub fn sock_recv(
   flags : RiFlags,
 ) -> (Size, RoFlags) raise Errno {
   let ri_data_len = contents.length()
-  let ri_data_ptr = @ffi.malloc(ri_data_len * 8)
+  let ri_data = FixedArray::make(ri_data_len * 2, 0)
+  let ri_data_ptr = @ffi.int_array2ptr(ri_data)
+  defer @ffi.free(ri_data_ptr)
   for i, byte in contents {
     let ptr = @ffi.byte_array2ptr(byte)
-    @ffi.store32(ri_data_ptr + i * 8, ptr)
-    @ffi.store32(ri_data_ptr + i * 8 + 4, byte.length())
-    @ffi.free(ptr)
+    ri_data[i * 2] = ptr
+    ri_data[i * 2 + 1] = byte.length()
   }
-  let ro_flags_ptr = @ffi.malloc(4)
-  let size_ptr = @ffi.malloc(4)
+  defer (for i in 0..<ri_data_len {
+    @ffi.free(ri_data[i * 2])
+  })
+  let return_area = FixedArray::make(2, 0U)
+  let return_area_ptr = @ffi.uint_array2ptr(return_area)
+  defer @ffi.free(return_area_ptr)
   let ret = sock_recv_ffi(
     self.inner(),
     ri_data_ptr,
     ri_data_len,
     flags.inner(),
-    size_ptr,
-    ro_flags_ptr,
+    return_area_ptr,
+    return_area_ptr + 4,
   )
   let ret = Errno::from_value(ret).unwrap()
-  let size = @ffi.load32_u(size_ptr)
-  let ro_flags = @ffi.load32_u(ro_flags_ptr)
-  @ffi.free(size_ptr)
-  @ffi.free(ro_flags_ptr)
-  @ffi.free(ri_data_ptr)
-  ignore(contents)
   if ret != Success {
     raise ret
   }
-  (size, ro_flags)
+  (return_area[0], return_area[1])
 }
 
 ///|
@@ -1352,7 +1407,8 @@ fn sock_send_ffi(
   size : Int,
 ) -> UInt = "wasi_snapshot_preview1" "sock_send"
 
-///| Send a message on a socket.
+///|
+/// Send a message on a socket.
 /// 
 /// Note: This is similar to `send` in POSIX, though it also supports writing
 /// the data from multiple buffers in the manner of `writev`.
@@ -1366,14 +1422,20 @@ pub fn sock_send(
   flags : SiFlags,
 ) -> Size raise Errno {
   let si_data_len = contents.length()
-  let si_data_ptr = @ffi.malloc(si_data_len * 8)
+  let si_data = FixedArray::make(si_data_len * 2, 0)
+  let si_data_ptr = @ffi.int_array2ptr(si_data)
+  defer @ffi.free(si_data_ptr)
   for i, byte in contents {
     let ptr = @ffi.bytes2ptr(byte.data())
-    @ffi.store32(si_data_ptr + i * 8, ptr + byte.start_offset())
-    @ffi.store32(si_data_ptr + i * 8 + 4, byte.length())
-    @ffi.free(ptr)
+    si_data[i * 2] = ptr + byte.start_offset()
+    si_data[i * 2 + 1] = byte.length()
   }
-  let size_ptr = @ffi.malloc(4)
+  defer (for i in 0..<si_data_len {
+    @ffi.free(si_data[i * 2])
+  })
+  let size = FixedArray::make(1, 0U)
+  let size_ptr = @ffi.uint_array2ptr(size)
+  defer @ffi.free(size_ptr)
   let ret = sock_send_ffi(
     self.inner(),
     si_data_ptr,
@@ -1382,20 +1444,17 @@ pub fn sock_send(
     size_ptr,
   )
   let ret = Errno::from_value(ret).unwrap()
-  let size = @ffi.load32_u(size_ptr)
-  @ffi.free(size_ptr)
-  @ffi.free(si_data_ptr)
-  ignore(contents)
   if ret != Success {
     raise ret
   }
-  size
+  size[0]
 }
 
 ///|
 fn sock_shutdown_ffi(sock : Int, how : UInt) -> UInt = "wasi_snapshot_preview1" "sock_shutdown"
 
-///| Shut down socket send and receive channels.
+///|
+/// Shut down socket send and receive channels.
 /// 
 /// Note: This is similar to `shutdown` in POSIX.
 /// 

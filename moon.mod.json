@@ -8,5 +8,6 @@
   "license": "Apache-2.0",
   "exclude": [
     "test"
-  ]
+  ],
+  "preferred-target": "wasm"
 }

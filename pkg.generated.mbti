@@ -1,10 +1,6 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "peter-jerry-ye/wasi"
 
-import(
-  "moonbitlang/core/bytes"
-)
-
 // Values
 fn args_get() -> Array[String] raise Errno
 
@@ -242,7 +238,7 @@ fn Fd::fd_renumber(Self, Self) -> Unit raise Errno
 fn Fd::fd_seek(Self, FileDelta, Whence) -> FileSize raise Errno
 fn Fd::fd_sync(Self) -> Unit raise Errno
 fn Fd::fd_tell(Self) -> FileSize raise Errno
-fn Fd::fd_write(Self, Array[@bytes.View]) -> Size raise Errno
+fn Fd::fd_write(Self, Array[BytesView]) -> Size raise Errno
 fn Fd::inner(Self) -> Int
 fn Fd::path_create_directory(Self, String) -> Unit raise Errno
 fn Fd::path_filestat_get(Self, LookupFlags, String) -> FileStat raise Errno
@@ -255,7 +251,7 @@ fn Fd::path_rename(Self, String, Self, String) -> Unit raise Errno
 fn Fd::path_unlink_file(Self, String) -> Unit raise Errno
 fn Fd::sock_accept(Self, FdFlags) -> Self raise Errno
 fn Fd::sock_recv(Self, Array[FixedArray[Byte]], RiFlags) -> (Size, RoFlags) raise Errno
-fn Fd::sock_send(Self, Array[@bytes.View], SiFlags) -> Size raise Errno
+fn Fd::sock_send(Self, Array[BytesView], SiFlags) -> Size raise Errno
 fn Fd::sock_shutdown(Self, SdFlags) -> Unit raise Errno
 impl Eq for Fd
 impl Show for Fd

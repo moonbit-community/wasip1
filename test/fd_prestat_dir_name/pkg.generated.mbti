@@ -1,7 +1,10 @@
+// Generated using `moon info`, DON'T EDIT IT
 package "peter-jerry-ye/wasi-test/fd_prestat_dir_name"
 
 // Values
 fn start() -> Unit
+
+// Errors
 
 // Types and methods
 

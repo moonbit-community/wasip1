@@ -4,7 +4,7 @@
     "@std/testing": "jsr:@std/testing@^1.0.3"
   },
   "tasks": {
-    "test:build": "moon build --source-dir test --target wasm --debug",
+    "test:build": "moon build --source-dir test --debug",
     "test": "deno test -A test.ts"
   }
 }

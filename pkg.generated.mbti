@@ -108,7 +108,12 @@ pub(all) suberror Errno {
   Xdev
   Notcapable
 }
+fn Errno::equal(Self, Self) -> Bool // from trait `Eq`
 fn Errno::from_value(UInt) -> Self?
+#deprecated
+fn Errno::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Errno::output(Self, &Logger) -> Unit // from trait `Show`
+fn Errno::to_string(Self) -> String // from trait `Show`
 fn Errno::value(Self) -> UInt
 impl Eq for Errno
 impl Show for Errno
@@ -122,7 +127,12 @@ pub(all) enum Advice {
   Dontneed
   Noreuse
 }
+fn Advice::equal(Self, Self) -> Bool // from trait `Eq`
 fn Advice::from_value(UInt) -> Self?
+#deprecated
+fn Advice::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Advice::output(Self, &Logger) -> Unit // from trait `Show`
+fn Advice::to_string(Self) -> String // from trait `Show`
 fn Advice::value(Self) -> UInt
 impl Eq for Advice
 impl Show for Advice
@@ -131,6 +141,11 @@ pub(all) struct CIOVec {
   buf : Int
   buf_len : Size
 }
+fn CIOVec::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn CIOVec::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn CIOVec::output(Self, &Logger) -> Unit // from trait `Show`
+fn CIOVec::to_string(Self) -> String // from trait `Show`
 impl Eq for CIOVec
 impl Show for CIOVec
 
@@ -142,18 +157,35 @@ pub(all) enum ClockId {
 }
 fn ClockId::clock_res_get(Self) -> TimeStamp raise Errno
 fn ClockId::clock_time_get(Self, TimeStamp) -> TimeStamp raise Errno
+fn ClockId::equal(Self, Self) -> Bool // from trait `Eq`
 fn ClockId::from_value(UInt) -> Self?
+#deprecated
+fn ClockId::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn ClockId::output(Self, &Logger) -> Unit // from trait `Show`
+fn ClockId::to_string(Self) -> String // from trait `Show`
 fn ClockId::value(Self) -> UInt
 impl Eq for ClockId
 impl Show for ClockId
 
 pub(all) struct Device(UInt64)
+fn Device::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn Device::inner(Self) -> UInt64
+#deprecated
+fn Device::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Device::output(Self, &Logger) -> Unit // from trait `Show`
+fn Device::to_string(Self) -> String // from trait `Show`
 impl Eq for Device
 impl Show for Device
 
 pub(all) struct DirCookie(UInt64)
+fn DirCookie::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn DirCookie::inner(Self) -> UInt64
+#deprecated
+fn DirCookie::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn DirCookie::output(Self, &Logger) -> Unit // from trait `Show`
+fn DirCookie::to_string(Self) -> String // from trait `Show`
 impl Eq for DirCookie
 impl Show for DirCookie
 
@@ -163,11 +195,22 @@ pub(all) struct DirEnt {
   d_namlen : DirNamlen
   d_type : FileType
 }
+fn DirEnt::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn DirEnt::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn DirEnt::output(Self, &Logger) -> Unit // from trait `Show`
+fn DirEnt::to_string(Self) -> String // from trait `Show`
 impl Eq for DirEnt
 impl Show for DirEnt
 
 pub(all) struct DirNamlen(UInt)
+fn DirNamlen::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn DirNamlen::inner(Self) -> UInt
+#deprecated
+fn DirNamlen::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn DirNamlen::output(Self, &Logger) -> Unit // from trait `Show`
+fn DirNamlen::to_string(Self) -> String // from trait `Show`
 impl Eq for DirNamlen
 impl Show for DirNamlen
 
@@ -177,21 +220,37 @@ pub(all) struct Event {
   type_ : EventType
   fd_readwrite : Event_fd_readwrite
 }
+fn Event::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn Event::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Event::output(Self, &Logger) -> Unit // from trait `Show`
+fn Event::to_string(Self) -> String // from trait `Show`
 impl Eq for Event
 impl Show for Event
 
 pub(all) enum EventRWFlag {
   Fd_readwrite_hangup
 }
+fn EventRWFlag::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn EventRWFlag::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn EventRWFlag::output(Self, &Logger) -> Unit // from trait `Show`
+fn EventRWFlag::to_string(Self) -> String // from trait `Show`
 fn EventRWFlag::value(Self) -> UInt
 impl Eq for EventRWFlag
 impl Show for EventRWFlag
 
 pub(all) struct EventRWFlags(UInt)
+fn EventRWFlags::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn EventRWFlags::inner(Self) -> UInt
 fn EventRWFlags::is_set(Self, EventRWFlag) -> Bool
 fn EventRWFlags::new() -> Self
+#deprecated
+fn EventRWFlags::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn EventRWFlags::output(Self, &Logger) -> Unit // from trait `Show`
 fn EventRWFlags::set(Self, EventRWFlag) -> Self
+fn EventRWFlags::to_string(Self) -> String // from trait `Show`
 fn EventRWFlags::unset(Self, EventRWFlag) -> Self
 impl Eq for EventRWFlags
 impl Show for EventRWFlags
@@ -201,7 +260,12 @@ pub(all) enum EventType {
   Fd_read
   Fd_write
 }
+fn EventType::equal(Self, Self) -> Bool // from trait `Eq`
 fn EventType::from_value(UInt) -> Self?
+#deprecated
+fn EventType::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn EventType::output(Self, &Logger) -> Unit // from trait `Show`
+fn EventType::to_string(Self) -> String // from trait `Show`
 fn EventType::value(Self) -> UInt
 impl Eq for EventType
 impl Show for EventType
@@ -210,15 +274,27 @@ pub(all) struct Event_fd_readwrite {
   nbytes : FileSize
   flags : EventRWFlags
 }
+fn Event_fd_readwrite::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn Event_fd_readwrite::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Event_fd_readwrite::output(Self, &Logger) -> Unit // from trait `Show`
+fn Event_fd_readwrite::to_string(Self) -> String // from trait `Show`
 impl Eq for Event_fd_readwrite
 impl Show for Event_fd_readwrite
 
 pub(all) struct ExitCode(UInt)
+fn ExitCode::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn ExitCode::inner(Self) -> UInt
+#deprecated
+fn ExitCode::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn ExitCode::output(Self, &Logger) -> Unit // from trait `Show`
+fn ExitCode::to_string(Self) -> String // from trait `Show`
 impl Eq for ExitCode
 impl Show for ExitCode
 
 pub(all) struct Fd(Int)
+fn Fd::equal(Self, Self) -> Bool // from trait `Eq`
 fn Fd::fd_advise(Self, FileSize, FileSize, Advice) -> Unit raise Errno
 fn Fd::fd_allocate(Self, FileSize, FileSize) -> Unit raise Errno
 fn Fd::fd_close(Self) -> Unit raise Errno
@@ -239,7 +315,11 @@ fn Fd::fd_seek(Self, FileDelta, Whence) -> FileSize raise Errno
 fn Fd::fd_sync(Self) -> Unit raise Errno
 fn Fd::fd_tell(Self) -> FileSize raise Errno
 fn Fd::fd_write(Self, Array[BytesView]) -> Size raise Errno
+#deprecated
 fn Fd::inner(Self) -> Int
+#deprecated
+fn Fd::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Fd::output(Self, &Logger) -> Unit // from trait `Show`
 fn Fd::path_create_directory(Self, String) -> Unit raise Errno
 fn Fd::path_filestat_get(Self, LookupFlags, String) -> FileStat raise Errno
 fn Fd::path_filestat_set_times(Self, LookupFlags, String, TimeStamp, TimeStamp, FstFlags) -> Unit raise Errno
@@ -253,6 +333,7 @@ fn Fd::sock_accept(Self, FdFlags) -> Self raise Errno
 fn Fd::sock_recv(Self, Array[FixedArray[Byte]], RiFlags) -> (Size, RoFlags) raise Errno
 fn Fd::sock_send(Self, Array[BytesView], SiFlags) -> Size raise Errno
 fn Fd::sock_shutdown(Self, SdFlags) -> Unit raise Errno
+fn Fd::to_string(Self) -> String // from trait `Show`
 impl Eq for Fd
 impl Show for Fd
 
@@ -263,15 +344,26 @@ pub(all) enum FdFlag {
   Rsync
   Sync
 }
+fn FdFlag::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn FdFlag::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn FdFlag::output(Self, &Logger) -> Unit // from trait `Show`
+fn FdFlag::to_string(Self) -> String // from trait `Show`
 fn FdFlag::value(Self) -> UInt
 impl Eq for FdFlag
 impl Show for FdFlag
 
 pub(all) struct FdFlags(UInt)
+fn FdFlags::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn FdFlags::inner(Self) -> UInt
 fn FdFlags::is_set(Self, FdFlag) -> Bool
 fn FdFlags::new() -> Self
+#deprecated
+fn FdFlags::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn FdFlags::output(Self, &Logger) -> Unit // from trait `Show`
 fn FdFlags::set(Self, FdFlag) -> Self
+fn FdFlags::to_string(Self) -> String // from trait `Show`
 fn FdFlags::unset(Self, FdFlag) -> Self
 impl Eq for FdFlags
 impl Show for FdFlags
@@ -282,16 +374,33 @@ pub(all) struct FdStat {
   fs_rights_base : Rights
   fs_rights_inheriting : Rights
 }
+fn FdStat::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn FdStat::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn FdStat::output(Self, &Logger) -> Unit // from trait `Show`
+fn FdStat::to_string(Self) -> String // from trait `Show`
 impl Eq for FdStat
 impl Show for FdStat
 
 pub(all) struct FileDelta(Int64)
+fn FileDelta::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn FileDelta::inner(Self) -> Int64
+#deprecated
+fn FileDelta::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn FileDelta::output(Self, &Logger) -> Unit // from trait `Show`
+fn FileDelta::to_string(Self) -> String // from trait `Show`
 impl Eq for FileDelta
 impl Show for FileDelta
 
 pub(all) struct FileSize(UInt64)
+fn FileSize::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn FileSize::inner(Self) -> UInt64
+#deprecated
+fn FileSize::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn FileSize::output(Self, &Logger) -> Unit // from trait `Show`
+fn FileSize::to_string(Self) -> String // from trait `Show`
 impl Eq for FileSize
 impl Show for FileSize
 
@@ -305,6 +414,11 @@ pub(all) struct FileStat {
   mtim : TimeStamp
   ctim : TimeStamp
 }
+fn FileStat::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn FileStat::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn FileStat::output(Self, &Logger) -> Unit // from trait `Show`
+fn FileStat::to_string(Self) -> String // from trait `Show`
 impl Eq for FileStat
 impl Show for FileStat
 
@@ -318,7 +432,12 @@ pub(all) enum FileType {
   Socket_stream
   Symbolic_link
 }
+fn FileType::equal(Self, Self) -> Bool // from trait `Eq`
 fn FileType::from_value(Int) -> Self?
+#deprecated
+fn FileType::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn FileType::output(Self, &Logger) -> Unit // from trait `Show`
+fn FileType::to_string(Self) -> String // from trait `Show`
 fn FileType::value(Self) -> Int
 impl Eq for FileType
 impl Show for FileType
@@ -329,15 +448,26 @@ pub(all) enum FstFlag {
   Mtim
   Mtim_now
 }
+fn FstFlag::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn FstFlag::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn FstFlag::output(Self, &Logger) -> Unit // from trait `Show`
+fn FstFlag::to_string(Self) -> String // from trait `Show`
 fn FstFlag::value(Self) -> UInt
 impl Eq for FstFlag
 impl Show for FstFlag
 
 pub(all) struct FstFlags(UInt)
+fn FstFlags::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn FstFlags::inner(Self) -> UInt
 fn FstFlags::is_set(Self, FstFlag) -> Bool
 fn FstFlags::new() -> Self
+#deprecated
+fn FstFlags::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn FstFlags::output(Self, &Logger) -> Unit // from trait `Show`
 fn FstFlags::set(Self, FstFlag) -> Self
+fn FstFlags::to_string(Self) -> String // from trait `Show`
 fn FstFlags::unset(Self, FstFlag) -> Self
 impl Eq for FstFlags
 impl Show for FstFlags
@@ -346,31 +476,59 @@ pub(all) struct IOVec {
   buf : Int
   buf_len : Size
 }
+fn IOVec::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn IOVec::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn IOVec::output(Self, &Logger) -> Unit // from trait `Show`
+fn IOVec::to_string(Self) -> String // from trait `Show`
 impl Eq for IOVec
 impl Show for IOVec
 
 pub(all) struct Inode(UInt64)
+fn Inode::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn Inode::inner(Self) -> UInt64
+#deprecated
+fn Inode::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Inode::output(Self, &Logger) -> Unit // from trait `Show`
+fn Inode::to_string(Self) -> String // from trait `Show`
 impl Eq for Inode
 impl Show for Inode
 
 pub(all) struct LinkCount(UInt64)
+fn LinkCount::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn LinkCount::inner(Self) -> UInt64
+#deprecated
+fn LinkCount::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn LinkCount::output(Self, &Logger) -> Unit // from trait `Show`
+fn LinkCount::to_string(Self) -> String // from trait `Show`
 impl Eq for LinkCount
 impl Show for LinkCount
 
 pub(all) enum LookupFlag {
   Symlink_follow
 }
+fn LookupFlag::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn LookupFlag::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn LookupFlag::output(Self, &Logger) -> Unit // from trait `Show`
+fn LookupFlag::to_string(Self) -> String // from trait `Show`
 fn LookupFlag::value(Self) -> UInt
 impl Eq for LookupFlag
 impl Show for LookupFlag
 
 pub(all) struct LookupFlags(UInt)
+fn LookupFlags::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn LookupFlags::inner(Self) -> UInt
 fn LookupFlags::is_set(Self, LookupFlag) -> Bool
 fn LookupFlags::new() -> Self
+#deprecated
+fn LookupFlags::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn LookupFlags::output(Self, &Logger) -> Unit // from trait `Show`
 fn LookupFlags::set(Self, LookupFlag) -> Self
+fn LookupFlags::to_string(Self) -> String // from trait `Show`
 fn LookupFlags::unset(Self, LookupFlag) -> Self
 impl Eq for LookupFlags
 impl Show for LookupFlags
@@ -381,15 +539,26 @@ pub(all) enum OpenFlag {
   Excl
   Trunc
 }
+fn OpenFlag::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn OpenFlag::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn OpenFlag::output(Self, &Logger) -> Unit // from trait `Show`
+fn OpenFlag::to_string(Self) -> String // from trait `Show`
 fn OpenFlag::value(Self) -> UInt
 impl Eq for OpenFlag
 impl Show for OpenFlag
 
 pub(all) struct OpenFlags(UInt)
+fn OpenFlags::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn OpenFlags::inner(Self) -> UInt
 fn OpenFlags::is_set(Self, OpenFlag) -> Bool
 fn OpenFlags::new() -> Self
+#deprecated
+fn OpenFlags::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn OpenFlags::output(Self, &Logger) -> Unit // from trait `Show`
 fn OpenFlags::set(Self, OpenFlag) -> Self
+fn OpenFlags::to_string(Self) -> String // from trait `Show`
 fn OpenFlags::unset(Self, OpenFlag) -> Self
 impl Eq for OpenFlags
 impl Show for OpenFlags
@@ -397,7 +566,12 @@ impl Show for OpenFlags
 pub(all) enum PreOpenType {
   Dir
 }
+fn PreOpenType::equal(Self, Self) -> Bool // from trait `Eq`
 fn PreOpenType::from_value(UInt) -> Self?
+#deprecated
+fn PreOpenType::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn PreOpenType::output(Self, &Logger) -> Unit // from trait `Show`
+fn PreOpenType::to_string(Self) -> String // from trait `Show`
 fn PreOpenType::value(Self) -> UInt
 impl Eq for PreOpenType
 impl Show for PreOpenType
@@ -405,12 +579,22 @@ impl Show for PreOpenType
 pub(all) enum PreStat {
   Dir(PreStat_dir)
 }
+fn PreStat::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn PreStat::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn PreStat::output(Self, &Logger) -> Unit // from trait `Show`
+fn PreStat::to_string(Self) -> String // from trait `Show`
 impl Eq for PreStat
 impl Show for PreStat
 
 pub(all) struct PreStat_dir {
   pr_name_len : Size
 }
+fn PreStat_dir::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn PreStat_dir::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn PreStat_dir::output(Self, &Logger) -> Unit // from trait `Show`
+fn PreStat_dir::to_string(Self) -> String // from trait `Show`
 impl Eq for PreStat_dir
 impl Show for PreStat_dir
 
@@ -418,15 +602,26 @@ pub(all) enum RiFlag {
   Recv_peek
   Recv_waitall
 }
+fn RiFlag::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn RiFlag::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn RiFlag::output(Self, &Logger) -> Unit // from trait `Show`
+fn RiFlag::to_string(Self) -> String // from trait `Show`
 fn RiFlag::value(Self) -> UInt
 impl Eq for RiFlag
 impl Show for RiFlag
 
 pub(all) struct RiFlags(UInt)
+fn RiFlags::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn RiFlags::inner(Self) -> UInt
 fn RiFlags::is_set(Self, RiFlag) -> Bool
 fn RiFlags::new() -> Self
+#deprecated
+fn RiFlags::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn RiFlags::output(Self, &Logger) -> Unit // from trait `Show`
 fn RiFlags::set(Self, RiFlag) -> Self
+fn RiFlags::to_string(Self) -> String // from trait `Show`
 fn RiFlags::unset(Self, RiFlag) -> Self
 impl Eq for RiFlags
 impl Show for RiFlags
@@ -463,15 +658,26 @@ pub(all) enum Right {
   Sock_shutdown
   Sock_accept
 }
+fn Right::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn Right::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Right::output(Self, &Logger) -> Unit // from trait `Show`
+fn Right::to_string(Self) -> String // from trait `Show`
 fn Right::value(Self) -> UInt64
 impl Eq for Right
 impl Show for Right
 
 pub(all) struct Rights(UInt64)
+fn Rights::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn Rights::inner(Self) -> UInt64
 fn Rights::is_set(Self, Right) -> Bool
 fn Rights::new() -> Self
+#deprecated
+fn Rights::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Rights::output(Self, &Logger) -> Unit // from trait `Show`
 fn Rights::set(Self, Right) -> Self
+fn Rights::to_string(Self) -> String // from trait `Show`
 fn Rights::unset(Self, Right) -> Self
 impl Eq for Rights
 impl Show for Rights
@@ -479,15 +685,26 @@ impl Show for Rights
 pub(all) enum RoFlag {
   Recv_data_truncated
 }
+fn RoFlag::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn RoFlag::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn RoFlag::output(Self, &Logger) -> Unit // from trait `Show`
+fn RoFlag::to_string(Self) -> String // from trait `Show`
 fn RoFlag::value(Self) -> UInt
 impl Eq for RoFlag
 impl Show for RoFlag
 
 pub(all) struct RoFlags(UInt)
+fn RoFlags::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn RoFlags::inner(Self) -> UInt
 fn RoFlags::is_set(Self, RoFlag) -> Bool
 fn RoFlags::new() -> Self
+#deprecated
+fn RoFlags::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn RoFlags::output(Self, &Logger) -> Unit // from trait `Show`
 fn RoFlags::set(Self, RoFlag) -> Self
+fn RoFlags::to_string(Self) -> String // from trait `Show`
 fn RoFlags::unset(Self, RoFlag) -> Self
 impl Eq for RoFlags
 impl Show for RoFlags
@@ -496,30 +713,52 @@ pub(all) enum SdFlag {
   Rd
   Wr
 }
+fn SdFlag::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn SdFlag::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn SdFlag::output(Self, &Logger) -> Unit // from trait `Show`
+fn SdFlag::to_string(Self) -> String // from trait `Show`
 fn SdFlag::value(Self) -> UInt
 impl Eq for SdFlag
 impl Show for SdFlag
 
 pub(all) struct SdFlags(UInt)
+fn SdFlags::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn SdFlags::inner(Self) -> UInt
 fn SdFlags::is_set(Self, SdFlag) -> Bool
 fn SdFlags::new() -> Self
+#deprecated
+fn SdFlags::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn SdFlags::output(Self, &Logger) -> Unit // from trait `Show`
 fn SdFlags::set(Self, SdFlag) -> Self
+fn SdFlags::to_string(Self) -> String // from trait `Show`
 fn SdFlags::unset(Self, SdFlag) -> Self
 impl Eq for SdFlags
 impl Show for SdFlags
 
 pub(all) enum SiFlag {
 }
+fn SiFlag::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn SiFlag::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn SiFlag::output(Self, &Logger) -> Unit // from trait `Show`
+fn SiFlag::to_string(Self) -> String // from trait `Show`
 fn SiFlag::value(Self) -> UInt
 impl Eq for SiFlag
 impl Show for SiFlag
 
 pub(all) struct SiFlags(UInt)
+fn SiFlags::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn SiFlags::inner(Self) -> UInt
 fn SiFlags::is_set(Self, SiFlag) -> Bool
 fn SiFlags::new() -> Self
+#deprecated
+fn SiFlags::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn SiFlags::output(Self, &Logger) -> Unit // from trait `Show`
 fn SiFlags::set(Self, SiFlag) -> Self
+fn SiFlags::to_string(Self) -> String // from trait `Show`
 fn SiFlags::unset(Self, SiFlag) -> Self
 impl Eq for SiFlags
 impl Show for SiFlags
@@ -557,28 +796,50 @@ pub(all) enum Signal {
   Pwr
   Sys
 }
+fn Signal::equal(Self, Self) -> Bool // from trait `Eq`
 fn Signal::from_value(UInt) -> Self?
+#deprecated
+fn Signal::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Signal::output(Self, &Logger) -> Unit // from trait `Show`
+fn Signal::to_string(Self) -> String // from trait `Show`
 fn Signal::value(Self) -> UInt
 impl Eq for Signal
 impl Show for Signal
 
 pub(all) struct Size(UInt)
+fn Size::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn Size::inner(Self) -> UInt
+#deprecated
+fn Size::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Size::output(Self, &Logger) -> Unit // from trait `Show`
+fn Size::to_string(Self) -> String // from trait `Show`
 impl Eq for Size
 impl Show for Size
 
 pub(all) enum SubclockFlag {
   Subscription_clock_abstime
 }
+fn SubclockFlag::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn SubclockFlag::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn SubclockFlag::output(Self, &Logger) -> Unit // from trait `Show`
+fn SubclockFlag::to_string(Self) -> String // from trait `Show`
 fn SubclockFlag::value(Self) -> UInt
 impl Eq for SubclockFlag
 impl Show for SubclockFlag
 
 pub(all) struct SubclockFlags(UInt)
+fn SubclockFlags::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn SubclockFlags::inner(Self) -> UInt
 fn SubclockFlags::is_set(Self, SubclockFlag) -> Bool
 fn SubclockFlags::new() -> Self
+#deprecated
+fn SubclockFlags::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn SubclockFlags::output(Self, &Logger) -> Unit // from trait `Show`
 fn SubclockFlags::set(Self, SubclockFlag) -> Self
+fn SubclockFlags::to_string(Self) -> String // from trait `Show`
 fn SubclockFlags::unset(Self, SubclockFlag) -> Self
 impl Eq for SubclockFlags
 impl Show for SubclockFlags
@@ -587,6 +848,11 @@ pub(all) struct Subscription {
   userdata : Userdata
   u : Subscription_u
 }
+fn Subscription::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn Subscription::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Subscription::output(Self, &Logger) -> Unit // from trait `Show`
+fn Subscription::to_string(Self) -> String // from trait `Show`
 impl Eq for Subscription
 impl Show for Subscription
 
@@ -596,12 +862,22 @@ pub(all) struct Subscription_clock {
   precision : TimeStamp
   flags : SubclockFlags
 }
+fn Subscription_clock::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn Subscription_clock::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Subscription_clock::output(Self, &Logger) -> Unit // from trait `Show`
+fn Subscription_clock::to_string(Self) -> String // from trait `Show`
 impl Eq for Subscription_clock
 impl Show for Subscription_clock
 
 pub(all) struct Subscription_fd_readwrite {
   file_descriptor : Fd
 }
+fn Subscription_fd_readwrite::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn Subscription_fd_readwrite::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Subscription_fd_readwrite::output(Self, &Logger) -> Unit // from trait `Show`
+fn Subscription_fd_readwrite::to_string(Self) -> String // from trait `Show`
 impl Eq for Subscription_fd_readwrite
 impl Show for Subscription_fd_readwrite
 
@@ -610,16 +886,33 @@ pub(all) enum Subscription_u {
   Fd_read(Subscription_fd_readwrite)
   Fd_write(Subscription_fd_readwrite)
 }
+fn Subscription_u::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn Subscription_u::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Subscription_u::output(Self, &Logger) -> Unit // from trait `Show`
+fn Subscription_u::to_string(Self) -> String // from trait `Show`
 impl Eq for Subscription_u
 impl Show for Subscription_u
 
 pub(all) struct TimeStamp(UInt64)
+fn TimeStamp::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn TimeStamp::inner(Self) -> UInt64
+#deprecated
+fn TimeStamp::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn TimeStamp::output(Self, &Logger) -> Unit // from trait `Show`
+fn TimeStamp::to_string(Self) -> String // from trait `Show`
 impl Eq for TimeStamp
 impl Show for TimeStamp
 
 pub(all) struct Userdata(UInt64)
+fn Userdata::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
 fn Userdata::inner(Self) -> UInt64
+#deprecated
+fn Userdata::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Userdata::output(Self, &Logger) -> Unit // from trait `Show`
+fn Userdata::to_string(Self) -> String // from trait `Show`
 impl Eq for Userdata
 impl Show for Userdata
 
@@ -628,7 +921,12 @@ pub(all) enum Whence {
   Cur
   End
 }
+fn Whence::equal(Self, Self) -> Bool // from trait `Eq`
 fn Whence::from_value(UInt) -> Self?
+#deprecated
+fn Whence::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn Whence::output(Self, &Logger) -> Unit // from trait `Show`
+fn Whence::to_string(Self) -> String // from trait `Show`
 fn Whence::value(Self) -> UInt
 impl Eq for Whence
 impl Show for Whence

@@ -1,6 +1,6 @@
 {
   "name": "peter-jerry-ye/wasi",
-  "version": "0.22.1",
+  "version": "0.22.2",
   "deps": {
     "tonyfettes/encoding": "0.3.3"
   },

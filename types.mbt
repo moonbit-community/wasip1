@@ -391,17 +391,17 @@ pub fn Right::value(self : Right) -> UInt64 {
 
 ///|
 pub fn Rights::set(self : Rights, right : Right) -> Rights {
-  self.inner() | right.value()
+  self.0 | right.value()
 }
 
 ///|
 pub fn Rights::unset(self : Rights, right : Right) -> Rights {
-  self.inner() & (right.value() ^ 0)
+  self.0 & (right.value() ^ 0)
 }
 
 ///|
 pub fn Rights::is_set(self : Rights, right : Right) -> Bool {
-  (self.inner() & right.value()) != 0
+  (self.0 & right.value()) != 0
 }
 
 ///|
@@ -619,17 +619,17 @@ pub fn FdFlag::value(self : FdFlag) -> UInt {
 
 ///|
 pub fn FdFlags::set(self : FdFlags, flag : FdFlag) -> FdFlags {
-  self.inner() | flag.value()
+  self.0 | flag.value()
 }
 
 ///|
 pub fn FdFlags::unset(self : FdFlags, flag : FdFlag) -> FdFlags {
-  self.inner() & (flag.value() ^ 0)
+  self.0 & (flag.value() ^ 0)
 }
 
 ///|
 pub fn FdFlags::is_set(self : FdFlags, flag : FdFlag) -> Bool {
-  (self.inner() & flag.value()) != 0
+  (self.0 & flag.value()) != 0
 }
 
 ///|
@@ -686,17 +686,17 @@ pub fn FstFlag::value(self : FstFlag) -> UInt {
 
 ///|
 pub fn FstFlags::set(self : FstFlags, flag : FstFlag) -> FstFlags {
-  self.inner() | flag.value()
+  self.0 | flag.value()
 }
 
 ///|
 pub fn FstFlags::unset(self : FstFlags, flag : FstFlag) -> FstFlags {
-  self.inner() & (flag.value() ^ 0)
+  self.0 & (flag.value() ^ 0)
 }
 
 ///|
 pub fn FstFlags::is_set(self : FstFlags, flag : FstFlag) -> Bool {
-  (self.inner() & flag.value()) != 0
+  (self.0 & flag.value()) != 0
 }
 
 ///|
@@ -722,17 +722,17 @@ pub fn LookupFlag::value(self : LookupFlag) -> UInt {
 
 ///|
 pub fn LookupFlags::set(self : LookupFlags, flag : LookupFlag) -> LookupFlags {
-  self.inner() | flag.value()
+  self.0 | flag.value()
 }
 
 ///|
 pub fn LookupFlags::unset(self : LookupFlags, flag : LookupFlag) -> LookupFlags {
-  self.inner() & (flag.value() ^ 0)
+  self.0 & (flag.value() ^ 0)
 }
 
 ///|
 pub fn LookupFlags::is_set(self : LookupFlags, flag : LookupFlag) -> Bool {
-  (self.inner() & flag.value()) != 0
+  (self.0 & flag.value()) != 0
 }
 
 ///|
@@ -770,17 +770,17 @@ pub fn OpenFlag::value(self : OpenFlag) -> UInt {
 
 ///|
 pub fn OpenFlags::set(self : OpenFlags, flag : OpenFlag) -> OpenFlags {
-  self.inner() | flag.value()
+  self.0 | flag.value()
 }
 
 ///|
 pub fn OpenFlags::unset(self : OpenFlags, flag : OpenFlag) -> OpenFlags {
-  self.inner() & (flag.value() ^ 0)
+  self.0 & (flag.value() ^ 0)
 }
 
 ///|
 pub fn OpenFlags::is_set(self : OpenFlags, flag : OpenFlag) -> Bool {
-  (self.inner() & flag.value()) != 0
+  (self.0 & flag.value()) != 0
 }
 
 ///|
@@ -874,7 +874,7 @@ pub fn EventRWFlags::set(
   self : EventRWFlags,
   flag : EventRWFlag,
 ) -> EventRWFlags {
-  EventRWFlags(self.inner() | flag.value())
+  EventRWFlags(self.0 | flag.value())
 }
 
 ///|
@@ -882,12 +882,12 @@ pub fn EventRWFlags::unset(
   self : EventRWFlags,
   flag : EventRWFlag,
 ) -> EventRWFlags {
-  EventRWFlags(self.inner() & (flag.value() ^ 0))
+  EventRWFlags(self.0 & (flag.value() ^ 0))
 }
 
 ///|
 pub fn EventRWFlags::is_set(self : EventRWFlags, flag : EventRWFlag) -> Bool {
-  (self.inner() & flag.value()) != 0
+  (self.0 & flag.value()) != 0
 }
 
 ///|
@@ -949,7 +949,7 @@ pub fn SubclockFlags::set(
   self : SubclockFlags,
   flag : SubclockFlag,
 ) -> SubclockFlags {
-  self.inner() | flag.value()
+  self.0 | flag.value()
 }
 
 ///|
@@ -957,12 +957,12 @@ pub fn SubclockFlags::unset(
   self : SubclockFlags,
   flag : SubclockFlag,
 ) -> SubclockFlags {
-  self.inner() & (flag.value() ^ 0)
+  self.0 & (flag.value() ^ 0)
 }
 
 ///|
 pub fn SubclockFlags::is_set(self : SubclockFlags, flag : SubclockFlag) -> Bool {
-  (self.inner() & flag.value()) != 0
+  (self.0 & flag.value()) != 0
 }
 
 ///|
@@ -1180,17 +1180,17 @@ pub fn RiFlag::value(self : RiFlag) -> UInt {
 
 ///|
 pub fn RiFlags::set(self : RiFlags, flag : RiFlag) -> RiFlags {
-  self.inner() | flag.value()
+  self.0 | flag.value()
 }
 
 ///|
 pub fn RiFlags::unset(self : RiFlags, flag : RiFlag) -> RiFlags {
-  self.inner() & (flag.value() ^ 0)
+  self.0 & (flag.value() ^ 0)
 }
 
 ///|
 pub fn RiFlags::is_set(self : RiFlags, flag : RiFlag) -> Bool {
-  (self.inner() & flag.value()) != 0
+  (self.0 & flag.value()) != 0
 }
 
 ///|
@@ -1219,17 +1219,17 @@ pub fn RoFlag::value(self : RoFlag) -> UInt {
 
 ///|
 pub fn RoFlags::set(self : RoFlags, flag : RoFlag) -> RoFlags {
-  self.inner() | flag.value()
+  self.0 | flag.value()
 }
 
 ///|
 pub fn RoFlags::unset(self : RoFlags, flag : RoFlag) -> RoFlags {
-  self.inner() & (flag.value() ^ 0)
+  self.0 & (flag.value() ^ 0)
 }
 
 ///|
 pub fn RoFlags::is_set(self : RoFlags, flag : RoFlag) -> Bool {
-  (self.inner() & flag.value()) != 0
+  (self.0 & flag.value()) != 0
 }
 
 ///|
@@ -1254,17 +1254,17 @@ pub fn SiFlag::value(self : SiFlag) -> UInt {
 
 ///|
 pub fn SiFlags::set(self : SiFlags, flag : SiFlag) -> SiFlags {
-  self.inner() | flag.value()
+  self.0 | flag.value()
 }
 
 ///|
 pub fn SiFlags::unset(self : SiFlags, flag : SiFlag) -> SiFlags {
-  self.inner() & (flag.value() ^ 0)
+  self.0 & (flag.value() ^ 0)
 }
 
 ///|
 pub fn SiFlags::is_set(self : SiFlags, flag : SiFlag) -> Bool {
-  (self.inner() & flag.value()) != 0
+  (self.0 & flag.value()) != 0
 }
 
 ///|
@@ -1296,17 +1296,17 @@ pub fn SdFlag::value(self : SdFlag) -> UInt {
 
 ///|
 pub fn SdFlags::set(self : SdFlags, flag : SdFlag) -> SdFlags {
-  self.inner() | flag.value()
+  self.0 | flag.value()
 }
 
 ///|
 pub fn SdFlags::unset(self : SdFlags, flag : SdFlag) -> SdFlags {
-  self.inner() & (flag.value() ^ 0)
+  self.0 & (flag.value() ^ 0)
 }
 
 ///|
 pub fn SdFlags::is_set(self : SdFlags, flag : SdFlag) -> Bool {
-  (self.inner() & flag.value()) != 0
+  (self.0 & flag.value()) != 0
 }
 
 ///|

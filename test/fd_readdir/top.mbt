@@ -16,7 +16,7 @@ pub fn start() -> Unit {
     |> ignore
     if test_dir_entries.1 {
       continue @wasi.DirCookie(
-          cookie.inner() + test_dir_entries.0.length().to_uint64(),
+          cookie.0 + test_dir_entries.0.length().to_uint64(),
         )
     } else {
       break

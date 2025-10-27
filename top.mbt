@@ -344,7 +344,7 @@ fn fd_filestat_get_ffi(fd : Int, buf : Int) -> UInt = "wasi_snapshot_preview1" "
 ///|
 /// Return the attributes of an open file
 pub fn fd_filestat_get(self : Fd) -> FileStat raise Errno {
-  let buf_ptr = @ffi.malloc(24)
+  let buf_ptr = @ffi.malloc(64)
   defer @ffi.free(buf_ptr)
   let ret = fd_filestat_get_ffi(self.0, buf_ptr)
   let ret = Errno::from_value(ret).unwrap()
@@ -768,7 +768,7 @@ pub fn path_filestat_get(
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
   defer @ffi.free(path_ptr)
-  let buf_ptr = @ffi.malloc(24)
+  let buf_ptr = @ffi.malloc(64)
   defer @ffi.free(buf_ptr)
   let ret = path_filestat_get_ffi(self.0, flags.0, path_ptr, path_len, buf_ptr)
   let ret = Errno::from_value(ret).unwrap()

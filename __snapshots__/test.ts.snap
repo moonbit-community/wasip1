@@ -24,10 +24,10 @@ snapshot[`fd_read 2`] = `"hello, this is a longer sentence, as a quick brown fox
 snapshot[`fd_readdir 1`] = `
 '[". ~> Directory", ".. ~> Directory", "moon.mod.json ~> Regular_file"]
 ["fd_fdstat_get ~> Directory", "args_get ~> Directory"]
-["fd_readdir ~> Directory", "poll_oneoff ~> Directory", "target ~> Directory"]
-[".mooncakes ~> Directory", "fd_prestat_dir_name ~> Directory"]
-["environ_get ~> Directory", "fd_write ~> Directory", "fd_read ~> Directory"]
-["proc_exit ~> Directory"]
+["fd_readdir ~> Directory", "poll_oneoff ~> Directory"]
+["spectest ~> Directory", "target ~> Directory", ".mooncakes ~> Directory"]
+["fd_prestat_dir_name ~> Directory", "environ_get ~> Directory"]
+["fd_write ~> Directory", "fd_read ~> Directory", "proc_exit ~> Directory"]
 '
 `;
 

@@ -12,11 +12,11 @@ pub fn args_sizes_get() -> (Int, Int) raise Errno {
   defer @ffi.free(size_ptr)
   let ret = args_sizes_get_ffi(argc_ptr, size_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let argc = @ffi.load32(argc_ptr)
-  let size = @ffi.load32(size_ptr)
   if ret != Success {
     raise ret
   }
+  let argc = @ffi.load32(argc_ptr)
+  let size = @ffi.load32(size_ptr)
   (argc, size)
 }
 
@@ -80,11 +80,11 @@ pub fn environ_sizes_get() -> (Int, Int) raise Errno {
   defer @ffi.free(size_ptr)
   let ret = environ_sizes_get_ffi(argc_ptr, size_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let argc = @ffi.load32(argc_ptr)
-  let size = @ffi.load32(size_ptr)
   if ret != Success {
     raise ret
   }
+  let argc = @ffi.load32(argc_ptr)
+  let size = @ffi.load32(size_ptr)
   (argc, size)
 }
 
@@ -142,15 +142,15 @@ fn clock_res_get_ffi(clock_id : UInt, resolution : Int) -> UInt = "wasi_snapshot
 /// 
 /// @param `self` The clock for which to return the resolution.  
 /// @return The resolution of the clock, or an error if one happened.
-pub fn clock_res_get(self : ClockId) -> TimeStamp raise Errno {
+pub fn ClockId::clock_res_get(self : ClockId) -> TimeStamp raise Errno {
   let resolution_ptr = @ffi.malloc(8)
   defer @ffi.free(resolution_ptr)
   let ret = clock_res_get_ffi(self.value(), resolution_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let resolution = @ffi.load64_u(resolution_ptr)
   if ret != Success {
     raise ret
   }
+  let resolution = @ffi.load64_u(resolution_ptr)
   resolution
 }
 
@@ -165,7 +165,7 @@ fn clock_time_get_ffi(clock_id : UInt, precision : UInt64, time : Int) -> UInt =
 /// @param `self` The clodk for which to return the time.  
 /// @param `precision` The maximum lag (exclusive) that the returned time value may have, compared to its actual value.  
 /// @return The time value of the clock.
-pub fn clock_time_get(
+pub fn ClockId::clock_time_get(
   self : ClockId,
   precision : TimeStamp,
 ) -> TimeStamp raise Errno {
@@ -173,10 +173,10 @@ pub fn clock_time_get(
   defer @ffi.free(time_ptr)
   let ret = clock_time_get_ffi(self.value(), precision.0, time_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let time = @ffi.load64_u(time_ptr)
   if ret != Success {
     raise ret
   }
+  let time = @ffi.load64_u(time_ptr)
   time
 }
 
@@ -196,7 +196,7 @@ fn fd_advise_ffi(
 /// @param `offset` The offset within the file to which the advisory applies.  
 /// @param `len` The length of the region to which the advisory applies.  
 /// @param `advice` The advice.
-pub fn fd_advise(
+pub fn Fd::fd_advise(
   self : Fd,
   offset : FileSize,
   len : FileSize,
@@ -220,7 +220,7 @@ fn fd_allocate_ffi(fd : Int, offset : UInt64, len : UInt64) -> UInt = "wasi_snap
 /// @param `offset` The offset at which to start allocating.  
 /// @param `len` The length of the area that is allocated.  
 /// @return The error code.
-pub fn fd_allocate(
+pub fn Fd::fd_allocate(
   self : Fd,
   offset : FileSize,
   len : FileSize,
@@ -239,7 +239,7 @@ fn fd_close_ffi(fd : Int) -> UInt = "wasi_snapshot_preview1" "fd_close"
 /// Close a file descriptor.
 /// 
 /// Note: This is similar to `close` in POSIX.
-pub fn fd_close(self : Fd) -> Unit raise Errno {
+pub fn Fd::fd_close(self : Fd) -> Unit raise Errno {
   let ret = fd_close_ffi(self.0)
   let ret = Errno::from_value(ret).unwrap()
   if ret != Success {
@@ -254,7 +254,7 @@ fn fd_datasync_ffi(fd : Int) -> UInt = "wasi_snapshot_preview1" "fd_datasync"
 /// Synchronize the data of a file to disk.
 /// 
 /// Note: This is similar to `fdatasync` in POSIX.
-pub fn fd_datasync(self : Fd) -> Unit raise Errno {
+pub fn Fd::fd_datasync(self : Fd) -> Unit raise Errno {
   let ret = fd_datasync_ffi(self.0)
   let ret = Errno::from_value(ret).unwrap()
   if ret != Success {
@@ -269,7 +269,7 @@ fn fd_fdstat_get_ffi(fd : Int, buf : Int) -> UInt = "wasi_snapshot_preview1" "fd
 /// Get the attributes of a file descriptor.
 /// 
 /// Note: This returns similar flags to `fcntl(fd, F_GETFL)` in POSIX, as well as additional fields.
-pub fn fd_fdstat_get(self : Fd) -> FdStat raise Errno {
+pub fn Fd::fd_fdstat_get(self : Fd) -> FdStat raise Errno {
   let buf_ptr = @ffi.malloc(24)
   defer @ffi.free(buf_ptr)
   let ret = fd_fdstat_get_ffi(self.0, buf_ptr)
@@ -301,7 +301,7 @@ fn fd_fdstat_set_flags_ffi(fd : Int, flags : UInt) -> UInt = "wasi_snapshot_prev
 /// Note: This is similar to `fcntl(fd, F_SETFL, flags)` in POSIX.
 /// 
 /// @param `flags` The desired values of the file descriptor flags.
-pub fn fd_fdstat_set_flags(self : Fd, flags : FdFlags) -> Unit raise Errno {
+pub fn Fd::fd_fdstat_set_flags(self : Fd, flags : FdFlags) -> Unit raise Errno {
   let ret = fd_fdstat_set_flags_ffi(self.0, flags.0)
   let ret = Errno::from_value(ret).unwrap()
   if ret != Success {
@@ -322,7 +322,7 @@ fn fd_fdstat_set_rights_ffi(
 /// This can only be used to remove rights, and returns `errno::notcapable` if called in a way that would attempt to add rights.
 /// 
 /// @param `fs_rights_base` The desired rights of the file descriptor.
-pub fn fd_fdstat_set_rights(
+pub fn Fd::fd_fdstat_set_rights(
   self : Fd,
   fs_rights_base : Rights,
   fs_rights_inheriting : Rights,
@@ -343,11 +343,14 @@ fn fd_filestat_get_ffi(fd : Int, buf : Int) -> UInt = "wasi_snapshot_preview1" "
 
 ///|
 /// Return the attributes of an open file
-pub fn fd_filestat_get(self : Fd) -> FileStat raise Errno {
+pub fn Fd::fd_filestat_get(self : Fd) -> FileStat raise Errno {
   let buf_ptr = @ffi.malloc(64)
   defer @ffi.free(buf_ptr)
   let ret = fd_filestat_get_ffi(self.0, buf_ptr)
   let ret = Errno::from_value(ret).unwrap()
+  if ret != Success {
+    raise ret
+  }
   let dev : Device = @ffi.load64_u(buf_ptr)
   let ino : Inode = @ffi.load64_u(buf_ptr + 8)
   let filetype : FileType = @ffi.load8_u(buf_ptr + 16)
@@ -359,9 +362,6 @@ pub fn fd_filestat_get(self : Fd) -> FileStat raise Errno {
   let mtim : TimeStamp = @ffi.load64_u(buf_ptr + 48)
   let ctim : TimeStamp = @ffi.load64_u(buf_ptr + 56)
   let buf = FileStat::{ dev, ino, filetype, nlink, size, atim, mtim, ctim }
-  if ret != Success {
-    raise ret
-  }
   buf
 }
 
@@ -374,7 +374,7 @@ fn fd_filestat_set_size_ffi(ffi : Int, size : UInt64) -> UInt = "wasi_snapshot_p
 /// Note: This is similar to `ftruncate` in POSIX.
 /// 
 /// @param `size` The desired file size.
-pub fn fd_filestat_set_size(self : Fd, size : FileSize) -> Unit raise Errno {
+pub fn Fd::fd_filestat_set_size(self : Fd, size : FileSize) -> Unit raise Errno {
   let ret = fd_filestat_set_size_ffi(self.0, size.0)
   let ret = Errno::from_value(ret).unwrap()
   if ret != Success {
@@ -398,7 +398,7 @@ fn fd_filestat_set_times_ffi(
 /// @param `atim` The desired value of the data access timestamp.  
 /// @param `mtim` The desired value of the data modification timestamp.  
 /// @param `fst_flags` A bitmask indicating which timestamps to adjust.
-pub fn fd_filestat_set_times(
+pub fn Fd::fd_filestat_set_times(
   self : Fd,
   atim : TimeStamp,
   mtim : TimeStamp,
@@ -424,7 +424,7 @@ fn fd_pread_ffi(
 /// Read from a file descriptor, without using and updating the file descriptor's offset.
 ///
 /// Note: This is similar to `preadv` in Linux (and other Unix-es).
-pub fn fd_pread(
+pub fn Fd::fd_pread(
   self : Fd,
   iovs : Array[FixedArray[Byte]],
   offset : FileSize,
@@ -444,10 +444,10 @@ pub fn fd_pread(
   defer @ffi.free(nread_ptr)
   let ret = fd_pread_ffi(self.0, iovs_ptr, iovs_len, offset.0, nread_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let nread = @ffi.load32_u(nread_ptr)
   if ret != Success {
     raise ret
   }
+  let nread = @ffi.load32_u(nread_ptr)
   nread
 }
 
@@ -458,7 +458,7 @@ fn fd_prestat_get_ffi(fd : Int, buf : Int) -> UInt = "wasi_snapshot_preview1" "f
 /// Return a description of the given preopened file descriptor.
 /// 
 /// Note: consider using `fd_prestat_dir_name` directly.
-pub fn fd_prestat_get(self : Fd) -> PreStat raise Errno {
+pub fn Fd::fd_prestat_get(self : Fd) -> PreStat raise Errno {
   let buf_ptr = @ffi.malloc(8)
   defer @ffi.free(buf_ptr)
   let ret = fd_prestat_get_ffi(self.0, buf_ptr)
@@ -478,7 +478,7 @@ fn fd_prestat_dir_name_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wasi
 
 ///|
 /// Return a description of the given preopened file descriptor.
-pub fn fd_prestat_dir_name(self : Fd) -> String raise Errno {
+pub fn Fd::fd_prestat_dir_name(self : Fd) -> String raise Errno {
   let prestat = self.fd_prestat_get()
   guard prestat is Dir({ pr_name_len: Size(size) })
   let buffer = Bytes::make(size.reinterpret_as_int(), b'\x00')
@@ -499,7 +499,10 @@ fn fd_read_ffi(fd : Int, iovs : Int, iovs_len : Int, nread : Int) -> UInt = "was
 /// Read from a file descriptor.
 ///
 /// Note: This is similar to `readv` in POSIX.
-pub fn fd_read(self : Fd, iovs : Array[FixedArray[Byte]]) -> Size raise Errno {
+pub fn Fd::fd_read(
+  self : Fd,
+  iovs : Array[FixedArray[Byte]],
+) -> Size raise Errno {
   let iovs_len = iovs.length()
   let iovs_ptr = @ffi.malloc(iovs_len * 8)
   defer @ffi.free(iovs_ptr)
@@ -515,10 +518,10 @@ pub fn fd_read(self : Fd, iovs : Array[FixedArray[Byte]]) -> Size raise Errno {
   defer @ffi.free(nread_ptr)
   let ret = fd_read_ffi(self.0, iovs_ptr, iovs_len, nread_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let nread = @ffi.load32_u(nread_ptr)
   if ret != Success {
     raise ret
   }
+  let nread = @ffi.load32_u(nread_ptr)
   nread
 }
 
@@ -549,7 +552,7 @@ fn fd_readdir_ffi(
 /// @param `cookie`: The location within the directory to start reading.  
 /// @param `size`: The buffer used to read.  
 /// @return The entries untruncated and whether there's still other entries.
-pub fn fd_readdir(
+pub fn Fd::fd_readdir(
   self : Fd,
   cookie? : DirCookie = DirCookie(0),
   buffer? : Bytes = Bytes::make(4096, 0),
@@ -561,10 +564,10 @@ pub fn fd_readdir(
   defer @ffi.free(buf_used_ptr)
   let ret = fd_readdir_ffi(self.0, buf_ptr, buf_len, cookie.0, buf_used_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let buf_used = @ffi.load32(buf_used_ptr)
   if ret != Success {
     raise ret
   }
+  let buf_used = @ffi.load32(buf_used_ptr)
   let entries = []
   for i = 0; i < buf_used; {
     if i + 24 > buf_used {
@@ -608,7 +611,7 @@ fn fd_renumber_ffi(fd : Int, to : Int) -> UInt = "wasi_snapshot_preview1" "fd_re
 ///
 /// This function provides a way to atomically renumber file descriptors, which
 /// would disappear if `dup2()` were to be removed entirely.
-pub fn fd_renumber(self : Fd, to : Fd) -> Unit raise Errno {
+pub fn Fd::fd_renumber(self : Fd, to : Fd) -> Unit raise Errno {
   let ret = fd_renumber_ffi(self.0, to.0)
   let ret = Errno::from_value(ret).unwrap()
   if ret != Success {
@@ -632,7 +635,7 @@ fn fd_seek_ffi(
 /// @param `offset` The number of bytes to move.
 /// @param `whence` The base from which the offset is calculated.
 /// @return The new offset of the file descriptor, relative to the start of the file.
-pub fn fd_seek(
+pub fn Fd::fd_seek(
   self : Fd,
   offset : FileDelta,
   whence : Whence,
@@ -641,10 +644,10 @@ pub fn fd_seek(
   defer @ffi.free(newoffset_ptr)
   let ret = fd_seek_ffi(self.0, offset.0, whence.value(), newoffset_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let newoffset = @ffi.load64_u(newoffset_ptr)
   if ret != Success {
     raise ret
   }
+  let newoffset = @ffi.load64_u(newoffset_ptr)
   newoffset
 }
 
@@ -655,7 +658,7 @@ fn fd_sync_ffi(fd : Int) -> UInt = "wasi_snapshot_preview1" "fd_sync"
 /// Synchronize the data and metadata of a file to disk.
 /// 
 /// Note: This is similar to `fsync` in POSIX.
-pub fn fd_sync(self : Fd) -> Unit raise Errno {
+pub fn Fd::fd_sync(self : Fd) -> Unit raise Errno {
   let ret = fd_sync_ffi(self.0)
   let ret = Errno::from_value(ret).unwrap()
   if ret != Success {
@@ -672,15 +675,15 @@ fn fd_tell_ffi(fd : Int, newoffset : Int) -> UInt = "wasi_snapshot_preview1" "fd
 /// Note: This is similar to `lseek(fd, 0, SEEK_CUR)` in POSIX.
 /// 
 /// @return The current offset of the file descriptor, relative to the start of the file.
-pub fn fd_tell(self : Fd) -> FileSize raise Errno {
+pub fn Fd::fd_tell(self : Fd) -> FileSize raise Errno {
   let newoffset_ptr = @ffi.malloc(8)
   defer @ffi.free(newoffset_ptr)
   let ret = fd_tell_ffi(self.0, newoffset_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let newoffset = @ffi.load64_u(newoffset_ptr)
   if ret != Success {
     raise ret
   }
+  let newoffset = @ffi.load64_u(newoffset_ptr)
   newoffset
 }
 
@@ -697,7 +700,7 @@ fn fd_write_ffi(fd : Int, iovs : Int, iovs_len : Int, nwritten : Int) -> UInt = 
 /// interleaved while `write` is executed.
 ///
 /// Note: it may write less than demanded.
-pub fn fd_write(self : Fd, contents : Array[BytesView]) -> Size raise Errno {
+pub fn Fd::fd_write(self : Fd, contents : Array[BytesView]) -> Size raise Errno {
   let iovs_len = contents.length()
   let iovs_ptr = @ffi.malloc(iovs_len * 8)
   defer @ffi.free(iovs_ptr)
@@ -715,10 +718,10 @@ pub fn fd_write(self : Fd, contents : Array[BytesView]) -> Size raise Errno {
   defer @ffi.free(nwritten_ptr)
   let ret = fd_write_ffi(self.0, iovs_ptr, iovs_len, nwritten_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let nwritten = @ffi.load32_u(nwritten_ptr)
   if ret != Success {
     raise ret
   }
+  let nwritten = @ffi.load32_u(nwritten_ptr)
   nwritten
 }
 
@@ -731,7 +734,7 @@ fn path_create_directory_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wa
 /// Note: This is similar to `mkdirat` in POSIX.
 ///
 /// @param `path` The path at which to create the directory.
-pub fn path_create_directory(self : Fd, path : String) -> Unit raise Errno {
+pub fn Fd::path_create_directory(self : Fd, path : String) -> Unit raise Errno {
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
@@ -759,7 +762,7 @@ fn path_filestat_get_ffi(
 ///
 /// @param `flags` Flags determining the method of how the path is resolved.
 /// @param `path` The path of the file or directory to inspect.
-pub fn path_filestat_get(
+pub fn Fd::path_filestat_get(
   self : Fd,
   flags : LookupFlags,
   path : String,
@@ -810,7 +813,7 @@ fn path_filestat_set_times_ffi(
 /// @param `atim` The desired values of the data access timestamp.
 /// @param `mtim` The desired values of the data modification timestamp.
 /// @param `fst_flags` A bitmask indicating which timestamps to adjust.
-pub fn path_filestat_set_times(
+pub fn Fd::path_filestat_set_times(
   self : Fd,
   flags : LookupFlags,
   path : String,
@@ -857,7 +860,7 @@ fn path_link_ffi(
 /// @param `old_path` The source path from which to link.
 /// @param `new_fd` The wroking directory at which the resolution of the new path starts.
 /// @param `new_path` The destination path at which to create the hard link.
-pub fn path_link(
+pub fn Fd::path_link(
   self : Fd,
   old_flags : LookupFlags,
   old_path : String,
@@ -925,7 +928,7 @@ fn path_open_ffi(
 ///        file being opened. The *inheriting* rights are rights that apply to
 ///        file descriptors derived from it.
 /// @return The file descriptor of the file that has been opened.
-pub fn path_open(
+pub fn Fd::path_open(
   self : Fd,
   dirflags : LookupFlags,
   path : String,
@@ -952,10 +955,10 @@ pub fn path_open(
     fd_ptr,
   )
   let ret = Errno::from_value(ret).unwrap()
-  let fd = @ffi.load32(fd_ptr)
   if ret != Success {
     raise ret
   }
+  let fd = @ffi.load32(fd_ptr)
   Fd(fd)
 }
 
@@ -975,7 +978,7 @@ fn path_readlink_ffi(
 /// Note: This is similar to `readlinkat` in POSIX. If `buf` is not large
 /// enough to store the contents of the link, the first `buf_len` bytes will be
 /// written `buf`.
-pub fn path_readlink(
+pub fn Fd::path_readlink(
   self : Fd,
   path : String,
   buffer? : FixedArray[Byte] = FixedArray::make(4096, 0),
@@ -998,10 +1001,10 @@ pub fn path_readlink(
     buf_used_ptr,
   )
   let ret = Errno::from_value(ret).unwrap()
-  let buf_used = @ffi.load32_u(buf_used_ptr)
   if ret != Success {
     raise ret
   }
+  let buf_used = @ffi.load32_u(buf_used_ptr)
   buf_used
 }
 
@@ -1014,7 +1017,7 @@ fn path_remove_directory_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wa
 /// Return `errno::notempty` if the directory is not empty.
 ///
 /// Note: This is similar to `unlinkat(fd, path, AT_REMOVEDIR)` in POSIX.
-pub fn path_remove_directory(self : Fd, path : String) -> Unit raise Errno {
+pub fn Fd::path_remove_directory(self : Fd, path : String) -> Unit raise Errno {
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
@@ -1044,7 +1047,7 @@ fn path_rename_ffi(
 /// @param `old_path` The source path of the file or directory to rename.
 /// @param `new_fd` The working directory at which the resolution of the new path starts.
 /// @param `new_path` The destination path of the file or directory to rename.
-pub fn path_rename(
+pub fn Fd::path_rename(
   self : Fd,
   old_path : String,
   new_fd : Fd,
@@ -1120,7 +1123,7 @@ fn path_unlink_file_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wasi_sn
 /// Return `errno::isdir` if the path refers to a directory.
 ///
 /// Note: This is similar to `unlinkat(fd, path, 0)` in POSIX.
-pub fn path_unlink_file(self : Fd, path : String) -> Unit raise Errno {
+pub fn Fd::path_unlink_file(self : Fd, path : String) -> Unit raise Errno {
   let path_bytes = path |> @encoding.encode(encoding=UTF8)
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
@@ -1177,10 +1180,10 @@ pub fn poll_oneoff(in_ : Array[Subscription]) -> Array[Event] raise Errno {
   defer @ffi.free(nevents_ptr)
   let ret = poll_oneoff_ffi(in_ptr, out_ptr, nsubscriptions, nevents_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let nevents = @ffi.load32(nevents_ptr)
   if ret != Success {
     raise ret
   }
+  let nevents = @ffi.load32(nevents_ptr)
   let events = []
   for i in 0..<nevents {
     let userdata : Userdata = @ffi.load64_u(out_ptr + i * 32)
@@ -1279,15 +1282,15 @@ fn sock_accept_ffi(sock : Int, flags : UInt, fd : Int) -> UInt = "wasi_snapshot_
 /// @param `self` The listening socket.
 /// @param `flags` The desired values of the file descriptor flags.
 /// @return New socket connection.
-pub fn sock_accept(self : Fd, flags : FdFlags) -> Fd raise Errno {
+pub fn Fd::sock_accept(self : Fd, flags : FdFlags) -> Fd raise Errno {
   let fd_ptr = @ffi.malloc(4)
   defer @ffi.free(fd_ptr)
   let ret = sock_accept_ffi(self.0, flags.0, fd_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let fd = @ffi.load32(fd_ptr)
   if ret != Success {
     raise ret
   }
+  let fd = @ffi.load32(fd_ptr)
   Fd(fd)
 }
 
@@ -1310,7 +1313,7 @@ fn sock_recv_ffi(
 /// @param `contents` List of scatter/gather vectors to which to store data.
 /// @param `flags` Message flags.
 /// @return Number of bytes stored in the buffers and message flags.
-pub fn sock_recv(
+pub fn Fd::sock_recv(
   self : Fd,
   contents : Array[FixedArray[Byte]],
   flags : RiFlags,
@@ -1340,11 +1343,11 @@ pub fn sock_recv(
     ro_flags_ptr,
   )
   let ret = Errno::from_value(ret).unwrap()
-  let size = @ffi.load32_u(size_ptr)
-  let ro_flags = @ffi.load32_u(ro_flags_ptr)
   if ret != Success {
     raise ret
   }
+  let size = @ffi.load32_u(size_ptr)
+  let ro_flags = @ffi.load32_u(ro_flags_ptr)
   (size, ro_flags)
 }
 
@@ -1366,7 +1369,7 @@ fn sock_send_ffi(
 /// @param `contents` List of scatter/gather vectors to which to retrieve the data.
 /// @param `flags` Message flags.
 /// @return The number of bytes transmitted.
-pub fn sock_send(
+pub fn Fd::sock_send(
   self : Fd,
   contents : Array[BytesView],
   flags : SiFlags,
@@ -1388,10 +1391,10 @@ pub fn sock_send(
   defer @ffi.free(size_ptr)
   let ret = sock_send_ffi(self.0, si_data_ptr, si_data_len, flags.0, size_ptr)
   let ret = Errno::from_value(ret).unwrap()
-  let size = @ffi.load32_u(size_ptr)
   if ret != Success {
     raise ret
   }
+  let size = @ffi.load32_u(size_ptr)
   size
 }
 
@@ -1404,7 +1407,7 @@ fn sock_shutdown_ffi(sock : Int, how : UInt) -> UInt = "wasi_snapshot_preview1" 
 /// Note: This is similar to `shutdown` in POSIX.
 /// 
 /// @param `how` Which channels on the socket to shut down.
-pub fn sock_shutdown(self : Fd, how : SdFlags) -> Unit raise Errno {
+pub fn Fd::sock_shutdown(self : Fd, how : SdFlags) -> Unit raise Errno {
   let ret = sock_shutdown_ffi(self.0, how.0)
   let ret = Errno::from_value(ret).unwrap()
   if ret != Success {

@@ -1,0 +1,11 @@
+{
+  "link": {
+    "wasm": {
+      "exports": ["print_char"],
+      "export-memory-name": "memory"
+    }
+  },
+  "import": [
+    "peter-jerry-ye/wasi"
+  ]
+}

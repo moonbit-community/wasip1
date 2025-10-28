@@ -135,7 +135,7 @@ pub(all) suberror Errno {
 } derive(Eq, Show)
 
 ///|
-pub fn value(self : Errno) -> UInt {
+pub fn Errno::value(self : Errno) -> UInt {
   match self {
     Success => 0
     TooBig => 1

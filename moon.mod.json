@@ -1,7 +1,7 @@
 {
   "name": "peter-jerry-ye/wasi",
   "version": "0.22.4",
-  "repository": "https://github.com/peter-jerry-ye/wasi",
+  "repository": "https://github.com/moonbit-community/wasip1",
   "license": "Apache-2.0",
   "exclude": [
     "test"

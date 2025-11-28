@@ -10,8 +10,9 @@ pub fn start() -> Unit {
       let (name, entry) = name_entry
       "\{name} ~> \{entry.d_type}"
     })
+    entries.sort()
     (try? @wasi.stdout.fd_write([
-      "\{entries}\n" |> @encoding.encode(encoding=UTF8),
+      "\{entries}\n" |> @encoding/utf8.encode(),
     ]))
     |> ignore
     if test_dir_entries.1 {

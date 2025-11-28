@@ -59,8 +59,7 @@ pub fn args_get() -> Array[String] raise Errno {
     }
     let len = arg_end - arg_start - 1 // remove trailing zero
     args.push(
-      arg_buf[arg_start:arg_start + len]
-      |> @encoding.decode_lossy(encoding=UTF8),
+      arg_buf[arg_start:arg_start + len] |> @encoding/utf8.decode_lossy(),
     )
   }
   args
@@ -120,7 +119,7 @@ pub fn environ_get() -> Array[(String, String)] raise Errno {
     }
     let len = env_end - env_start - 1 // remove trailing zero
     let str = environ_buf[env_start:env_start + len]
-      |> @encoding.decode_lossy(encoding=UTF8)
+      |> @encoding/utf8.decode_lossy()
     guard str.split("=").collect() is [key, .. value]
     envs.push(
       (key.to_string(), value.iter().map(StringView::to_string).join("=")),
@@ -489,7 +488,7 @@ pub fn Fd::fd_prestat_dir_name(self : Fd) -> String raise Errno {
   if ret != Success {
     raise ret
   }
-  buffer |> @encoding.decode_lossy(encoding=UTF8)
+  buffer |> @encoding/utf8.decode_lossy()
 }
 
 ///|
@@ -587,7 +586,7 @@ pub fn Fd::fd_readdir(
     }
     entries.push(
       (
-        buffer[i + 24:i + 24 + namlen] |> @encoding.decode_lossy(encoding=UTF8),
+        buffer[i + 24:i + 24 + namlen] |> @encoding/utf8.decode_lossy(),
         DirEnt::{ d_next, d_ino, d_namlen, d_type },
       ),
     )
@@ -735,7 +734,7 @@ fn path_create_directory_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wa
 ///
 /// @param `path` The path at which to create the directory.
 pub fn Fd::path_create_directory(self : Fd, path : String) -> Unit raise Errno {
-  let path_bytes = path |> @encoding.encode(encoding=UTF8)
+  let path_bytes = path |> @encoding/utf8.encode()
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
   defer @ffi.free(path_ptr)
@@ -767,7 +766,7 @@ pub fn Fd::path_filestat_get(
   flags : LookupFlags,
   path : String,
 ) -> FileStat raise Errno {
-  let path_bytes = path |> @encoding.encode(encoding=UTF8)
+  let path_bytes = path |> @encoding/utf8.encode()
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
   defer @ffi.free(path_ptr)
@@ -821,7 +820,7 @@ pub fn Fd::path_filestat_set_times(
   mtim : TimeStamp,
   fst_flags : FstFlags,
 ) -> Unit raise Errno {
-  let path_bytes = path |> @encoding.encode(encoding=UTF8)
+  let path_bytes = path |> @encoding/utf8.encode()
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
   defer @ffi.free(path_ptr)
@@ -867,11 +866,11 @@ pub fn Fd::path_link(
   new_fd : Fd,
   new_path : String,
 ) -> Unit raise Errno {
-  let old_path_bytes = old_path |> @encoding.encode(encoding=UTF8)
+  let old_path_bytes = old_path |> @encoding/utf8.encode()
   let old_path_len = old_path_bytes.length()
   let old_path_ptr = @ffi.bytes2ptr(old_path_bytes)
   defer @ffi.free(old_path_ptr)
-  let new_path_bytes = new_path |> @encoding.encode(encoding=UTF8)
+  let new_path_bytes = new_path |> @encoding/utf8.encode()
   let new_path_len = new_path_bytes.length()
   let new_path_ptr = @ffi.bytes2ptr(new_path_bytes)
   defer @ffi.free(new_path_ptr)
@@ -937,7 +936,7 @@ pub fn Fd::path_open(
   fs_rights_inheriting : Rights,
   fs_flags : FdFlags,
 ) -> Fd raise Errno {
-  let path_bytes = path |> @encoding.encode(encoding=UTF8)
+  let path_bytes = path |> @encoding/utf8.encode()
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
   defer @ffi.free(path_ptr)
@@ -983,7 +982,7 @@ pub fn Fd::path_readlink(
   path : String,
   buffer? : FixedArray[Byte] = FixedArray::make(4096, 0),
 ) -> Size raise Errno {
-  let path_bytes = path |> @encoding.encode(encoding=UTF8)
+  let path_bytes = path |> @encoding/utf8.encode()
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
   defer @ffi.free(path_ptr)
@@ -1018,7 +1017,7 @@ fn path_remove_directory_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wa
 ///
 /// Note: This is similar to `unlinkat(fd, path, AT_REMOVEDIR)` in POSIX.
 pub fn Fd::path_remove_directory(self : Fd, path : String) -> Unit raise Errno {
-  let path_bytes = path |> @encoding.encode(encoding=UTF8)
+  let path_bytes = path |> @encoding/utf8.encode()
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
   defer @ffi.free(path_ptr)
@@ -1053,11 +1052,11 @@ pub fn Fd::path_rename(
   new_fd : Fd,
   new_path : String,
 ) -> Unit raise Errno {
-  let old_path_bytes = old_path |> @encoding.encode(encoding=UTF8)
+  let old_path_bytes = old_path |> @encoding/utf8.encode()
   let old_path_len = old_path_bytes.length()
   let old_path_ptr = @ffi.bytes2ptr(old_path_bytes)
   defer @ffi.free(old_path_ptr)
-  let new_path_bytes = new_path |> @encoding.encode(encoding=UTF8)
+  let new_path_bytes = new_path |> @encoding/utf8.encode()
   let new_path_len = new_path_bytes.length()
   let new_path_ptr = @ffi.bytes2ptr(new_path_bytes)
   defer @ffi.free(new_path_ptr)
@@ -1093,11 +1092,11 @@ pub fn path_symlink(
   fd : Fd,
   new_path : String,
 ) -> Unit raise Errno {
-  let old_path_bytes = old_path |> @encoding.encode(encoding=UTF8)
+  let old_path_bytes = old_path |> @encoding/utf8.encode()
   let old_path_len = old_path_bytes.length()
   let old_path_ptr = @ffi.bytes2ptr(old_path_bytes)
   defer @ffi.free(old_path_ptr)
-  let new_path_bytes = new_path |> @encoding.encode(encoding=UTF8)
+  let new_path_bytes = new_path |> @encoding/utf8.encode()
   let new_path_len = new_path_bytes.length()
   let new_path_ptr = @ffi.bytes2ptr(new_path_bytes)
   defer @ffi.free(new_path_ptr)
@@ -1124,7 +1123,7 @@ fn path_unlink_file_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wasi_sn
 ///
 /// Note: This is similar to `unlinkat(fd, path, 0)` in POSIX.
 pub fn Fd::path_unlink_file(self : Fd, path : String) -> Unit raise Errno {
-  let path_bytes = path |> @encoding.encode(encoding=UTF8)
+  let path_bytes = path |> @encoding/utf8.encode()
   let path_len = path_bytes.length()
   let path_ptr = @ffi.bytes2ptr(path_bytes)
   defer @ffi.free(path_ptr)

@@ -22,13 +22,7 @@ snapshot[`fd_read 1`] = `"hello"`;
 snapshot[`fd_read 2`] = `"hello, this is a longer sentence, as a quick brown fox jumps ove"`;
 
 snapshot[`fd_readdir 1`] = `
-'[". ~> Directory", ".. ~> Directory", "fd_read ~> Directory"]
-["spectest ~> Directory", "environ_get ~> Directory"]
-["args_get ~> Directory", "poll_oneoff ~> Directory"]
-["target ~> Directory", "proc_exit ~> Directory", "fd_fdstat_get ~> Directory"]
-["fd_write ~> Directory", "fd_prestat_dir_name ~> Directory"]
-[".mooncakes ~> Directory", "moon.mod.json ~> Regular_file"]
-["fd_readdir ~> Directory"]
+'[". ~> Directory", ".. ~> Directory", "target ~> Directory", "fd_read ~> Directory", "args_get ~> Directory", "fd_write ~> Directory", "spectest ~> Directory", "proc_exit ~> Directory", "fd_readdir ~> Directory", "environ_get ~> Directory", "poll_oneoff ~> Directory", "fd_fdstat_get ~> Directory", "moon.mod.json ~> Regular_file", "fd_prestat_dir_name ~> Directory"]
 '
 `;
 

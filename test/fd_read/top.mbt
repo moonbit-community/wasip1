@@ -7,15 +7,15 @@ pub fn start() -> Unit {
   let buffer = FixedArray::make(len.0.reinterpret_as_int(), b'\x00')
   if len.0 <= 64 {
     buffer1.blit_to(buffer, len=len.0.reinterpret_as_int())
-    (try? @wasi.Fd(1).fd_write([Bytes::from_fixedarray(buffer)])) |> ignore
+    (try? @wasi.Fd(1).fd_write([Bytes::from_array(buffer)])) |> ignore
   } else if len.0 <= 128 {
     let buffer = FixedArray::make(len.0.reinterpret_as_int(), b'\x00')
     buffer1.blit_to(buffer, len=64)
     buffer2.blit_to(buffer, len=len.0.reinterpret_as_int() - 64, dst_offset=64)
-    (try? @wasi.Fd(1).fd_write([Bytes::from_fixedarray(buffer)])) |> ignore
+    (try? @wasi.Fd(1).fd_write([Bytes::from_array(buffer)])) |> ignore
   } else {
     (try? @wasi.Fd(1).fd_write([
-      "Input too long\n" |> @encoding.encode(encoding=UTF8),
+      "Input too long\n" |> @encoding/utf8.encode(),
     ]))
     |> ignore
   }

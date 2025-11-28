@@ -1,7 +1,6 @@
 {
     "import": [
-      "peter-jerry-ye/wasi",
-      "tonyfettes/encoding"
+      "peter-jerry-ye/wasi"
     ],
     "link": {
         "wasm": {

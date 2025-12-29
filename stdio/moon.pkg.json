@@ -1,6 +1,0 @@
-{
-  "import": [
-    "peter-jerry-ye/wasi/io",
-    "peter-jerry-ye/wasi"
-  ]
-}

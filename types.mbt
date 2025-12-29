@@ -53,7 +53,7 @@ pub fn ClockId::from_value(value : UInt) -> ClockId? {
 /// API; some are used in higher-level library layers, and others are provided
 /// merely for alignment with POSIX.
 /// 
-/// See : https://github.com/WebAssembly/WASI/blob/main/legacy/preview1/docs.md#-errno-variant
+/// See : https://github.com/WebAssembly/WASI/blob/wasi-0.1/preview1/docs.md#-errno-variant
 pub(all) suberror Errno {
   Success
   TooBig

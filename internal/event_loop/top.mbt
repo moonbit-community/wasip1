@@ -19,6 +19,8 @@ pub async fn suspend_for_write(fd : @wasi.Fd) -> UInt64 {
     },
     coro,
   }
+  event_loop.set(coro.id(), subscribe)
+  defer event_loop.remove(coro.id())
   @coroutine.suspend()
   guard subscribe.event is Some(event)
   if event.fd_readwrite.flags.is_set(@wasi.EventRWFlag::Fd_readwrite_hangup) {
@@ -38,6 +40,8 @@ pub async fn suspend_for_read(fd : @wasi.Fd) -> UInt64 {
     },
     coro,
   }
+  event_loop.set(coro.id(), subscribe)
+  defer event_loop.remove(coro.id())
   @coroutine.suspend()
   guard subscribe.event is Some(event)
   if event.fd_readwrite.flags.is_set(@wasi.EventRWFlag::Fd_readwrite_hangup) {
@@ -63,6 +67,8 @@ pub async fn sleep(time : Int) -> Unit {
     },
     coro,
   }
+  event_loop.set(coro.id(), subscribe)
+  defer event_loop.remove(coro.id())
   @coroutine.suspend()
   guard subscribe.event is Some(_)
 }
@@ -70,31 +76,28 @@ pub async fn sleep(time : Int) -> Unit {
 ///|
 
 ///|
-pub fn async_run(f : async () -> Unit) -> Unit {
-  let mut err = false
-  let _ = @coroutine.spawn(async fn() -> Unit { f() catch { _ => err = true } })
+pub fn async_run(f : async () -> Unit) -> Unit raise {
+  let mut err = None
+  let _ = @coroutine.spawn(async fn() -> Unit {
+    f() catch {
+      e => err = Some(e)
+    }
+  })
   while !@coroutine.no_more_work() {
     @coroutine.reschedule()
     if event_loop.is_empty() {
       continue
     }
     let values = event_loop.values().map(sub => sub.sub).collect()
-    let events = @wasi.poll_oneoff(values) catch {
-      _ => {
-        @wasi.proc_exit(114)
-        panic()
-      }
-    }
+    let events = @wasi.poll_oneoff(values)
     for e in events {
       let id = e.userdata.0.to_int()
       guard event_loop.get(id) is Some(subscribe)
-      event_loop.remove(id)
       subscribe.event = Some(e)
       subscribe.coro.wake()
     }
   }
-  if err {
-    @wasi.proc_exit(1)
-    panic()
+  if err is Some(e) {
+    raise e
   }
 }

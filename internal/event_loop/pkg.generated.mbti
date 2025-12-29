@@ -6,7 +6,7 @@ import(
 )
 
 // Values
-pub fn async_run(async () -> Unit) -> Unit
+pub fn async_run(async () -> Unit) -> Unit raise
 
 pub async fn sleep(Int) -> Unit
 

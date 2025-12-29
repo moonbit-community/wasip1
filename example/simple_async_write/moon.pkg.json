@@ -1,0 +1,14 @@
+{
+  "import": [
+    "peter-jerry-ye/wasi/async",
+    "peter-jerry-ye/wasi/async/stdio",
+    { "path": "peter-jerry-ye/wasi/stdio", "alias": "sync_stdio" },
+    "peter-jerry-ye/wasi"
+  ],
+  "is-main": true,
+  "link": {
+    "wasm": {
+      "export-memory-name": "memory"
+    }
+  }
+}

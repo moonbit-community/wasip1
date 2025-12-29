@@ -1,0 +1,9 @@
+{
+  "name": "example/simple_async_sleep",
+  "deps": {
+    "peter-jerry-ye/wasi": {
+      "path": "../.."
+    }
+  },
+  "preferred-target": "wasm"
+}

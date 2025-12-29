@@ -1167,11 +1167,11 @@ pub fn poll_oneoff(in_ : Array[Subscription]) -> Array[Event] raise Errno {
       }
       Fd_read({ file_descriptor }) => {
         @ffi.store32(in_ptr + i * 48 + 8, 1)
-        @ffi.store32(in_ptr + i * 48 + 12, file_descriptor.0)
+        @ffi.store32(in_ptr + i * 48 + 16, file_descriptor.0)
       }
       Fd_write({ file_descriptor }) => {
         @ffi.store32(in_ptr + i * 48 + 8, 2)
-        @ffi.store32(in_ptr + i * 48 + 12, file_descriptor.0)
+        @ffi.store32(in_ptr + i * 48 + 16, file_descriptor.0)
       }
     }
   }

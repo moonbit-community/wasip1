@@ -21,6 +21,8 @@ pub async fn[X] retry(RetryMethod, max_retry? : Int, fatal_error? : (Error) -> B
 
 pub async fn sleep(Int) -> Unit
 
+pub fn with_event_loop(async (TaskGroup[Unit]) -> Unit) -> Unit raise
+
 pub async fn[X] with_task_group(async (TaskGroup[X]) -> X) -> X
 
 pub async fn[X] with_timeout(Int, async () -> X, error? : Error) -> X

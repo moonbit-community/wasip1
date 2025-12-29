@@ -13,17 +13,8 @@
 // limitations under the License.
 
 ///|
-/// Create a fresh event loop and run a async program inside the loop.
-/// A new task group will be created for convenience,
-/// that is, `with_event_loop(f)` will run `with_task_group(f)` using the event loop.
-///
-/// There can only one event loop running for every program,
-/// calling `with_event_loop` inside another event loop is invalid,
-/// and will result in immediate failure.
-#deprecated("use `async fn main` or `async test` instead")
-#cfg(target="native")
 pub fn with_event_loop(f : async (TaskGroup[Unit]) -> Unit) -> Unit raise {
-  @event_loop.with_event_loop(() => with_task_group(f))
+  @event_loop.async_run(() => with_task_group(f))
 }
 
 ///|

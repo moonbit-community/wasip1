@@ -89,10 +89,6 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
 }
 
 ///|
-struct FileSync {
-  fd : @wasi.Fd
-}
-
 ///|
 pub fn open_sync(
   path : StringView,
@@ -101,7 +97,7 @@ pub fn open_sync(
   append? : Bool = false,
   create? : Int,
   truncate? : Bool = false,
-) -> FileSync raise @wasi.Errno {
+) -> File raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
   let rights = match mode {
     ReadOnly =>
@@ -148,44 +144,7 @@ pub fn open_sync(
     rights_inheriting,
     fdflags,
   )
-  FileSync::{ fd, }
-}
-
-///|
-pub fn FileSync::close(self : FileSync) -> Unit raise @wasi.Errno {
-  self.fd.fd_close()
-}
-
-///|
-pub fn FileSync::fd(self : FileSync) -> Int {
-  self.fd.0
-}
-
-///|
-pub impl @sync_io.Reader for FileSync with _get_internal_buffer(self) {
-  let _ = self
-  @sync_io.ReaderBuffer::new()
-}
-
-///|
-pub impl @sync_io.Reader for FileSync with _direct_read(
-  self,
-  buf,
-  offset~,
-  max_len~,
-) {
-  let buffer = FixedArray::make(max_len, b'\x00')
-  let iovs = [buf]
-  let result = self.fd.fd_read(iovs).0.reinterpret_as_int()
-  buffer.blit_to(buf, len=result, dst_offset=offset)
-  result
-}
-
-///|
-pub impl @sync_io.Writer for FileSync with write_once(self, data, offset~, len~) {
-  let iovs = [data[offset:offset + len]]
-  let result = self.fd.fd_write(iovs)
-  result.0.reinterpret_as_int()
+  File::{ fd, read_buf: @async_io.ReaderBuffer::new() }
 }
 
 ///|
@@ -203,11 +162,10 @@ pub fn open(
   create? : Int,
   truncate? : Bool = false,
 ) -> File raise @wasi.Errno {
-  let sync_file = match create {
+  match create {
     Some(value) => open_sync(path, mode~, sync~, append~, create=value, truncate~)
     None => open_sync(path, mode~, sync~, append~, truncate~)
   }
-  File::{ fd: sync_file.fd, read_buf: @async_io.ReaderBuffer::new() }
 }
 
 ///|
@@ -261,6 +219,33 @@ pub impl @async_io.Writer for File with write_once(self, data, offset~, len~) {
 }
 
 ///|
+pub impl @sync_io.Reader for File with _get_internal_buffer(self) {
+  let _ = self
+  @sync_io.ReaderBuffer::new()
+}
+
+///|
+pub impl @sync_io.Reader for File with _direct_read(
+  self,
+  buf,
+  offset~,
+  max_len~,
+) {
+  let buffer = FixedArray::make(max_len, b'\x00')
+  let iovs = [buf]
+  let result = self.fd.fd_read(iovs).0.reinterpret_as_int()
+  buffer.blit_to(buf, len=result, dst_offset=offset)
+  result
+}
+
+///|
+pub impl @sync_io.Writer for File with write_once(self, data, offset~, len~) {
+  let iovs = [data[offset:offset + len]]
+  let result = self.fd.fd_write(iovs)
+  result.0.reinterpret_as_int()
+}
+
+///|
 struct Directory {
   fd : @wasi.Fd
 }
@@ -301,7 +286,7 @@ pub async fn read_file(
     e => fail("read_file failed: \{e}")
   }
   defer file.close()
-  file.read_all()
+  @async_io.Reader::read_all(file)
 }
 
 ///|
@@ -323,7 +308,7 @@ pub async fn write_file(
     e => fail("write_file failed: \{e}")
   }
   defer file.close()
-  file.write(data)
+  @async_io.Writer::write(file, data)
 }
 
 ///|
@@ -641,42 +626,6 @@ pub fn write_file_sync(
 }
 
 ///|
-pub fn FileSync::atime(self : FileSync) -> (Int64, Int) raise @wasi.Errno {
-  let stat = self.fd.fd_filestat_get()
-  convert_timestamp(stat.atim)
-}
-
-///|
-pub fn FileSync::ctime(self : FileSync) -> (Int64, Int) raise @wasi.Errno {
-  let stat = self.fd.fd_filestat_get()
-  convert_timestamp(stat.ctim)
-}
-
-///|
-pub fn FileSync::mtime(self : FileSync) -> (Int64, Int) raise @wasi.Errno {
-  let stat = self.fd.fd_filestat_get()
-  convert_timestamp(stat.mtim)
-}
-
-///|
-pub fn FileSync::size(self : FileSync) -> Int64 {
-  try {
-    let stat = self.fd.fd_filestat_get()
-    stat.size.0.reinterpret_as_int64()
-  } catch {
-    _ => 0L
-  }
-}
-
-///|
-pub fn FileSync::kind(self : FileSync) -> FileKind {
-  try {
-    let stat = self.fd.fd_filestat_get()
-    filetype_to_filekind(stat.filetype)
-  } catch {
-    _ => FileKind::Unknown
-  }
-}
 
 ///|
 pub fn File::atime(self : File) -> (Int64, Int) raise @wasi.Errno {
@@ -842,47 +791,33 @@ pub async fn File::write_at(
 }
 
 ///|
-pub async fn Directory::read_all(
+pub fn Directory::read_all(
   self : Directory,
   include_hidden? : Bool = true,
   include_special? : Bool = false,
-) -> Array[String] {
-  try {
-    let _ = @event_loop.suspend_for_read(self.fd)
-    let result : Array[String] = []
-    let entries_tuple = self.fd.fd_readdir()
-    for entry in entries_tuple.0 {
-      let name = entry.0
-      let dir_ent = entry.1
-      if name == "." || name == ".." {
-        continue
-      }
-      if !include_hidden && name.has_prefix(".") {
-        continue
-      }
-      if !include_special {
-        if dir_ent.d_type is @wasi.FileType::Socket_dgram {
-          continue
-        }
-        if dir_ent.d_type is @wasi.FileType::Socket_stream {
-          continue
-        }
-      }
-      result.push(name)
+) -> Array[String] raise @wasi.Errno {
+  let result : Array[String] = []
+  let entries_tuple = self.fd.fd_readdir()
+  for entry in entries_tuple.0 {
+    let name = entry.0
+    let dir_ent = entry.1
+    if name == "." || name == ".." {
+      continue
     }
-    result
-  } catch {
-    e => fail("read_all failed: \{e}")
+    if !include_hidden && name.has_prefix(".") {
+      continue
+    }
+    if !include_special {
+      if dir_ent.d_type is @wasi.FileType::Socket_dgram {
+        continue
+      }
+      if dir_ent.d_type is @wasi.FileType::Socket_stream {
+        continue
+      }
+    }
+    result.push(name)
   }
-}
-
-///|
-pub fn FileSync::as_dir(self : FileSync) -> Directory raise @wasi.Errno {
-  let stat = self.fd.fd_filestat_get()
-  if not(stat.filetype is @wasi.FileType::Directory) {
-    raise @wasi.Notdir
-  }
-  Directory::{ fd: self.fd }
+  result
 }
 
 ///|

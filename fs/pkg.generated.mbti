@@ -32,7 +32,7 @@ pub fn mtime(StringView, follow_symlink? : Bool) -> (Int64, Int) raise @wasi.Err
 
 pub fn open(StringView, mode~ : Mode, sync? : SyncMode, append? : Bool, create? : Int, truncate? : Bool) -> File raise @wasi.Errno
 
-pub fn open_sync(StringView, mode? : Mode, sync? : SyncMode, append? : Bool, create? : Int, truncate? : Bool) -> FileSync raise @wasi.Errno
+pub fn open_sync(StringView, mode? : Mode, sync? : SyncMode, append? : Bool, create? : Int, truncate? : Bool) -> File raise @wasi.Errno
 
 pub fn opendir(StringView) -> Directory raise @wasi.Errno
 
@@ -65,7 +65,7 @@ pub fn write_file_sync(StringView, Bytes, sync? : SyncMode, append? : Bool, crea
 // Types and methods
 type Directory
 pub fn Directory::close(Self) -> Unit
-pub async fn Directory::read_all(Self, include_hidden? : Bool, include_special? : Bool) -> Array[String]
+pub fn Directory::read_all(Self, include_hidden? : Bool, include_special? : Bool) -> Array[String] raise @wasi.Errno
 
 type File
 pub fn File::as_dir(Self) -> Directory raise @wasi.Errno
@@ -82,6 +82,8 @@ pub fn File::sync(Self, only_data? : Bool) -> Unit raise @wasi.Errno
 pub async fn File::write_at(Self, BytesView, position~ : Int64) -> Unit
 pub impl @io.Reader for File
 pub impl @io.Writer for File
+pub impl @sync_io.Reader for File
+pub impl @sync_io.Writer for File
 
 pub(all) enum FileKind {
   Unknown
@@ -95,18 +97,6 @@ pub(all) enum FileKind {
 }
 pub impl Eq for FileKind
 pub impl Show for FileKind
-
-type FileSync
-pub fn FileSync::as_dir(Self) -> Directory raise @wasi.Errno
-pub fn FileSync::atime(Self) -> (Int64, Int) raise @wasi.Errno
-pub fn FileSync::close(Self) -> Unit raise @wasi.Errno
-pub fn FileSync::ctime(Self) -> (Int64, Int) raise @wasi.Errno
-pub fn FileSync::fd(Self) -> Int
-pub fn FileSync::kind(Self) -> FileKind
-pub fn FileSync::mtime(Self) -> (Int64, Int) raise @wasi.Errno
-pub fn FileSync::size(Self) -> Int64
-pub impl @sync_io.Reader for FileSync
-pub impl @sync_io.Writer for FileSync
 
 pub(all) enum Mode {
   ReadOnly

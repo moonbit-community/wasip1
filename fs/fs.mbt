@@ -40,9 +40,7 @@ fn decode_utf8_view(view : BytesView) -> String raise @wasi.Errno {
 fn get_preopened_dirs() -> Array[(String, @wasi.Fd)] raise @wasi.Errno {
   let dirs = []
   for fd = 3; ; fd = fd + 1 {
-    let prestats = try {
-      Some(@wasi.Fd(fd).fd_prestat_get())
-    } catch {
+    let prestats = Some(@wasi.Fd(fd).fd_prestat_get()) catch {
       @wasi.Badf => None
       e => raise e
     }

@@ -83,7 +83,7 @@ Deno.test("core wasi", async (t) => {
 
     await t.step("fd_readdir", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fd_readdir/fd_readdir.wasm'],
+            args: ['--dir', 'test/fd_readdir', 'test/target/wasm/debug/build/fd_readdir/fd_readdir.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()

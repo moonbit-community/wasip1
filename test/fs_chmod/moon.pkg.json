@@ -1,0 +1,14 @@
+{
+  "import": [
+    "peter-jerry-ye/wasi",
+    "peter-jerry-ye/wasi/fs"
+  ],
+  "link": {
+    "wasm": {
+      "export-memory-name": "memory",
+      "exports": [
+        "start:_start"
+      ]
+    }
+  }
+}

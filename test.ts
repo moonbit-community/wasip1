@@ -168,6 +168,17 @@ Deno.test("extensions", async (t) => {
         await assertSnapshot(t, stdout);
     })
 
+    await t.step("fs_chmod", async (t) => {
+        const output = await new Deno.Command("wasmtime", {
+            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_chmod/fs_chmod.wasm'],
+            stdout: 'piped',
+            stderr: 'piped',
+        }).spawn().output()
+        assertEquals(output.code, 0);
+        const stdout = textDecoder.decode(output.stdout)
+        await assertSnapshot(t, stdout);
+    })
+
     await t.step("fs_realpath", async (t) => {
         const output = await new Deno.Command("wasmtime", {
             args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_realpath/fs_realpath.wasm'],

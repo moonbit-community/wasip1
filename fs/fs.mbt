@@ -26,11 +26,13 @@ pub(all) enum SyncMode {
 
 ///|
 fn normalize_path(path : StringView) -> String {
-  let p = path.to_string()
-  if p.has_prefix("/") {
-    p
-  } else {
-    "/" + p
+  path.to_string()
+}
+
+///|
+fn decode_utf8_view(view : BytesView) -> String raise @wasi.Errno {
+  @encoding/utf8.decode(view.to_bytes()) catch {
+    _ => raise @wasi.Ilseq
   }
 }
 
@@ -38,14 +40,17 @@ fn normalize_path(path : StringView) -> String {
 fn get_preopened_dirs() -> Array[(String, @wasi.Fd)] raise @wasi.Errno {
   let dirs = []
   for fd = 3; ; fd = fd + 1 {
-    let _prestat = @wasi.Fd(fd).fd_prestat_get()
-    let dir_name = @wasi.Fd(fd).fd_prestat_dir_name()
-    let normalized_dir = if dir_name.has_prefix("/") {
-      dir_name
-    } else {
-      "/" + dir_name
+    let prestats = try {
+      Some(@wasi.Fd(fd).fd_prestat_get())
+    } catch {
+      @wasi.Badf => None
+      e => raise e
     }
-    dirs.push((normalized_dir, @wasi.Fd(fd)))
+    if prestats is None {
+      break
+    }
+    let dir_name = @wasi.Fd(fd).fd_prestat_dir_name()
+    dirs.push((dir_name, @wasi.Fd(fd)))
   }
   dirs
 }
@@ -53,39 +58,66 @@ fn get_preopened_dirs() -> Array[(String, @wasi.Fd)] raise @wasi.Errno {
 ///|
 pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
   let normalized = normalize_path(path)
+  let normalized_bytes = @encoding/utf8.encode(normalized)
   let preopened_dirs = get_preopened_dirs()
-  let mut best_fd = @wasi.Fd(0)
-  let mut best_path : String = ""
-  let mut best_len = 0
-  for i in 0..<preopened_dirs.length() {
-    let dir_name = preopened_dirs[i].0
-    let fd = preopened_dirs[i].1
-    if normalized.has_prefix(dir_name) {
-      let len = dir_name.length()
-      if len > best_len {
-        best_fd = fd
-        if len == normalized.length() {
+  if normalized.has_prefix("/") {
+    let mut best_fd = @wasi.Fd(0)
+    let mut best_path : String = ""
+    let mut best_len = 0
+    for i in 0..<preopened_dirs.length() {
+      let dir_name = preopened_dirs[i].0
+      let fd = preopened_dirs[i].1
+      if dir_name == "/" {
+        if normalized_bytes.length() == 1 {
+          best_fd = fd
           best_path = "."
+          best_len = 1
         } else {
-          let normalized_str = normalized.to_string()
-          let bytes = @encoding/utf8.encode(normalized_str)
-          best_path = @encoding/utf8.decode(bytes[len:]) catch {
-            _ => raise @wasi.Ilseq
+          best_fd = fd
+          best_path = decode_utf8_view(normalized_bytes[1:])
+          best_len = 1
+        }
+      } else if dir_name.has_prefix("/") {
+        if normalized == dir_name {
+          let len = dir_name.length()
+          if len > best_len {
+            best_fd = fd
+            best_path = "."
+            best_len = len
+          }
+        } else if normalized.has_prefix(dir_name + "/") {
+          let len = dir_name.length()
+          if len > best_len {
+            best_fd = fd
+            let dir_bytes = @encoding/utf8.encode(dir_name)
+            best_path = decode_utf8_view(
+              normalized_bytes[dir_bytes.length() + 1:],
+            )
+            best_len = len
           }
         }
-        best_len = len
       }
     }
-  }
-  if best_len == 0 {
+    if best_len == 0 {
+      raise @wasi.Noent
+    }
+    (best_fd, best_path)
+  } else {
+    for i in 0..<preopened_dirs.length() {
+      let dir_name = preopened_dirs[i].0
+      let fd = preopened_dirs[i].1
+      if dir_name == "." || !dir_name.has_prefix("/") {
+        try {
+          let _ = fd.path_filestat_get(@wasi.LookupFlags::new(), normalized)
+          return (fd, normalized)
+        } catch {
+          @wasi.Noent => ()
+          e => raise e
+        }
+      }
+    }
     raise @wasi.Noent
   }
-  let relative : String = if best_path.strip_prefix("/") is Some(str) {
-    str.to_string()
-  } else {
-    best_path
-  }
-  (best_fd, relative)
 }
 
 ///|
@@ -234,7 +266,7 @@ pub impl @sync_io.Reader for File with _direct_read(
   max_len~,
 ) {
   let buffer = FixedArray::make(max_len, b'\x00')
-  let iovs = [buf]
+  let iovs = [buffer]
   let result = self.fd.fd_read(iovs).0.reinterpret_as_int()
   buffer.blit_to(buf, len=result, dst_offset=offset)
   result

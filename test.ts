@@ -121,9 +121,9 @@ Deno.test("proc_exit", async () => {
     assertEquals(output.code, 122);
 })
 
-Deno.test("fs_basic", async (t) => {
+Deno.test("fs_read_text", async (t) => {
     const output = await new Deno.Command("wasmtime", {
-        args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_basic/fs_basic.wasm'],
+        args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_read_text/fs_read_text.wasm'],
         stdout: 'piped',
         stderr: 'piped',
     }).spawn().output()

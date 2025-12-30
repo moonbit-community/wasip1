@@ -35,11 +35,6 @@ fn normalize_path(path : StringView) -> String {
 }
 
 ///|
-async fn yield_once() -> Unit {
-  @event_loop.sleep(0)
-}
-
-///|
 fn get_preopened_dirs() -> Array[(String, @wasi.Fd)] raise @wasi.Errno {
   let dirs = []
   for fd = 3; ; fd = fd + 1 {
@@ -200,33 +195,27 @@ struct File {
 }
 
 ///|
-pub async fn open(
+pub fn open(
   path : StringView,
   mode~ : Mode,
   sync? : SyncMode = NoSync,
   append? : Bool = false,
   create? : Int,
   truncate? : Bool = false,
-) -> File {
-  yield_once()
-  try {
-    let sync_file = match create {
-      Some(value) =>
-        open_sync(path, mode~, sync~, append~, create=value, truncate~)
-      None => open_sync(path, mode~, sync~, append~, truncate~)
-    }
-    File::{ fd: sync_file.fd, read_buf: @async_io.ReaderBuffer::new() }
-  } catch {
-    e => fail("open failed: \{e}")
+) -> File raise @wasi.Errno {
+  let sync_file = match create {
+    Some(value) => open_sync(path, mode~, sync~, append~, create=value, truncate~)
+    None => open_sync(path, mode~, sync~, append~, truncate~)
   }
+  File::{ fd: sync_file.fd, read_buf: @async_io.ReaderBuffer::new() }
 }
 
 ///|
-pub async fn create(
+pub fn create(
   path : StringView,
   permission~ : Int,
   sync? : SyncMode = NoSync,
-) -> File {
+) -> File raise @wasi.Errno {
   open(path, mode=ReadWrite, sync~, create=permission, truncate=true)
 }
 
@@ -277,7 +266,7 @@ struct Directory {
 }
 
 ///|
-pub fn opendir_sync(path : StringView) -> Directory raise @wasi.Errno {
+pub fn opendir(path : StringView) -> Directory raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
   let rights = @wasi.Rights::new()
     |> @wasi.Rights::set(@wasi.Right::Fd_read)
@@ -296,14 +285,6 @@ pub fn opendir_sync(path : StringView) -> Directory raise @wasi.Errno {
 }
 
 ///|
-pub async fn opendir(path : StringView) -> Directory {
-  yield_once()
-  opendir_sync(path) catch {
-    e => fail("opendir failed: \{e}")
-  }
-}
-
-///|
 pub fn Directory::close(self : Directory) -> Unit {
   self.fd.fd_close() catch {
     _ => ()
@@ -316,7 +297,9 @@ pub async fn read_file(
   sync_timestamp? : Bool,
 ) -> &@async_io.Data {
   let _ = sync_timestamp
-  let file = open(path, mode=ReadOnly)
+  let file = try open(path, mode=ReadOnly) catch {
+    e => fail("read_file failed: \{e}")
+  }
   defer file.close()
   file.read_all()
 }
@@ -330,10 +313,14 @@ pub async fn write_file(
   create? : Int,
   truncate? : Bool = false,
 ) -> Unit {
-  let file = match create {
-    Some(value) =>
-      open(path, mode=WriteOnly, sync~, append~, create=value, truncate~)
-    None => open(path, mode=WriteOnly, sync~, append~, truncate~)
+  let file = try {
+    match create {
+      Some(value) =>
+        open(path, mode=WriteOnly, sync~, append~, create=value, truncate~)
+      None => open(path, mode=WriteOnly, sync~, append~, truncate~)
+    }
+  } catch {
+    e => fail("write_file failed: \{e}")
   }
   defer file.close()
   file.write(data)
@@ -377,7 +364,7 @@ fn get_filestat(
 }
 
 ///|
-pub fn atime_sync(
+pub fn atime(
   path : StringView,
   follow_symlink? : Bool = true,
 ) -> (Int64, Int) raise @wasi.Errno {
@@ -386,7 +373,7 @@ pub fn atime_sync(
 }
 
 ///|
-pub fn ctime_sync(
+pub fn ctime(
   path : StringView,
   follow_symlink? : Bool = true,
 ) -> (Int64, Int) raise @wasi.Errno {
@@ -395,7 +382,7 @@ pub fn ctime_sync(
 }
 
 ///|
-pub fn mtime_sync(
+pub fn mtime(
   path : StringView,
   follow_symlink? : Bool = true,
 ) -> (Int64, Int) raise @wasi.Errno {
@@ -404,7 +391,7 @@ pub fn mtime_sync(
 }
 
 ///|
-pub fn exists_sync(path : StringView) -> Bool {
+pub fn exists(path : StringView) -> Bool {
   try {
     let _ = get_filestat(path, true)
     true
@@ -414,7 +401,7 @@ pub fn exists_sync(path : StringView) -> Bool {
 }
 
 ///|
-pub fn kind_sync(
+pub fn kind(
   path : StringView,
   follow_symlink? : Bool = true,
 ) -> FileKind raise @wasi.Errno {
@@ -423,7 +410,7 @@ pub fn kind_sync(
 }
 
 ///|
-pub fn mkdir_sync(
+pub fn mkdir(
   path : StringView,
   permission~ : Int,
 ) -> Unit raise @wasi.Errno {
@@ -433,8 +420,8 @@ pub fn mkdir_sync(
 }
 
 ///|
-pub fn remove_sync(path : StringView) -> Unit raise @wasi.Errno {
-  let file_kind = kind_sync(path, follow_symlink=false)
+pub fn remove(path : StringView) -> Unit raise @wasi.Errno {
+  let file_kind = kind(path, follow_symlink=false)
   let (base_fd, relative_path) = resolve_path(path)
   if file_kind is FileKind::Directory {
     base_fd.path_remove_directory(relative_path)
@@ -444,12 +431,12 @@ pub fn remove_sync(path : StringView) -> Unit raise @wasi.Errno {
 }
 
 ///|
-pub fn rmdir_sync(
+pub fn rmdir(
   path : StringView,
   recursive? : Bool = false,
 ) -> Unit raise @wasi.Errno {
   if recursive {
-    let entries = readdir_sync(
+    let entries = readdir(
       path,
       include_hidden=true,
       include_special=true,
@@ -457,7 +444,7 @@ pub fn rmdir_sync(
     )
     for entry in entries {
       let entry_path = path.to_string() + "/" + entry
-      remove_sync(entry_path) catch {
+      remove(entry_path) catch {
         _ => ()
       }
     }
@@ -467,13 +454,13 @@ pub fn rmdir_sync(
 }
 
 ///|
-pub fn readdir_sync(
+pub fn readdir(
   path : StringView,
   include_hidden? : Bool = true,
   include_special? : Bool = false,
   sort? : Bool = false,
 ) -> Array[String] raise @wasi.Errno {
-  let dir = opendir_sync(path)
+  let dir = opendir(path)
   let result : Array[String] = []
   let entries_tuple = dir.fd.fd_readdir()
   for entry in entries_tuple.0 {
@@ -486,7 +473,7 @@ pub fn readdir_sync(
     }
     if !include_special {
       let entry_path = path.to_string() + "/" + name
-      let entry_kind = kind_sync(entry_path, follow_symlink=false) catch {
+      let entry_kind = kind(entry_path, follow_symlink=false) catch {
         _ => FileKind::Unknown
       }
       if entry_kind is FileKind::Socket {
@@ -506,7 +493,7 @@ pub fn readdir_sync(
 }
 
 ///|
-pub fn symlink_sync(
+pub fn symlink(
   target~ : StringView,
   path : StringView,
 ) -> Unit raise @wasi.Errno {
@@ -515,100 +502,7 @@ pub fn symlink_sync(
 }
 
 ///|
-pub async fn atime(
-  path : StringView,
-  follow_symlink? : Bool = true,
-) -> (Int64, Int) {
-  yield_once()
-  atime_sync(path, follow_symlink~) catch {
-    e => fail("atime failed: \{e}")
-  }
-}
-
-///|
-pub async fn ctime(
-  path : StringView,
-  follow_symlink? : Bool = true,
-) -> (Int64, Int) {
-  yield_once()
-  ctime_sync(path, follow_symlink~) catch {
-    e => fail("ctime failed: \{e}")
-  }
-}
-
-///|
-pub async fn mtime(
-  path : StringView,
-  follow_symlink? : Bool = true,
-) -> (Int64, Int) {
-  yield_once()
-  mtime_sync(path, follow_symlink~) catch {
-    e => fail("mtime failed: \{e}")
-  }
-}
-
-///|
-pub async fn exists(path : StringView) -> Bool {
-  yield_once()
-  exists_sync(path)
-}
-
-///|
-pub async fn kind(path : StringView, follow_symlink? : Bool = true) -> FileKind {
-  yield_once()
-  kind_sync(path, follow_symlink~) catch {
-    _ => FileKind::Unknown
-  }
-}
-
-///|
-pub async fn mkdir(path : StringView, permission~ : Int) -> Unit {
-  yield_once()
-  mkdir_sync(path, permission~) catch {
-    e => fail("mkdir failed: \{e}")
-  }
-}
-
-///|
-pub async fn remove(path : StringView) -> Unit {
-  yield_once()
-  remove_sync(path) catch {
-    e => fail("remove failed: \{e}")
-  }
-}
-
-///|
-pub async fn rmdir(path : StringView, recursive? : Bool = false) -> Unit {
-  yield_once()
-  rmdir_sync(path, recursive~) catch {
-    e => fail("rmdir failed: \{e}")
-  }
-}
-
-///|
-pub async fn readdir(
-  path : StringView,
-  include_hidden? : Bool = true,
-  include_special? : Bool = false,
-  sort? : Bool = false,
-) -> Array[String] {
-  yield_once()
-  readdir_sync(path, include_hidden~, include_special~, sort~) catch {
-    e => fail("readdir failed: \{e}")
-  }
-}
-
-///|
-pub async fn symlink(target~ : StringView, path : StringView) -> Unit {
-  yield_once()
-  symlink_sync(target~, path) catch {
-    e => fail("symlink failed: \{e}")
-  }
-}
-
-///|
-pub async fn realpath(path : StringView) -> String {
-  yield_once()
+pub fn realpath(path : StringView) -> String {
   normalize_path(path)
 }
 
@@ -618,7 +512,7 @@ async fn walk_inner(
   visitor : async (String, Array[String]) -> Unit,
   allow_failure : Bool,
 ) -> Unit {
-  let entries = readdir_sync(
+  let entries = readdir(
     path,
     include_hidden=true,
     include_special=true,
@@ -629,7 +523,7 @@ async fn walk_inner(
   visitor(path, entries)
   for entry in entries {
     let entry_path = path + "/" + entry
-    let entry_kind = kind_sync(entry_path, follow_symlink=false) catch {
+    let entry_kind = kind(entry_path, follow_symlink=false) catch {
       e =>
         if allow_failure {
           FileKind::Unknown
@@ -667,20 +561,14 @@ pub fn readlink(path : StringView) -> String raise @wasi.Errno {
 }
 
 ///|
-pub fn chmod_sync(path : StringView, mode : Int) -> Unit {
+pub fn chmod(path : StringView, mode : Int) -> Unit {
   let _ = path
   let _ = mode
 
 }
 
 ///|
-pub async fn chmod(path : StringView, mode : Int) -> Unit {
-  yield_once()
-  chmod_sync(path, mode)
-}
-
-///|
-pub fn can_execute_sync(path : StringView) -> Bool {
+pub fn can_execute(path : StringView) -> Bool {
   try {
     let file = open_sync(path, mode=ReadOnly)
     file.close()
@@ -691,7 +579,7 @@ pub fn can_execute_sync(path : StringView) -> Bool {
 }
 
 ///|
-pub fn can_read_sync(path : StringView) -> Bool {
+pub fn can_read(path : StringView) -> Bool {
   try {
     let file = open_sync(path, mode=ReadOnly)
     file.close()
@@ -702,7 +590,7 @@ pub fn can_read_sync(path : StringView) -> Bool {
 }
 
 ///|
-pub fn can_write_sync(path : StringView) -> Bool {
+pub fn can_write(path : StringView) -> Bool {
   try {
     let file = open_sync(path, mode=WriteOnly)
     file.close()
@@ -713,23 +601,6 @@ pub fn can_write_sync(path : StringView) -> Bool {
 }
 
 ///|
-pub async fn can_execute(path : StringView) -> Bool {
-  yield_once()
-  can_execute_sync(path)
-}
-
-///|
-pub async fn can_read(path : StringView) -> Bool {
-  yield_once()
-  can_read_sync(path)
-}
-
-///|
-pub async fn can_write(path : StringView) -> Bool {
-  yield_once()
-  can_write_sync(path)
-}
-
 ///|
 pub fn read_file_sync(path : StringView) -> Bytes raise @wasi.Errno {
   let file = open_sync(path, mode=ReadOnly)
@@ -808,36 +679,21 @@ pub fn FileSync::kind(self : FileSync) -> FileKind {
 }
 
 ///|
-pub async fn File::atime(self : File) -> (Int64, Int) {
-  yield_once()
-  try {
-    let stat = self.fd.fd_filestat_get()
-    convert_timestamp(stat.atim)
-  } catch {
-    e => fail("atime failed: \{e}")
-  }
+pub fn File::atime(self : File) -> (Int64, Int) raise @wasi.Errno {
+  let stat = self.fd.fd_filestat_get()
+  convert_timestamp(stat.atim)
 }
 
 ///|
-pub async fn File::ctime(self : File) -> (Int64, Int) {
-  yield_once()
-  try {
-    let stat = self.fd.fd_filestat_get()
-    convert_timestamp(stat.ctim)
-  } catch {
-    e => fail("ctime failed: \{e}")
-  }
+pub fn File::ctime(self : File) -> (Int64, Int) raise @wasi.Errno {
+  let stat = self.fd.fd_filestat_get()
+  convert_timestamp(stat.ctim)
 }
 
 ///|
-pub async fn File::mtime(self : File) -> (Int64, Int) {
-  yield_once()
-  try {
-    let stat = self.fd.fd_filestat_get()
-    convert_timestamp(stat.mtim)
-  } catch {
-    e => fail("mtime failed: \{e}")
-  }
+pub fn File::mtime(self : File) -> (Int64, Int) raise @wasi.Errno {
+  let stat = self.fd.fd_filestat_get()
+  convert_timestamp(stat.mtim)
 }
 
 ///|
@@ -905,14 +761,9 @@ pub async fn File::read_exactly_at(
 }
 
 ///|
-pub async fn File::size(self : File) -> Int64 {
-  yield_once()
-  try {
-    let stat = self.fd.fd_filestat_get()
-    stat.size.0.reinterpret_as_int64()
-  } catch {
-    e => fail("size failed: \{e}")
-  }
+pub fn File::size(self : File) -> Int64 raise @wasi.Errno {
+  let stat = self.fd.fd_filestat_get()
+  stat.size.0.reinterpret_as_int64()
 }
 
 ///|
@@ -926,16 +777,11 @@ pub fn File::kind(self : File) -> FileKind {
 }
 
 ///|
-pub async fn File::sync(self : File, only_data? : Bool = false) -> Unit {
-  yield_once()
-  try {
-    if only_data {
-      self.fd.fd_datasync()
-    } else {
-      self.fd.fd_sync()
-    }
-  } catch {
-    e => fail("sync failed: \{e}")
+pub fn File::sync(self : File, only_data? : Bool = false) -> Unit raise @wasi.Errno {
+  if only_data {
+    self.fd.fd_datasync()
+  } else {
+    self.fd.fd_sync()
   }
 }
 

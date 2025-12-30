@@ -27,6 +27,7 @@ pub(all) enum ClockId {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric clock id value.
 pub fn ClockId::value(self : ClockId) -> UInt {
   match self {
     RealTime => 0
@@ -37,6 +38,7 @@ pub fn ClockId::value(self : ClockId) -> UInt {
 }
 
 ///|
+/// Convert a numeric clock id into `ClockId`.
 pub fn ClockId::from_value(value : UInt) -> ClockId? {
   match value {
     0 => Some(RealTime)
@@ -135,6 +137,7 @@ pub(all) suberror Errno {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric errno value.
 pub fn Errno::value(self : Errno) -> UInt {
   match self {
     Success => 0
@@ -218,6 +221,7 @@ pub fn Errno::value(self : Errno) -> UInt {
 }
 
 ///|
+/// Convert a numeric errno into `Errno`.
 pub fn Errno::from_value(value : UInt) -> Errno? {
   match value {
     0 => Some(Success)
@@ -314,6 +318,7 @@ test "errno" {
 pub(all) struct Rights(UInt64) derive(Eq, Show)
 
 ///|
+/// Create an empty set of rights.
 pub fn Rights::new() -> Rights {
   0
 }
@@ -354,6 +359,7 @@ pub(all) enum Right {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for a single right.
 pub fn Right::value(self : Right) -> UInt64 {
   match self {
     Fd_datasync => 1UL << 0
@@ -390,16 +396,19 @@ pub fn Right::value(self : Right) -> UInt64 {
 }
 
 ///|
+/// Return a new rights set with the given right enabled.
 pub fn Rights::set(self : Rights, right : Right) -> Rights {
   self.0 | right.value()
 }
 
 ///|
+/// Return a new rights set with the given right disabled.
 pub fn Rights::unset(self : Rights, right : Right) -> Rights {
   self.0 & (right.value() ^ 0)
 }
 
 ///|
+/// Check whether a right is enabled.
 pub fn Rights::is_set(self : Rights, right : Right) -> Bool {
   (self.0 & right.value()) != 0
 }
@@ -441,6 +450,7 @@ pub(all) enum Whence {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric whence value.
 pub fn Whence::value(self : Whence) -> UInt {
   match self {
     Set => 0
@@ -450,6 +460,7 @@ pub fn Whence::value(self : Whence) -> UInt {
 }
 
 ///|
+/// Convert a numeric whence into `Whence`.
 pub fn Whence::from_value(value : UInt) -> Whence? {
   match value {
     0 => Some(Set)
@@ -496,6 +507,7 @@ pub(all) enum FileType {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric file type value.
 pub fn FileType::value(self : FileType) -> Int {
   match self {
     Unknown => 0
@@ -510,6 +522,7 @@ pub fn FileType::value(self : FileType) -> Int {
 }
 
 ///|
+/// Convert a numeric file type into `FileType`.
 pub fn FileType::from_value(value : Int) -> FileType? {
   match value {
     0 => Some(Unknown)
@@ -557,6 +570,7 @@ pub(all) enum Advice {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric advice value.
 pub fn Advice::value(self : Advice) -> UInt {
   match self {
     Normal => 0
@@ -569,6 +583,7 @@ pub fn Advice::value(self : Advice) -> UInt {
 }
 
 ///|
+/// Convert a numeric advice value into `Advice`.
 pub fn Advice::from_value(value : UInt) -> Advice? {
   match value {
     0 => Some(Normal)
@@ -586,6 +601,7 @@ pub fn Advice::from_value(value : UInt) -> Advice? {
 pub(all) struct FdFlags(UInt) derive(Eq, Show)
 
 ///|
+/// Create an empty set of fd flags.
 pub fn FdFlags::new() -> FdFlags {
   0
 }
@@ -607,6 +623,7 @@ pub(all) enum FdFlag {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for a single fd flag.
 pub fn FdFlag::value(self : FdFlag) -> UInt {
   match self {
     Append => 1
@@ -618,16 +635,19 @@ pub fn FdFlag::value(self : FdFlag) -> UInt {
 }
 
 ///|
+/// Return a new fd flags set with the given flag enabled.
 pub fn FdFlags::set(self : FdFlags, flag : FdFlag) -> FdFlags {
   self.0 | flag.value()
 }
 
 ///|
+/// Return a new fd flags set with the given flag disabled.
 pub fn FdFlags::unset(self : FdFlags, flag : FdFlag) -> FdFlags {
   self.0 & (flag.value() ^ 0)
 }
 
 ///|
+/// Check whether an fd flag is enabled.
 pub fn FdFlags::is_set(self : FdFlags, flag : FdFlag) -> Bool {
   (self.0 & flag.value()) != 0
 }
@@ -656,6 +676,7 @@ pub(all) struct Device(UInt64) derive(Eq, Show)
 pub(all) struct FstFlags(UInt) derive(Eq, Show)
 
 ///|
+/// Create an empty set of filestat flags.
 pub fn FstFlags::new() -> FstFlags {
   0
 }
@@ -675,6 +696,7 @@ pub(all) enum FstFlag {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for a filestat flag.
 pub fn FstFlag::value(self : FstFlag) -> UInt {
   match self {
     Atim => 1
@@ -685,16 +707,19 @@ pub fn FstFlag::value(self : FstFlag) -> UInt {
 }
 
 ///|
+/// Return a new filestat flags set with the given flag enabled.
 pub fn FstFlags::set(self : FstFlags, flag : FstFlag) -> FstFlags {
   self.0 | flag.value()
 }
 
 ///|
+/// Return a new filestat flags set with the given flag disabled.
 pub fn FstFlags::unset(self : FstFlags, flag : FstFlag) -> FstFlags {
   self.0 & (flag.value() ^ 0)
 }
 
 ///|
+/// Check whether a filestat flag is enabled.
 pub fn FstFlags::is_set(self : FstFlags, flag : FstFlag) -> Bool {
   (self.0 & flag.value()) != 0
 }
@@ -704,6 +729,7 @@ pub fn FstFlags::is_set(self : FstFlags, flag : FstFlag) -> Bool {
 pub(all) struct LookupFlags(UInt) derive(Eq, Show)
 
 ///|
+/// Create an empty set of lookup flags.
 pub fn LookupFlags::new() -> LookupFlags {
   0
 }
@@ -714,6 +740,7 @@ pub(all) enum LookupFlag {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for a lookup flag.
 pub fn LookupFlag::value(self : LookupFlag) -> UInt {
   match self {
     Symlink_follow => 1
@@ -721,16 +748,19 @@ pub fn LookupFlag::value(self : LookupFlag) -> UInt {
 }
 
 ///|
+/// Return a new lookup flags set with the given flag enabled.
 pub fn LookupFlags::set(self : LookupFlags, flag : LookupFlag) -> LookupFlags {
   self.0 | flag.value()
 }
 
 ///|
+/// Return a new lookup flags set with the given flag disabled.
 pub fn LookupFlags::unset(self : LookupFlags, flag : LookupFlag) -> LookupFlags {
   self.0 & (flag.value() ^ 0)
 }
 
 ///|
+/// Check whether a lookup flag is enabled.
 pub fn LookupFlags::is_set(self : LookupFlags, flag : LookupFlag) -> Bool {
   (self.0 & flag.value()) != 0
 }
@@ -740,6 +770,7 @@ pub fn LookupFlags::is_set(self : LookupFlags, flag : LookupFlag) -> Bool {
 pub(all) struct OpenFlags(UInt) derive(Eq, Show)
 
 ///|
+/// Create an empty set of open flags.
 pub fn OpenFlags::new() -> OpenFlags {
   0
 }
@@ -759,6 +790,7 @@ pub(all) enum OpenFlag {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for an open flag.
 pub fn OpenFlag::value(self : OpenFlag) -> UInt {
   match self {
     Create => 1
@@ -769,16 +801,19 @@ pub fn OpenFlag::value(self : OpenFlag) -> UInt {
 }
 
 ///|
+/// Return a new open flags set with the given flag enabled.
 pub fn OpenFlags::set(self : OpenFlags, flag : OpenFlag) -> OpenFlags {
   self.0 | flag.value()
 }
 
 ///|
+/// Return a new open flags set with the given flag disabled.
 pub fn OpenFlags::unset(self : OpenFlags, flag : OpenFlag) -> OpenFlags {
   self.0 & (flag.value() ^ 0)
 }
 
 ///|
+/// Check whether an open flag is enabled.
 pub fn OpenFlags::is_set(self : OpenFlags, flag : OpenFlag) -> Bool {
   (self.0 & flag.value()) != 0
 }
@@ -827,6 +862,7 @@ pub(all) enum EventType {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for an event type.
 pub fn EventType::value(self : EventType) -> UInt {
   match self {
     Clock => 0
@@ -836,6 +872,7 @@ pub fn EventType::value(self : EventType) -> UInt {
 }
 
 ///|
+/// Convert a numeric event type into `EventType`.
 pub fn EventType::from_value(value : UInt) -> EventType? {
   match value {
     0 => Some(Clock)
@@ -850,6 +887,7 @@ pub fn EventType::from_value(value : UInt) -> EventType? {
 pub(all) struct EventRWFlags(UInt) derive(Eq, Show)
 
 ///|
+/// Create an empty set of event read/write flags.
 pub fn EventRWFlags::new() -> EventRWFlags {
   0
 }
@@ -863,6 +901,7 @@ pub(all) enum EventRWFlag {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for an event read/write flag.
 pub fn EventRWFlag::value(self : EventRWFlag) -> UInt {
   match self {
     Fd_readwrite_hangup => 1
@@ -870,6 +909,7 @@ pub fn EventRWFlag::value(self : EventRWFlag) -> UInt {
 }
 
 ///|
+/// Return a new event read/write flags set with the given flag enabled.
 pub fn EventRWFlags::set(
   self : EventRWFlags,
   flag : EventRWFlag,
@@ -878,6 +918,7 @@ pub fn EventRWFlags::set(
 }
 
 ///|
+/// Return a new event read/write flags set with the given flag disabled.
 pub fn EventRWFlags::unset(
   self : EventRWFlags,
   flag : EventRWFlag,
@@ -886,6 +927,7 @@ pub fn EventRWFlags::unset(
 }
 
 ///|
+/// Check whether an event read/write flag is enabled.
 pub fn EventRWFlags::is_set(self : EventRWFlags, flag : EventRWFlag) -> Bool {
   (self.0 & flag.value()) != 0
 }
@@ -920,6 +962,7 @@ pub(all) struct Event {
 pub(all) struct SubclockFlags(UInt) derive(Eq, Show)
 
 ///|
+/// Create an empty set of subclock flags.
 pub fn SubclockFlags::new() -> SubclockFlags {
   0
 }
@@ -938,6 +981,7 @@ pub(all) enum SubclockFlag {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for a subclock flag.
 pub fn SubclockFlag::value(self : SubclockFlag) -> UInt {
   match self {
     Subscription_clock_abstime => 1
@@ -945,6 +989,7 @@ pub fn SubclockFlag::value(self : SubclockFlag) -> UInt {
 }
 
 ///|
+/// Return a new subclock flags set with the given flag enabled.
 pub fn SubclockFlags::set(
   self : SubclockFlags,
   flag : SubclockFlag,
@@ -953,6 +998,7 @@ pub fn SubclockFlags::set(
 }
 
 ///|
+/// Return a new subclock flags set with the given flag disabled.
 pub fn SubclockFlags::unset(
   self : SubclockFlags,
   flag : SubclockFlag,
@@ -961,6 +1007,7 @@ pub fn SubclockFlags::unset(
 }
 
 ///|
+/// Check whether a subclock flag is enabled.
 pub fn SubclockFlags::is_set(self : SubclockFlags, flag : SubclockFlag) -> Bool {
   (self.0 & flag.value()) != 0
 }
@@ -1077,6 +1124,7 @@ pub(all) enum Signal {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for a signal.
 pub fn Signal::value(self : Signal) -> UInt {
   match self {
     None => 0
@@ -1114,6 +1162,7 @@ pub fn Signal::value(self : Signal) -> UInt {
 }
 
 ///|
+/// Convert a numeric signal into `Signal`.
 pub fn Signal::from_value(value : UInt) -> Signal? {
   match value {
     0 => Some(None)
@@ -1156,6 +1205,7 @@ pub fn Signal::from_value(value : UInt) -> Signal? {
 pub(all) struct RiFlags(UInt) derive(Eq, Show)
 
 ///|
+/// Create an empty set of recv flags.
 pub fn RiFlags::new() -> RiFlags {
   0
 }
@@ -1171,6 +1221,7 @@ pub(all) enum RiFlag {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for a recv flag.
 pub fn RiFlag::value(self : RiFlag) -> UInt {
   match self {
     Recv_peek => 1
@@ -1179,16 +1230,19 @@ pub fn RiFlag::value(self : RiFlag) -> UInt {
 }
 
 ///|
+/// Return a new recv flags set with the given flag enabled.
 pub fn RiFlags::set(self : RiFlags, flag : RiFlag) -> RiFlags {
   self.0 | flag.value()
 }
 
 ///|
+/// Return a new recv flags set with the given flag disabled.
 pub fn RiFlags::unset(self : RiFlags, flag : RiFlag) -> RiFlags {
   self.0 & (flag.value() ^ 0)
 }
 
 ///|
+/// Check whether a recv flag is enabled.
 pub fn RiFlags::is_set(self : RiFlags, flag : RiFlag) -> Bool {
   (self.0 & flag.value()) != 0
 }
@@ -1198,6 +1252,7 @@ pub fn RiFlags::is_set(self : RiFlags, flag : RiFlag) -> Bool {
 pub(all) struct RoFlags(UInt) derive(Eq, Show)
 
 ///|
+/// Create an empty set of recv open flags.
 pub fn RoFlags::new() -> RoFlags {
   0
 }
@@ -1211,6 +1266,7 @@ pub(all) enum RoFlag {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for a recv open flag.
 pub fn RoFlag::value(self : RoFlag) -> UInt {
   match self {
     Recv_data_truncated => 1
@@ -1218,16 +1274,19 @@ pub fn RoFlag::value(self : RoFlag) -> UInt {
 }
 
 ///|
+/// Return a new recv open flags set with the given flag enabled.
 pub fn RoFlags::set(self : RoFlags, flag : RoFlag) -> RoFlags {
   self.0 | flag.value()
 }
 
 ///|
+/// Return a new recv open flags set with the given flag disabled.
 pub fn RoFlags::unset(self : RoFlags, flag : RoFlag) -> RoFlags {
   self.0 & (flag.value() ^ 0)
 }
 
 ///|
+/// Check whether a recv open flag is enabled.
 pub fn RoFlags::is_set(self : RoFlags, flag : RoFlag) -> Bool {
   (self.0 & flag.value()) != 0
 }
@@ -1237,6 +1296,7 @@ pub fn RoFlags::is_set(self : RoFlags, flag : RoFlag) -> Bool {
 pub(all) struct SiFlags(UInt) derive(Eq, Show)
 
 ///|
+/// Create an empty set of send flags.
 pub fn SiFlags::new() -> SiFlags {
   0
 }
@@ -1246,6 +1306,7 @@ pub fn SiFlags::new() -> SiFlags {
 pub(all) enum SiFlag {} derive(Eq, Show)
 
 ///|
+/// Return the numeric value for a send flag.
 pub fn SiFlag::value(self : SiFlag) -> UInt {
   match self {
     _ => panic()
@@ -1253,16 +1314,19 @@ pub fn SiFlag::value(self : SiFlag) -> UInt {
 }
 
 ///|
+/// Return a new send flags set with the given flag enabled.
 pub fn SiFlags::set(self : SiFlags, flag : SiFlag) -> SiFlags {
   self.0 | flag.value()
 }
 
 ///|
+/// Return a new send flags set with the given flag disabled.
 pub fn SiFlags::unset(self : SiFlags, flag : SiFlag) -> SiFlags {
   self.0 & (flag.value() ^ 0)
 }
 
 ///|
+/// Check whether a send flag is enabled.
 pub fn SiFlags::is_set(self : SiFlags, flag : SiFlag) -> Bool {
   (self.0 & flag.value()) != 0
 }
@@ -1272,6 +1336,7 @@ pub fn SiFlags::is_set(self : SiFlags, flag : SiFlag) -> Bool {
 pub(all) struct SdFlags(UInt) derive(Eq, Show)
 
 ///|
+/// Create an empty set of shutdown flags.
 pub fn SdFlags::new() -> SdFlags {
   0
 }
@@ -1287,6 +1352,7 @@ pub(all) enum SdFlag {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric value for a shutdown flag.
 pub fn SdFlag::value(self : SdFlag) -> UInt {
   match self {
     Rd => 1
@@ -1295,16 +1361,19 @@ pub fn SdFlag::value(self : SdFlag) -> UInt {
 }
 
 ///|
+/// Return a new shutdown flags set with the given flag enabled.
 pub fn SdFlags::set(self : SdFlags, flag : SdFlag) -> SdFlags {
   self.0 | flag.value()
 }
 
 ///|
+/// Return a new shutdown flags set with the given flag disabled.
 pub fn SdFlags::unset(self : SdFlags, flag : SdFlag) -> SdFlags {
   self.0 & (flag.value() ^ 0)
 }
 
 ///|
+/// Check whether a shutdown flag is enabled.
 pub fn SdFlags::is_set(self : SdFlags, flag : SdFlag) -> Bool {
   (self.0 & flag.value()) != 0
 }
@@ -1318,6 +1387,7 @@ pub(all) enum PreOpenType {
 } derive(Eq, Show)
 
 ///|
+/// Return the numeric preopen type value.
 pub fn PreOpenType::value(self : PreOpenType) -> UInt {
   match self {
     Dir => 0
@@ -1325,6 +1395,7 @@ pub fn PreOpenType::value(self : PreOpenType) -> UInt {
 }
 
 ///|
+/// Convert a numeric preopen type into `PreOpenType`.
 pub fn PreOpenType::from_value(value : UInt) -> PreOpenType? {
   match value {
     0 => Some(Dir)
@@ -1347,10 +1418,13 @@ pub(all) enum PreStat {
 } derive(Eq, Show)
 
 ///|
+/// Standard input file descriptor.
 pub let stdin : Fd = 0
 
 ///|
+/// Standard output file descriptor.
 pub let stdout : Fd = 1
 
 ///|
+/// Standard error file descriptor.
 pub let stderr : Fd = 2

@@ -29,21 +29,25 @@ let scheduler : Scheduler = {
 }
 
 ///|
+/// Return the currently running coroutine.
 pub fn current_coroutine() -> Coroutine {
   scheduler.curr_coro.unwrap()
 }
 
 ///|
+/// Return whether any coroutine is ready to run.
 pub fn has_immediately_ready_task() -> Bool {
   !scheduler.run_later.is_empty()
 }
 
 ///|
+/// Return whether the scheduler has no runnable or blocked tasks.
 pub fn no_more_work() -> Bool {
   scheduler.blocking == 0 && scheduler.run_later.is_empty()
 }
 
 ///|
+/// Run ready coroutines until the queue is empty.
 pub fn reschedule() -> Unit {
   while scheduler.run_later.pop_front() is Some(coro) {
     coro.ready = false

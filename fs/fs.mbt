@@ -1,4 +1,5 @@
 ///|
+/// High-level file kinds mapped from WASI file types.
 pub(all) enum FileKind {
   Unknown
   Regular
@@ -11,6 +12,7 @@ pub(all) enum FileKind {
 } derive(Eq, Show)
 
 ///|
+/// File open modes used by `open` and `open_sync`.
 pub(all) enum Mode {
   ReadOnly
   WriteOnly
@@ -18,6 +20,7 @@ pub(all) enum Mode {
 }
 
 ///|
+/// Sync behavior for writes when opening or creating files.
 pub(all) enum SyncMode {
   NoSync
   Data
@@ -54,6 +57,7 @@ fn get_preopened_dirs() -> Array[(String, @wasi.Fd)] raise @wasi.Errno {
 }
 
 ///|
+/// Resolve a WASI path against preopened directories.
 pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
   let normalized = normalize_path(path)
   let normalized_bytes = @encoding/utf8.encode(normalized)
@@ -119,8 +123,7 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
 }
 
 ///|
-
-///|
+/// Open a file using WASI preopen path resolution.
 pub fn open_sync(
   path : StringView,
   mode? : Mode = ReadOnly,
@@ -179,12 +182,14 @@ pub fn open_sync(
 }
 
 ///|
+/// File handle backed by a WASI file descriptor.
 struct File {
   fd : @wasi.Fd
   read_buf : @async_io.ReaderBuffer
 }
 
 ///|
+/// Open a file with the requested mode and options.
 pub fn open(
   path : StringView,
   mode~ : Mode,
@@ -201,6 +206,7 @@ pub fn open(
 }
 
 ///|
+/// Create or truncate a file with read/write access.
 pub fn create(
   path : StringView,
   permission~ : Int,
@@ -210,6 +216,7 @@ pub fn create(
 }
 
 ///|
+/// Close the file, ignoring any close error.
 pub fn File::close(self : File) -> Unit {
   self.fd.fd_close() catch {
     _ => ()
@@ -217,16 +224,19 @@ pub fn File::close(self : File) -> Unit {
 }
 
 ///|
+/// Return the raw WASI file descriptor number.
 pub fn File::fd(self : File) -> Int {
   self.fd.0
 }
 
 ///|
+/// Async reader implementation for `File`.
 pub impl @async_io.Reader for File with _get_internal_buffer(self) {
   self.read_buf
 }
 
 ///|
+/// Async read implementation for `File`.
 pub impl @async_io.Reader for File with _direct_read(
   self,
   buf,
@@ -242,6 +252,7 @@ pub impl @async_io.Reader for File with _direct_read(
 }
 
 ///|
+/// Async write implementation for `File`.
 pub impl @async_io.Writer for File with write_once(self, data, offset~, len~) {
   let available = @event_loop.suspend_for_write(self.fd)
   let write_len = @cmp.minimum(available, len.to_uint64()).to_int()
@@ -251,12 +262,14 @@ pub impl @async_io.Writer for File with write_once(self, data, offset~, len~) {
 }
 
 ///|
+/// Sync reader implementation for `File`.
 pub impl @sync_io.Reader for File with _get_internal_buffer(self) {
   let _ = self
   @sync_io.ReaderBuffer::new()
 }
 
 ///|
+/// Sync read implementation for `File`.
 pub impl @sync_io.Reader for File with _direct_read(
   self,
   buf,
@@ -271,6 +284,7 @@ pub impl @sync_io.Reader for File with _direct_read(
 }
 
 ///|
+/// Sync write implementation for `File`.
 pub impl @sync_io.Writer for File with write_once(self, data, offset~, len~) {
   let iovs = [data[offset:offset + len]]
   let result = self.fd.fd_write(iovs)
@@ -278,11 +292,13 @@ pub impl @sync_io.Writer for File with write_once(self, data, offset~, len~) {
 }
 
 ///|
+/// Directory handle backed by a WASI directory descriptor.
 struct Directory {
   fd : @wasi.Fd
 }
 
 ///|
+/// Open a directory for reading entries.
 pub fn opendir(path : StringView) -> Directory raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
   let rights = @wasi.Rights::new()
@@ -302,6 +318,7 @@ pub fn opendir(path : StringView) -> Directory raise @wasi.Errno {
 }
 
 ///|
+/// Close the directory, ignoring any close error.
 pub fn Directory::close(self : Directory) -> Unit {
   self.fd.fd_close() catch {
     _ => ()
@@ -309,6 +326,7 @@ pub fn Directory::close(self : Directory) -> Unit {
 }
 
 ///|
+/// Read the entire file asynchronously.
 pub async fn read_file(
   path : StringView,
   sync_timestamp? : Bool,
@@ -320,6 +338,7 @@ pub async fn read_file(
 }
 
 ///|
+/// Write data to a file asynchronously.
 pub async fn write_file(
   path : StringView,
   data : &@async_io.Data,
@@ -375,6 +394,7 @@ fn get_filestat(
 }
 
 ///|
+/// Get access time for a path.
 pub fn atime(
   path : StringView,
   follow_symlink? : Bool = true,
@@ -384,6 +404,7 @@ pub fn atime(
 }
 
 ///|
+/// Get creation/change time for a path.
 pub fn ctime(
   path : StringView,
   follow_symlink? : Bool = true,
@@ -393,6 +414,7 @@ pub fn ctime(
 }
 
 ///|
+/// Get modification time for a path.
 pub fn mtime(
   path : StringView,
   follow_symlink? : Bool = true,
@@ -402,6 +424,7 @@ pub fn mtime(
 }
 
 ///|
+/// Check if a path exists.
 pub fn exists(path : StringView) -> Bool {
   try {
     let _ = get_filestat(path, true)
@@ -412,6 +435,7 @@ pub fn exists(path : StringView) -> Bool {
 }
 
 ///|
+/// Get the file kind for a path.
 pub fn kind(
   path : StringView,
   follow_symlink? : Bool = true,
@@ -421,6 +445,7 @@ pub fn kind(
 }
 
 ///|
+/// Create a directory.
 pub fn mkdir(path : StringView, permission~ : Int) -> Unit raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
   let _permission = permission
@@ -428,6 +453,7 @@ pub fn mkdir(path : StringView, permission~ : Int) -> Unit raise @wasi.Errno {
 }
 
 ///|
+/// Remove a file or directory.
 pub fn remove(path : StringView) -> Unit raise @wasi.Errno {
   let file_kind = kind(path, follow_symlink=false)
   let (base_fd, relative_path) = resolve_path(path)
@@ -439,6 +465,7 @@ pub fn remove(path : StringView) -> Unit raise @wasi.Errno {
 }
 
 ///|
+/// Remove a directory, optionally recursively.
 pub fn rmdir(
   path : StringView,
   recursive? : Bool = false,
@@ -462,6 +489,7 @@ pub fn rmdir(
 }
 
 ///|
+/// Read directory entries.
 pub fn readdir(
   path : StringView,
   include_hidden? : Bool = true,
@@ -501,6 +529,7 @@ pub fn readdir(
 }
 
 ///|
+/// Create a symbolic link.
 pub fn symlink(
   target~ : StringView,
   path : StringView,
@@ -510,6 +539,7 @@ pub fn symlink(
 }
 
 ///|
+/// Normalize and return a path string.
 pub fn realpath(path : StringView) -> String {
   normalize_path(path)
 }
@@ -546,6 +576,7 @@ async fn walk_inner(
 }
 
 ///|
+/// Walk a directory tree and invoke `visitor` for each directory.
 pub async fn walk(
   path : StringView,
   visitor : async (String, Array[String]) -> Unit,
@@ -562,6 +593,7 @@ pub async fn walk(
 }
 
 ///|
+/// Read the target of a symbolic link.
 pub fn readlink(path : StringView) -> String raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
   let size = base_fd.path_readlink(relative_path)
@@ -569,6 +601,7 @@ pub fn readlink(path : StringView) -> String raise @wasi.Errno {
 }
 
 ///|
+/// Change file permissions (no-op on WASI preview1).
 pub fn chmod(path : StringView, mode : Int) -> Unit {
   let _ = path
   let _ = mode
@@ -576,6 +609,7 @@ pub fn chmod(path : StringView, mode : Int) -> Unit {
 }
 
 ///|
+/// Best-effort check for executable access by opening the path.
 pub fn can_execute(path : StringView) -> Bool {
   try {
     let file = open_sync(path, mode=ReadOnly)
@@ -587,6 +621,7 @@ pub fn can_execute(path : StringView) -> Bool {
 }
 
 ///|
+/// Check if a path can be opened for reading.
 pub fn can_read(path : StringView) -> Bool {
   try {
     let file = open_sync(path, mode=ReadOnly)
@@ -598,6 +633,7 @@ pub fn can_read(path : StringView) -> Bool {
 }
 
 ///|
+/// Check if a path can be opened for writing.
 pub fn can_write(path : StringView) -> Bool {
   try {
     let file = open_sync(path, mode=WriteOnly)
@@ -609,8 +645,7 @@ pub fn can_write(path : StringView) -> Bool {
 }
 
 ///|
-
-///|
+/// Read the entire file synchronously.
 pub fn read_file_sync(path : StringView) -> &@sync_io.Data raise {
   let file = open_sync(path, mode=ReadOnly)
   defer file.close()
@@ -618,6 +653,7 @@ pub fn read_file_sync(path : StringView) -> &@sync_io.Data raise {
 }
 
 ///|
+/// Write data to a file synchronously.
 pub fn write_file_sync(
   path : StringView,
   data : &@sync_io.Data,
@@ -636,26 +672,28 @@ pub fn write_file_sync(
 }
 
 ///|
-
-///|
+/// Get access time for an open file.
 pub fn File::atime(self : File) -> (Int64, Int) raise @wasi.Errno {
   let stat = self.fd.fd_filestat_get()
   convert_timestamp(stat.atim)
 }
 
 ///|
+/// Get creation/change time for an open file.
 pub fn File::ctime(self : File) -> (Int64, Int) raise @wasi.Errno {
   let stat = self.fd.fd_filestat_get()
   convert_timestamp(stat.ctim)
 }
 
 ///|
+/// Get modification time for an open file.
 pub fn File::mtime(self : File) -> (Int64, Int) raise @wasi.Errno {
   let stat = self.fd.fd_filestat_get()
   convert_timestamp(stat.mtim)
 }
 
 ///|
+/// Read from a file at a byte offset into a buffer.
 pub async fn File::read_at(
   self : File,
   buf : FixedArray[Byte],
@@ -694,6 +732,7 @@ pub async fn File::read_at(
 }
 
 ///|
+/// Read exactly `len` bytes starting at a byte offset.
 pub async fn File::read_exactly_at(
   self : File,
   len : Int,
@@ -720,12 +759,14 @@ pub async fn File::read_exactly_at(
 }
 
 ///|
+/// Get file size in bytes.
 pub fn File::size(self : File) -> Int64 raise @wasi.Errno {
   let stat = self.fd.fd_filestat_get()
   stat.size.0.reinterpret_as_int64()
 }
 
 ///|
+/// Get the file kind from filestat.
 pub fn File::kind(self : File) -> FileKind {
   try {
     let stat = self.fd.fd_filestat_get()
@@ -736,6 +777,7 @@ pub fn File::kind(self : File) -> FileKind {
 }
 
 ///|
+/// Flush file contents to storage.
 pub fn File::sync(
   self : File,
   only_data? : Bool = false,
@@ -748,6 +790,7 @@ pub fn File::sync(
 }
 
 ///|
+/// Write data at a byte offset, restoring the original position.
 pub async fn File::write_at(
   self : File,
   data : BytesView,
@@ -804,6 +847,7 @@ pub async fn File::write_at(
 }
 
 ///|
+/// Read all entries from an open directory.
 pub fn Directory::read_all(
   self : Directory,
   include_hidden? : Bool = true,
@@ -834,6 +878,7 @@ pub fn Directory::read_all(
 }
 
 ///|
+/// Treat the file handle as a directory.
 pub fn File::as_dir(self : File) -> Directory raise @wasi.Errno {
   let stat = self.fd.fd_filestat_get()
   if not(stat.filetype is @wasi.FileType::Directory) {

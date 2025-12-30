@@ -21,6 +21,7 @@ priv enum State {
 }
 
 ///|
+/// Coroutine handle for async scheduling.
 struct Coroutine {
   coro_id : Int
   mut state : State
@@ -41,21 +42,25 @@ pub impl Hash for Coroutine with hash_combine(self, hasher) {
 }
 
 ///|
+/// Wake a coroutine and schedule it to run.
 pub fn Coroutine::wake(self : Coroutine) -> Unit {
   self.ready = true
   scheduler.run_later.push_back(self)
 }
 
 ///|
+/// Return whether the current coroutine is cancelled and not shielded.
 pub fn is_being_cancelled() -> Bool {
   let coro = current_coroutine()
   coro.cancelled && not(coro.shielded)
 }
 
 ///|
+/// Cancellation error raised when a coroutine is cancelled.
 pub(all) suberror Cancelled derive(Show)
 
 ///|
+/// Mark a coroutine as cancelled and wake it if needed.
 pub fn Coroutine::cancel(self : Coroutine) -> Unit {
   self.cancelled = true
   if not(self.shielded || self.ready) {
@@ -64,6 +69,7 @@ pub fn Coroutine::cancel(self : Coroutine) -> Unit {
 }
 
 ///|
+/// Yield execution to other coroutines.
 pub async fn pause() -> Unit {
   guard scheduler.curr_coro is Some(coro)
   if coro.cancelled && not(coro.shielded) {
@@ -78,6 +84,7 @@ pub async fn pause() -> Unit {
 }
 
 ///|
+/// Suspend the current coroutine until resumed by the scheduler.
 pub async fn suspend() -> Unit {
   guard scheduler.curr_coro is Some(coro)
   if coro.cancelled && not(coro.shielded) {
@@ -94,6 +101,7 @@ pub async fn suspend() -> Unit {
 }
 
 ///|
+/// Spawn a new coroutine for the async function.
 pub fn spawn(f : async () -> Unit) -> Coroutine {
   scheduler.coro_id += 1
   let coro = {
@@ -125,6 +133,7 @@ pub fn spawn(f : async () -> Unit) -> Coroutine {
 }
 
 ///|
+/// Raise the coroutine error if it failed.
 pub fn Coroutine::unwrap(self : Coroutine) -> Unit raise {
   match self.state {
     Done => ()
@@ -134,6 +143,7 @@ pub fn Coroutine::unwrap(self : Coroutine) -> Unit raise {
 }
 
 ///|
+/// Wait for another coroutine to complete.
 pub async fn Coroutine::wait(target : Coroutine) -> Unit {
   guard scheduler.curr_coro is Some(coro)
   guard not(physical_equal(coro, target))
@@ -154,6 +164,7 @@ pub async fn Coroutine::wait(target : Coroutine) -> Unit {
 }
 
 ///|
+/// Check and raise the error for a coroutine, if any.
 pub fn Coroutine::check_error(coro : Coroutine) -> Unit raise {
   match coro.state {
     Fail(err) => raise err
@@ -162,6 +173,7 @@ pub fn Coroutine::check_error(coro : Coroutine) -> Unit raise {
 }
 
 ///|
+/// Run an async function shielded from cancellation.
 pub async fn protect_from_cancel(f : async () -> Unit) -> Unit {
   guard scheduler.curr_coro is Some(coro)
   if coro.shielded {
@@ -180,6 +192,7 @@ pub async fn protect_from_cancel(f : async () -> Unit) -> Unit {
 }
 
 ///|
+/// Return the coroutine id.
 pub fn Coroutine::id(coroutine : Coroutine) -> Int {
   coroutine.coro_id
 }

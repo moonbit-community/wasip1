@@ -41,6 +41,7 @@ struct TaskGroup[X] {
 }
 
 ///|
+/// Deprecated error retained for compatibility.
 #deprecated("this error is no longer emitted")
 pub suberror AlreadyTerminated derive(Show)
 

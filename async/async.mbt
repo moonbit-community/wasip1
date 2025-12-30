@@ -13,6 +13,7 @@
 // limitations under the License.
 
 ///|
+/// Run an async entrypoint with the event loop and a task group.
 pub fn with_event_loop(f : async (TaskGroup[Unit]) -> Unit) -> Unit raise {
   @event_loop.async_run(() => with_task_group(f))
 }
@@ -52,6 +53,7 @@ pub fn is_cancellation_error(error : Error) -> Bool {
 }
 
 ///|
+/// Error raised by `with_timeout` on deadline expiration.
 pub suberror TimeoutError derive(Show, ToJson)
 
 ///|
@@ -124,9 +126,11 @@ pub fn now() -> Int64 raise {
 }
 
 ///|
+/// Re-export of the async queue type.
 pub using @aqueue {type Queue}
 
 ///|
+/// Re-export of the async semaphore type.
 pub using @semaphore {type Semaphore}
 
 ///|

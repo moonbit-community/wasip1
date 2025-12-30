@@ -114,6 +114,7 @@ pub async fn[R : Reader] BufferedReader::drop(self : Self[R], n : Int) -> Unit {
 }
 
 ///|
+/// Forward reader buffer access to the wrapped reader.
 pub impl[R : Reader] Reader for BufferedReader[R] with _get_internal_buffer(
   self,
 ) {
@@ -121,6 +122,7 @@ pub impl[R : Reader] Reader for BufferedReader[R] with _get_internal_buffer(
 }
 
 ///|
+/// Forward read calls to the wrapped reader.
 pub impl[R : Reader] Reader for BufferedReader[R] with _direct_read(
   self,
   dst,

@@ -265,6 +265,7 @@ pub fn[X] Queue::try_get(self : Queue[X]) -> X? raise {
 }
 
 ///|
+/// Error raised when operating on a closed queue.
 pub suberror QueueAlreadyClosed derive(Show, ToJson)
 
 ///|

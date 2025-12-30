@@ -55,6 +55,7 @@ pub async fn[W : Writer] BufferedWriter::flush(
 }
 
 ///|
+/// Writer implementation that buffers writes.
 pub impl[W : Writer] Writer for BufferedWriter[W] with write_once(
   self,
   buf,
@@ -71,6 +72,7 @@ pub impl[W : Writer] Writer for BufferedWriter[W] with write_once(
 }
 
 ///|
+/// Writer implementation that consumes a reader into the buffer.
 pub impl[W : Writer] Writer for BufferedWriter[W] with write_reader(
   self,
   reader,

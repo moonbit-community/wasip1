@@ -31,31 +31,37 @@ impl Data with to_bytesview(self) {
 }
 
 ///|
+/// `Data` implementation for binary bytes.
 pub impl Data for Bytes with to_bytes(self) {
   self
 }
 
 ///|
+/// `Data` implementation for byte views.
 pub impl Data for BytesView with to_bytes(self) {
   self.to_bytes()
 }
 
 ///|
+/// `Data` implementation for byte views without copying.
 pub impl Data for BytesView with to_bytesview(self) {
   self
 }
 
 ///|
+/// `Data` implementation for UTF-8 strings.
 pub impl Data for String with to_bytes(self) {
   @encoding/utf8.encode(self)
 }
 
 ///|
+/// `Data` implementation for UTF-8 string views.
 pub impl Data for StringView with to_bytes(self) {
   @encoding/utf8.encode(self)
 }
 
 ///|
+/// `Data` implementation for JSON values.
 pub impl Data for Json with to_bytes(self) {
   @encoding/utf8.encode(self.stringify())
 }

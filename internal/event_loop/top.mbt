@@ -9,6 +9,7 @@ priv struct Subscribe {
 }
 
 ///|
+/// Suspend until the fd is writable and return writable byte count.
 pub async fn suspend_for_write(fd : @wasi.Fd) -> UInt64 {
   let coro = @coroutine.current_coroutine()
   let subscribe = {
@@ -30,6 +31,7 @@ pub async fn suspend_for_write(fd : @wasi.Fd) -> UInt64 {
 }
 
 ///|
+/// Suspend until the fd is readable and return readable byte count.
 pub async fn suspend_for_read(fd : @wasi.Fd) -> UInt64 {
   let coro = @coroutine.current_coroutine()
   let subscribe = {
@@ -51,7 +53,7 @@ pub async fn suspend_for_read(fd : @wasi.Fd) -> UInt64 {
 }
 
 ///|
-/// sleep in millisecond
+/// Sleep for the given duration in milliseconds.
 pub async fn sleep(time : Int) -> Unit {
   let coro = @coroutine.current_coroutine()
   let subscribe = {
@@ -74,8 +76,7 @@ pub async fn sleep(time : Int) -> Unit {
 }
 
 ///|
-
-///|
+/// Run the event loop until all scheduled tasks complete.
 pub fn async_run(f : async () -> Unit) -> Unit raise {
   let mut err = None
   let _ = @coroutine.spawn(async fn() -> Unit {

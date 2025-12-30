@@ -13,12 +13,14 @@
 // limitations under the License.
 
 ///|
+/// Wrapper for async stdin reads.
 struct Input {
   io : @wasi.Fd
   read_buf : @io.ReaderBuffer
 }
 
 ///|
+/// Read bytes from stdin into the provided buffer.
 pub impl @io.Reader for Input with _direct_read(self, buf, offset~, max_len~) {
   let len = @event_loop.suspend_for_read(self.io)
   let len = @cmp.minimum(len, max_len.to_uint64()).to_int()
@@ -29,14 +31,17 @@ pub impl @io.Reader for Input with _direct_read(self, buf, offset~, max_len~) {
 }
 
 ///|
+/// Provide a read buffer for stdin.
 pub impl @io.Reader for Input with _get_internal_buffer(self) {
   self.read_buf
 }
 
 ///|
+/// Wrapper for async stdout/stderr writes.
 struct Output(@wasi.Fd)
 
 ///|
+/// Write bytes to stdout/stderr.
 pub impl @io.Writer for Output with write_once(self, buf, offset~, len~) {
   let len = @cmp.minimum(@event_loop.suspend_for_write(self.0), len.to_uint64()).to_int()
   self.0.fd_write([buf[offset:offset + len]]).0.reinterpret_as_int()

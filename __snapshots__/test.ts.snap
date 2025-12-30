@@ -1,37 +1,51 @@
 export const snapshot = {};
 
-snapshot[`arg_get 1`] = `""`;
+snapshot[`core wasi > arg_get 1`] = `""`;
 
-snapshot[`environ_get 1`] = `""`;
+snapshot[`core wasi > environ_get 1`] = `""`;
 
-snapshot[`fd_fdstat_get 1`] = `
+snapshot[`core wasi > fd_fdstat_get 1`] = `
 "{fs_filetype: Unknown, fs_flags: FdFlags(0), fs_rights_base: Rights(64), fs_rights_inheriting: Rights(64)}
 {fs_filetype: Directory, fs_flags: FdFlags(0), fs_rights_base: Rights(129498624), fs_rights_inheriting: Rights(267911167)}
 "
 `;
 
-snapshot[`fd_prestat_dir_name 1`] = `
+snapshot[`core wasi > fd_prestat_dir_name 1`] = `
 "Accessing 3 got .
 Accessing 4 got test
 Error: Accessing 5 got Badf
 "
 `;
 
-snapshot[`fd_read 1`] = `"hello"`;
+snapshot[`core wasi > fd_read 1`] = `"hello"`;
 
-snapshot[`fd_read 2`] = `"hello, this is a longer sentence, as a quick brown fox jumps ove"`;
+snapshot[`core wasi > fd_read 2`] = `"hello, this is a longer sentence, as a quick brown fox jumps ove"`;
 
-snapshot[`fd_readdir 1`] = `
-'[". ~> Directory", ".. ~> Directory", "target ~> Directory", "fd_read ~> Directory", "args_get ~> Directory", "fd_write ~> Directory", "fixtures ~> Directory", "spectest ~> Directory", "proc_exit ~> Directory", ".mooncakes ~> Directory", "fd_readdir ~> Directory", "environ_get ~> Directory", "poll_oneoff ~> Directory", "fs_read_text ~> Directory", "fd_fdstat_get ~> Directory", "moon.mod.json ~> Regular_file", "fd_prestat_dir_name ~> Directory"]
+snapshot[`core wasi > fd_readdir 1`] = `
+'[". ~> Directory", ".. ~> Directory", "target ~> Directory", "fd_read ~> Directory", "args_get ~> Directory", "fd_write ~> Directory", "fixtures ~> Directory", "spectest ~> Directory", "fs_exists ~> Directory", "proc_exit ~> Directory", ".mooncakes ~> Directory", "fd_readdir ~> Directory", "fs_readdir ~> Directory", "environ_get ~> Directory", "fs_realpath ~> Directory", "poll_oneoff ~> Directory", "fs_read_text ~> Directory", "fd_fdstat_get ~> Directory", "moon.mod.json ~> Regular_file", "fd_prestat_dir_name ~> Directory"]
 '
 `;
 
-snapshot[`fd_write 1`] = `
+snapshot[`core wasi > fd_write 1`] = `
 "Hello
 Size(6)"
 `;
+snapshot[`extensions > fs_exists 1`] = `
+"true,false
+"
+`;
 
-snapshot[`fs_read_text 1`] = `
+snapshot[`extensions > fs_realpath 1`] = `
+"fixtures/hello.txt
+"
+`;
+
+snapshot[`extensions > fs_readdir 1`] = `
+'["hello.txt"]
+'
+`;
+
+snapshot[`extensions > fs_read_text 1`] = `
 "hello from fs
 "
 `;

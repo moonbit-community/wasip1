@@ -89,6 +89,7 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
 }
 
 ///|
+
 ///|
 pub fn open_sync(
   path : StringView,
@@ -163,7 +164,8 @@ pub fn open(
   truncate? : Bool = false,
 ) -> File raise @wasi.Errno {
   match create {
-    Some(value) => open_sync(path, mode~, sync~, append~, create=value, truncate~)
+    Some(value) =>
+      open_sync(path, mode~, sync~, append~, create=value, truncate~)
     None => open_sync(path, mode~, sync~, append~, truncate~)
   }
 }
@@ -282,9 +284,7 @@ pub async fn read_file(
   sync_timestamp? : Bool,
 ) -> &@async_io.Data {
   let _ = sync_timestamp
-  let file = try open(path, mode=ReadOnly) catch {
-    e => fail("read_file failed: \{e}")
-  }
+  let file = open(path, mode=ReadOnly)
   defer file.close()
   @async_io.Reader::read_all(file)
 }
@@ -298,14 +298,10 @@ pub async fn write_file(
   create? : Int,
   truncate? : Bool = false,
 ) -> Unit {
-  let file = try {
-    match create {
-      Some(value) =>
-        open(path, mode=WriteOnly, sync~, append~, create=value, truncate~)
-      None => open(path, mode=WriteOnly, sync~, append~, truncate~)
-    }
-  } catch {
-    e => fail("write_file failed: \{e}")
+  let file = match create {
+    Some(value) =>
+      open(path, mode=WriteOnly, sync~, append~, create=value, truncate~)
+    None => open(path, mode=WriteOnly, sync~, append~, truncate~)
   }
   defer file.close()
   @async_io.Writer::write(file, data)
@@ -395,10 +391,7 @@ pub fn kind(
 }
 
 ///|
-pub fn mkdir(
-  path : StringView,
-  permission~ : Int,
-) -> Unit raise @wasi.Errno {
+pub fn mkdir(path : StringView, permission~ : Int) -> Unit raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
   let _permission = permission
   base_fd.path_create_directory(relative_path)
@@ -586,43 +579,30 @@ pub fn can_write(path : StringView) -> Bool {
 }
 
 ///|
-///|
-pub fn read_file_sync(path : StringView) -> Bytes raise @wasi.Errno {
-  let file = open_sync(path, mode=ReadOnly)
-  let buffer_size : Int = 8192
-  let buffer = FixedArray::make(buffer_size, b'\x00')
-  let mut data : Bytes = ""
-  while {
-          let iovs = [buffer]
-          let size = file.fd.fd_read(iovs)
-          let read_len = size.0.reinterpret_as_int()
-          data = data +
-            buffer.unsafe_reinterpret_as_bytes()[:read_len].to_bytes()
-          read_len > 0
-        } {
 
-  }
-  file.close()
-  data
+///|
+pub fn read_file_sync(path : StringView) -> &@sync_io.Data raise {
+  let file = open_sync(path, mode=ReadOnly)
+  defer file.close()
+  @sync_io.Reader::read_all(file)
 }
 
 ///|
 pub fn write_file_sync(
   path : StringView,
-  data : Bytes,
+  data : &@sync_io.Data,
   sync? : SyncMode = NoSync,
   append? : Bool = false,
   create? : Int,
   truncate? : Bool = false,
-) -> Unit raise @wasi.Errno {
+) -> Unit raise {
   let file = match create {
     Some(value) =>
       open_sync(path, mode=WriteOnly, sync~, append~, create=value, truncate~)
     None => open_sync(path, mode=WriteOnly, sync~, append~, truncate~)
   }
-  let iovs = [data[0:data.length()]]
-  let _ = file.fd.fd_write(iovs)
-  file.close()
+  defer file.close()
+  @sync_io.Writer::write(file, data)
 }
 
 ///|
@@ -726,7 +706,10 @@ pub fn File::kind(self : File) -> FileKind {
 }
 
 ///|
-pub fn File::sync(self : File, only_data? : Bool = false) -> Unit raise @wasi.Errno {
+pub fn File::sync(
+  self : File,
+  only_data? : Bool = false,
+) -> Unit raise @wasi.Errno {
   if only_data {
     self.fd.fd_datasync()
   } else {

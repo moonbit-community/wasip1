@@ -120,3 +120,14 @@ Deno.test("proc_exit", async () => {
     }).spawn().output()
     assertEquals(output.code, 122);
 })
+
+Deno.test("fs_basic", async (t) => {
+    const output = await new Deno.Command("wasmtime", {
+        args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_basic/fs_basic.wasm'],
+        stdout: 'piped',
+        stderr: 'piped',
+    }).spawn().output()
+    assertEquals(output.code, 0);
+    const stdout = textDecoder.decode(output.stdout)
+    await assertSnapshot(t, stdout);
+})

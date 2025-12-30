@@ -38,7 +38,7 @@ pub fn opendir(StringView) -> Directory raise @wasi.Errno
 
 pub async fn read_file(StringView, sync_timestamp? : Bool) -> &@io.Data
 
-pub fn read_file_sync(StringView) -> Bytes raise @wasi.Errno
+pub fn read_file_sync(StringView) -> &@sync_io.Data raise
 
 pub fn readdir(StringView, include_hidden? : Bool, include_special? : Bool, sort? : Bool) -> Array[String] raise @wasi.Errno
 
@@ -58,7 +58,7 @@ pub async fn walk(StringView, async (String, Array[String]) -> Unit, max_concurr
 
 pub async fn write_file(StringView, &@io.Data, sync? : SyncMode, append? : Bool, create? : Int, truncate? : Bool) -> Unit
 
-pub fn write_file_sync(StringView, Bytes, sync? : SyncMode, append? : Bool, create? : Int, truncate? : Bool) -> Unit raise @wasi.Errno
+pub fn write_file_sync(StringView, &@sync_io.Data, sync? : SyncMode, append? : Bool, create? : Int, truncate? : Bool) -> Unit raise
 
 // Errors
 

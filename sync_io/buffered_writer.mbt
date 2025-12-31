@@ -49,31 +49,26 @@ pub fn[W : Writer] BufferedWriter::flush(
   self : BufferedWriter[W],
 ) -> Unit raise {
   if self.len > 0 {
-    self.writer.write(self.buf.unsafe_reinterpret_as_bytes()[:self.len])
+    self.writer.write_sync(self.buf.unsafe_reinterpret_as_bytes()[:self.len])
     self.len = 0
   }
 }
 
 ///|
 /// Writer implementation that buffers writes.
-pub impl[W : Writer] Writer for BufferedWriter[W] with write_once(
-  self,
-  buf,
-  offset~,
-  len~,
-) {
+pub impl[W : Writer] Writer for BufferedWriter[W] with write_once(self, buf) {
   if self.len >= self.buf.length() {
     self.flush()
   }
-  let len = @cmp.minimum(len, self.buf.length() - self.len)
-  self.buf.blit_from_bytes(self.len, buf, offset, len)
+  let len = @cmp.minimum(buf.length(), self.buf.length())
+  self.buf.blit_from_bytesview(self.len, buf[:len])
   self.len += len
   len
 }
 
 ///|
 /// Writer implementation that consumes a reader into the buffer.
-pub impl[W : Writer] Writer for BufferedWriter[W] with write_reader(
+pub impl[W : Writer] Writer for BufferedWriter[W] with write_reader_sync(
   self,
   reader,
 ) {
@@ -81,7 +76,7 @@ pub impl[W : Writer] Writer for BufferedWriter[W] with write_reader(
     if self.len >= self.buf.length() {
       self.flush()
     }
-    let n = reader.read(
+    let n = reader.read_sync(
       self.buf,
       offset=self.len,
       max_len=self.buf.length() - self.len,

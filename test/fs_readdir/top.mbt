@@ -1,15 +1,13 @@
 ///|
 pub fn start() -> Unit {
-  let entries = try {
-    @fs.readdir(
-      "fixtures",
-      include_hidden=true,
-      include_special=true,
-      sort=true,
-    )
-  } catch {
+  let entries = @fs.readdir(
+    "fixtures",
+    include_hidden=true,
+    include_special=true,
+    sort=true,
+  ) catch {
     e => {
-      try! @sync_stdio.stderr.write("\{e}\n")
+      try! @sync_stdio.stderr.write_sync("\{e}\n")
       @wasi.proc_exit(1)
       []
     }

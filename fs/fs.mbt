@@ -268,8 +268,8 @@ pub impl @sync_io.Reader for File with _direct_read(
 
 ///|
 /// Sync write implementation for `File`.
-pub impl @sync_io.Writer for File with write_once(self, data, offset~, len~) {
-  let iovs = [data[offset:offset + len]]
+pub impl @sync_io.Writer for File with write_once(self, data) {
+  let iovs = [data]
   let result = self.fd.fd_write(iovs)
   result.0.reinterpret_as_int()
 }
@@ -625,7 +625,7 @@ pub fn can_write(path : StringView) -> Bool {
 pub fn read_file_sync(path : StringView) -> &@sync_io.Data raise {
   let file = open_sync(path, mode=ReadOnly)
   defer file.close()
-  @sync_io.Reader::read_all(file)
+  @sync_io.Reader::read_all_sync(file)
 }
 
 ///|
@@ -644,7 +644,7 @@ pub fn write_file_sync(
     None => open_sync(path, mode=WriteOnly, sync~, append~, truncate~)
   }
   defer file.close()
-  @sync_io.Writer::write(file, data)
+  @sync_io.Writer::write_sync(file, data)
 }
 
 ///|

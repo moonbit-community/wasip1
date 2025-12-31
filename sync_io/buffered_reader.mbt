@@ -228,5 +228,5 @@ pub fn[R : Reader] BufferedReader::find(
 /// will be conusmed from the reader.
 /// The returned string is decoded with UTF8.
 pub fn[R : Reader] BufferedReader::read_line(self : Self[R]) -> String? raise {
-  self.read_until("\n")
+  self.read_until_sync("\n")
 }

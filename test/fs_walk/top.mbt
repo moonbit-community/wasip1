@@ -9,14 +9,14 @@ pub async fn run() -> Unit {
     }
   })
   paths.sort()
-  @sync_stdio.stdout.write(paths.join("\n") + "\n")
+  @sync_stdio.stdout.write_sync(paths.join("\n") + "\n")
 }
 
 ///|
 pub fn start() -> Unit {
   @async.with_event_loop(fn(_) { run() }) catch {
     e => {
-      try! @sync_stdio.stderr.write("\{e}\n")
+      try! @sync_stdio.stderr.write_sync("\{e}\n")
       @wasi.proc_exit(1)
     }
   }

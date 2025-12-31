@@ -40,8 +40,8 @@ struct Output(@wasi.Fd)
 
 ///|
 /// Write bytes to stdout/stderr.
-pub impl @io.Writer for Output with write_once(self, buf, offset~, len~) {
-  self.0.fd_write([buf[offset:offset + len]]).0.reinterpret_as_int()
+pub impl @io.Writer for Output with write_once(self, buf) {
+  self.0.fd_write([buf]).0.reinterpret_as_int()
 }
 
 ///|

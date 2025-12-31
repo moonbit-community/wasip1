@@ -19,36 +19,26 @@ pub(all) enum Encoding {
 
 ///|
 pub(open) trait Writer {
-  write_once(Self, Bytes, offset~ : Int, len~ : Int) -> Int raise
-  write(Self, &Data) -> Unit raise = _
-  write_reader(Self, &Reader) -> Unit raise = _
-  #deprecated("use `write` instead", skip_current_package=true)
-  write_string(Self, StringView, encoding~ : Encoding) -> Unit raise = _
+  write_once(Self, BytesView) -> Int raise
+  write_sync(Self, &Data) -> Unit raise = _
+  write_reader_sync(Self, &Reader) -> Unit raise = _
 }
 
 ///|
-impl Writer with write(self, data) {
-  let view = data.to_bytesview()
-  let start = view.start_offset()
-  let len = view.length()
-  guard len > 0 else { return }
-  let end = start + len
-  let offset = self.write_once(view.data(), offset=start, len~)
-  if offset == end {
-    return
-  }
-  for offset = start + offset; offset < end; {
-    let progress = self.write_once(view.data(), offset~, len=end - offset)
-    continue offset + progress
+impl Writer with write_sync(self, data) {
+  let mut view = data.to_bytesview()
+  while view.length() > 0 {
+    let written = self.write_once(view)
+    view = view[written:]
   }
 }
 
 ///|
-impl Writer with write_reader(self, reader) {
+impl Writer with write_reader_sync(self, reader) {
   let buf = reader._get_internal_buffer()
   if buf.len > 0 {
     let buf_bytes = buf.buf.unsafe_reinterpret_as_bytes()
-    self.write(buf_bytes[buf.start:buf.start + buf.len])
+    self.write_sync(buf_bytes[buf.start:buf.start + buf.len])
     buf.start = 0
     buf.len = 0
   }
@@ -56,13 +46,6 @@ impl Writer with write_reader(self, reader) {
   let max_len = buf.buf.length()
   while reader._direct_read(buf.buf, offset=0, max_len~) is n && n > 0 {
     let buf_bytes = buf.buf.unsafe_reinterpret_as_bytes()
-    self.write(buf_bytes[:n])
+    self.write_sync(buf_bytes[:n])
   }
-}
-
-///|
-impl Writer with write_string(self, str, encoding~) {
-  guard encoding is UTF8
-  let data = @encoding/utf8.encode(str, bom=false)
-  self.write(data)
 }

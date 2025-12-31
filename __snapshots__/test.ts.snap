@@ -72,8 +72,17 @@ snapshot[`extensions > fs_kind 1`] = `
 `;
 
 snapshot[`extensions > fs_readdir 1`] = `
-'["hello.txt"]
+'["walk", "hello.txt"]
 '
+`;
+
+snapshot[`extensions > fs_walk 1`] = `
+"fixtures/walk/a
+fixtures/walk/a/b
+fixtures/walk/root.txt
+fixtures/walk/a/one.txt
+fixtures/walk/a/b/two.txt
+"
 `;
 
 snapshot[`extensions > fs_read_text 1`] = `

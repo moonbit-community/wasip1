@@ -233,4 +233,15 @@ Deno.test("extensions", async (t) => {
         const stdout = textDecoder.decode(output.stdout)
         await assertSnapshot(t, stdout);
     })
+
+    await t.step("fs_walk", async (t) => {
+        const output = await new Deno.Command("wasmtime", {
+            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_walk/fs_walk.wasm'],
+            stdout: 'piped',
+            stderr: 'piped',
+        }).spawn().output()
+        assertEquals(output.code, 0);
+        const stdout = textDecoder.decode(output.stdout)
+        await assertSnapshot(t, stdout);
+    })
 })

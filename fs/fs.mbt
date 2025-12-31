@@ -62,13 +62,14 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
   let normalized = normalize_path(path)
   let normalized_bytes = @encoding/utf8.encode(normalized)
   let preopened_dirs = get_preopened_dirs()
-  if normalized.has_prefix("/") {
-    let mut best_fd = @wasi.Fd(0)
-    let mut best_path : String = ""
-    let mut best_len = 0
-    for i in 0..<preopened_dirs.length() {
-      let dir_name = preopened_dirs[i].0
-      let fd = preopened_dirs[i].1
+  let is_absolute = normalized.has_prefix("/")
+  let mut best_fd = @wasi.Fd(0)
+  let mut best_path : String = ""
+  let mut best_len = if is_absolute { 0 } else { -1 }
+  for i in 0..<preopened_dirs.length() {
+    let dir_name = preopened_dirs[i].0
+    let fd = preopened_dirs[i].1
+    if is_absolute {
       if dir_name == "/" {
         if normalized_bytes.length() == 1 {
           best_fd = fd
@@ -79,38 +80,12 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
           best_path = decode_utf8_view(normalized_bytes[1:])
           best_len = 1
         }
-      } else if dir_name.has_prefix("/") {
-        if normalized == dir_name {
-          let len = dir_name.length()
-          if len > best_len {
-            best_fd = fd
-            best_path = "."
-            best_len = len
-          }
-        } else if normalized.has_prefix(dir_name + "/") {
-          let len = dir_name.length()
-          if len > best_len {
-            best_fd = fd
-            let dir_bytes = @encoding/utf8.encode(dir_name)
-            best_path = decode_utf8_view(
-              normalized_bytes[dir_bytes.length() + 1:],
-            )
-            best_len = len
-          }
-        }
+        continue
       }
-    }
-    if best_len == 0 {
-      raise @wasi.Noent
-    }
-    (best_fd, best_path)
-  } else {
-    let mut best_fd = @wasi.Fd(0)
-    let mut best_path : String = ""
-    let mut best_len = -1
-    for i in 0..<preopened_dirs.length() {
-      let dir_name = preopened_dirs[i].0
-      let fd = preopened_dirs[i].1
+      if !dir_name.has_prefix("/") {
+        continue
+      }
+    } else {
       if dir_name.has_prefix("/") {
         continue
       }
@@ -122,30 +97,30 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
         }
         continue
       }
-      if normalized == dir_name {
-        let dir_len = dir_name.length()
-        if dir_len > best_len {
-          best_fd = fd
-          best_path = "."
-          best_len = dir_len
-        }
-      } else if normalized.has_prefix(dir_name + "/") {
-        let dir_len = dir_name.length()
-        if dir_len > best_len {
-          best_fd = fd
-          let dir_bytes = @encoding/utf8.encode(dir_name)
-          best_path = decode_utf8_view(
-            normalized_bytes[dir_bytes.length() + 1:],
-          )
-          best_len = dir_len
-        }
+    }
+    if normalized == dir_name {
+      let len = dir_name.length()
+      if len > best_len {
+        best_fd = fd
+        best_path = "."
+        best_len = len
+      }
+    } else if normalized.has_prefix(dir_name + "/") {
+      let len = dir_name.length()
+      if len > best_len {
+        best_fd = fd
+        let dir_bytes = @encoding/utf8.encode(dir_name)
+        best_path = decode_utf8_view(
+          normalized_bytes[dir_bytes.length() + 1:],
+        )
+        best_len = len
       }
     }
-    if best_len < 0 {
-      raise @wasi.Noent
-    }
-    (best_fd, best_path)
   }
+  if best_len < 0 {
+    raise @wasi.Noent
+  }
+  (best_fd, best_path)
 }
 
 ///|

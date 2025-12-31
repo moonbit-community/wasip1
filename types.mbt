@@ -57,82 +57,159 @@ pub fn ClockId::from_value(value : UInt) -> ClockId? {
 /// 
 /// See : https://github.com/WebAssembly/WASI/blob/wasi-0.1/preview1/docs.md#-errno-variant
 pub(all) suberror Errno {
+  /// No error occurred
   Success
+  /// Argument list too long
   TooBig
+  /// Permission denied
   Acces
+  /// Address in use
   Addrinuse
+  /// Address not available
   Addrnotavail
+  /// Address family not supported
   Afnosupport
+  /// Resource unavailable, or operation would block
   Again
+  /// Connection already in progress
   Already
+  /// Bad file descriptor
   Badf
+  /// Bad message
   Badmsg
+  /// Device or resource busy
   Busy
+  /// Operation canceled
   Canceled
+  /// No child processes
   Child
+  /// Connection aborted
   Connaborted
+  /// Connection refused
   Connrefused
+  /// Connection reset
   Connreset
+  /// Resource deadlock would occur
   Deadlock
+  /// Destionation address required
   Destaddrreq
+  /// Mathematics argument out of domain of function
   Dom
+  /// Reserved
   Dquot
+  /// File exists
   Exist
+  /// Bad address
   Fault
+  /// File too large
   Fbig
+  /// Host is unreachable
   Hostunreach
+  /// Identifier removed
   Idrm
+  /// Illegal byte sequence
   Ilseq
+  /// Operation in progress
   Inprogress
+  /// Interrupted function
   Intr
+  /// Invalid argument
   Inval
+  /// I/O error
   IO
+  /// Socket is connected
   Isconn
+  /// Is a directory
   Isdir
+  /// Too many levels of symbolic links
   Loop
+  /// File descriptor value too large
   Mfile
+  /// Too many links
   Mlink
+  /// Message too large
   Msgsize
+  /// Reserved
   Multihop
+  /// Filename too long
   Nametoolong
+  /// Network is down
   Netdown
+  /// Connection aborted by network
   Netreset
+  /// Network unreachable
   Netunreach
+  /// Too many files open in system
   Nfile
+  /// No buffer space available
   Nobufs
+  /// No such device
   Nodev
+  /// No such file or directory
   Noent
+  /// Executable file format error
   Noexec
+  /// No locks available
   Nolck
+  /// Reserved
   Nolink
+  /// Not enough space
   Nomem
+  /// No message of the desired type
   Nomsg
+  /// Protocol not available
   Noprotoopt
+  /// No space left on device
   Nospc
+  /// Function not supported
   Nosys
+  /// The socket is not connected
   Notconn
+  /// Not a directory or a symbolic link to a directory
   Notdir
+  /// Directory not empty
   Notempty
+  /// State not recoverable
   Notrecoverable
+  /// Not a socket
   Notsock
+  /// Not supported, or operation not supported on socket
   Notsup
+  /// Inappropriate I/O control operation
   Notty
+  /// No such device or address
   Nxio
+  /// Value too large to be stored in data type
   Overflow
+  /// Previous owner died
   Ownerdead
+  /// Operation not permitted
   Perm
+  /// Broken pipe
   Pipe
+  /// Protocol error
   Proto
+  /// Protocol not supported
   Protonosupport
+  /// Protocol wrong type for socket
   Prototype
+  /// Result too large
   Range
+  /// Read-only file system
   Rofs
+  /// Invalid seek
   Spipe
+  /// No such process
   Srch
+  /// Reserved
   Stale
+  /// Connection timed out
   Timedout
+  /// Text file busy
   Txtbsy
+  /// Cross-device link
   Xdev
+  /// Extension: Capabilities insufficient
   Notcapable
 } derive(Eq, Show)
 

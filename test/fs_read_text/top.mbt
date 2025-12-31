@@ -6,10 +6,10 @@ pub fn start() -> Unit {
     data.binary()
   } catch {
     e => {
-      try! @sync_stdio.stderr.write_sync("\{e}\n")
+      try! @stdio.stderr.write_sync("\{e}\n")
       @wasi.proc_exit(1)
       b""
     }
   }
-  try! @sync_stdio.stdout.write_sync(bytes)
+  try! @stdio.stdout.write_sync(bytes)
 }

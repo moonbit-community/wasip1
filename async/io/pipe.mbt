@@ -42,7 +42,7 @@ priv enum PipeWriter {
 priv struct Pipe {
   mut reader : PipeReader
   mut writer : PipeWriter
-  read_buf : ReaderBuffer
+  read_buf : @io_buffer.Buffer
 }
 
 ///|
@@ -60,7 +60,11 @@ struct PipeWrite(Pipe)
 /// Data written to the write end can be obtained from the read end.
 /// Useful for testing and converting writer-based function to reader.
 pub fn pipe() -> (PipeRead, PipeWrite) {
-  let p = { reader: NoReader, writer: NoWriter, read_buf: ReaderBuffer::new() }
+  let p = {
+    reader: NoReader,
+    writer: NoWriter,
+    read_buf: @io_buffer.Buffer::new(0),
+  }
   (PipeRead(p), PipeWrite(p))
 }
 

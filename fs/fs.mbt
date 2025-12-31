@@ -161,14 +161,14 @@ pub fn open_sync(
     rights_inheriting,
     fdflags,
   )
-  File::{ fd, read_buf: @async_io.ReaderBuffer::new() }
+  File::{ fd, read_buf: @io_buffer.Buffer::new(0) }
 }
 
 ///|
 /// File handle backed by a WASI file descriptor.
 struct File {
   fd : @wasi.Fd
-  read_buf : @async_io.ReaderBuffer
+  read_buf : @io_buffer.Buffer
 }
 
 ///|
@@ -248,7 +248,7 @@ pub impl @async_io.Writer for File with write_once(self, data, offset~, len~) {
 /// Sync reader implementation for `File`.
 pub impl @sync_io.Reader for File with _get_internal_buffer(self) {
   let _ = self
-  @sync_io.ReaderBuffer::new()
+  @io_buffer.Buffer::new(0)
 }
 
 ///|
@@ -268,7 +268,7 @@ pub impl @sync_io.Reader for File with _direct_read(
 
 ///|
 /// Sync write implementation for `File`.
-pub impl @sync_io.Writer for File with write_once(self, data) {
+pub impl @sync_io.Writer for File with write_once_sync(self, data) {
   let iovs = [data]
   let result = self.fd.fd_write(iovs)
   result.0.reinterpret_as_int()

@@ -13,10 +13,30 @@
 // limitations under the License.
 
 ///|
-/// Wrapper for async stdin reads.
+/// Wrapper for synchronous stdin reads.
 struct Input {
   io : @wasi.Fd
-  read_buf : @io.ReaderBuffer
+  read_buf : @io_buffer.Buffer
+}
+
+///|
+/// Read bytes from stdin into the provided buffer.
+pub impl @sync_io.Reader for Input with _direct_read(
+  self,
+  buf,
+  offset~,
+  max_len~,
+) {
+  let buffer = FixedArray::make(max_len, b'\x00')
+  let read = self.io.fd_read([buffer]).0.reinterpret_as_int()
+  buffer.blit_to(buf, len=read, dst_offset=offset)
+  read
+}
+
+///|
+/// Provide a read buffer for stdin.
+pub impl @sync_io.Reader for Input with _get_internal_buffer(self) {
+  self.read_buf
 }
 
 ///|
@@ -37,8 +57,14 @@ pub impl @io.Reader for Input with _get_internal_buffer(self) {
 }
 
 ///|
-/// Wrapper for async stdout/stderr writes.
+/// Wrapper for synchronous stdout/stderr writes.
 struct Output(@wasi.Fd)
+
+///|
+/// Write bytes to stdout/stderr.
+pub impl @sync_io.Writer for Output with write_once_sync(self, buf) {
+  self.0.fd_write([buf]).0.reinterpret_as_int()
+}
 
 ///|
 /// Write bytes to stdout/stderr.
@@ -51,7 +77,7 @@ pub impl @io.Writer for Output with write_once(self, buf, offset~, len~) {
 /// The standard input channel.
 /// Using this value will result in standard input being set to non-blocking mode.
 /// The standard input will be reset to its original state after the program exits.
-pub let stdin : Input = { io: @wasi.Fd(0), read_buf: @io.ReaderBuffer::new() }
+pub let stdin : Input = { io: @wasi.Fd(0), read_buf: @io_buffer.Buffer::new(0) }
 
 ///|
 /// The standard output channel.

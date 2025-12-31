@@ -30,10 +30,6 @@ pub async fn[X] with_timeout(Int, async () -> X, error? : Error) -> X
 pub async fn[X] with_timeout_opt(Int, async () -> X) -> X?
 
 // Errors
-#deprecated
-pub suberror AlreadyTerminated
-pub impl Show for AlreadyTerminated
-
 pub suberror TimeoutError
 pub impl Show for TimeoutError
 pub impl ToJson for TimeoutError

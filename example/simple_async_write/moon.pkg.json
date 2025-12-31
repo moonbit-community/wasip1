@@ -1,8 +1,7 @@
 {
   "import": [
     "peter-jerry-ye/wasi/async",
-    "peter-jerry-ye/wasi/async/stdio",
-    "peter-jerry-ye/wasi/sync_stdio",
+    "peter-jerry-ye/wasi/stdio",
     "peter-jerry-ye/wasi"
   ],
   "is-main": true,

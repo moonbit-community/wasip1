@@ -1,6 +1,0 @@
-{
-  "import": [
-    { "path": "peter-jerry-ye/wasi/sync_io", "alias": "io" },
-    "peter-jerry-ye/wasi"
-  ]
-}

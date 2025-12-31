@@ -3,7 +3,7 @@
     "peter-jerry-ye/wasi",
     "peter-jerry-ye/wasi/fs",
     "peter-jerry-ye/wasi/async",
-    "peter-jerry-ye/wasi/sync_stdio"
+    "peter-jerry-ye/wasi/stdio"
   ],
   "link": {
     "wasm": {

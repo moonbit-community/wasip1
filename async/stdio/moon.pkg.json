@@ -1,7 +1,0 @@
-{
-  "import": [
-    "peter-jerry-ye/wasi/internal/event_loop",
-    "peter-jerry-ye/wasi/async/io",
-    "peter-jerry-ye/wasi"
-  ]
-}

@@ -19,7 +19,7 @@ pub(all) enum Encoding {
 
 ///|
 pub(open) trait Writer {
-  write_once(Self, BytesView) -> Int raise
+  write_once_sync(Self, BytesView) -> Int raise
   write_sync(Self, &Data) -> Unit raise = _
   write_reader_sync(Self, &Reader) -> Unit raise = _
 }
@@ -28,7 +28,7 @@ pub(open) trait Writer {
 impl Writer with write_sync(self, data) {
   let mut view = data.to_bytesview()
   while view.length() > 0 {
-    let written = self.write_once(view)
+    let written = self.write_once_sync(view)
     view = view[written:]
   }
 }
@@ -42,7 +42,7 @@ impl Writer with write_reader_sync(self, reader) {
     buf.start = 0
     buf.len = 0
   }
-  buf.0.enlarge_to(1)
+  buf.enlarge_to(1)
   let max_len = buf.buf.length()
   while reader._direct_read(buf.buf, offset=0, max_len~) is n && n > 0 {
     let buf_bytes = buf.buf.unsafe_reinterpret_as_bytes()

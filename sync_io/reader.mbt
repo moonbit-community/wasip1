@@ -15,7 +15,7 @@
 ///|
 pub(open) trait Reader {
   // API for internal implementation only, do not use
-  _get_internal_buffer(Self) -> ReaderBuffer
+  _get_internal_buffer(Self) -> @io_buffer.Buffer
 
   // API for internal implementation only, do not use
   _direct_read(Self, FixedArray[Byte], offset~ : Int, max_len~ : Int) -> Int raise
@@ -47,7 +47,7 @@ impl Reader with read_sync(
   if buf.len > 0 {
     let n = @cmp.minimum(max_len, buf.len)
     buf.buf.blit_to(dst, src_offset=buf.start, dst_offset=offset, len=n)
-    buf.0.drop(n)
+    buf.drop(n)
     n
   } else {
     self._direct_read(dst, offset~, max_len~)
@@ -62,12 +62,12 @@ impl Reader with read_sync(
 impl Reader with drop(self, len) {
   let buf = self._get_internal_buffer()
   if buf.len >= len {
-    buf.0.drop(len)
+    buf.drop(len)
     len
   } else {
     let buffered = buf.len
-    buf.0.drop(buffered)
-    buf.0.enlarge_to(1)
+    buf.drop(buffered)
+    buf.enlarge_to(1)
     for dropped = buffered; dropped < len; {
       buf.len = self._direct_read(buf.buf, offset=0, max_len=buf.buf.length())
       if buf.len == 0 {
@@ -127,7 +127,7 @@ impl Reader with read_some_sync(self, max_len?) {
       return Some(data)
     }
   }
-  buf.0.enlarge_to(if max_len is Some(max_len) { max_len } else { 1 })
+  buf.enlarge_to(if max_len is Some(max_len) { max_len } else { 1 })
   let n = self._direct_read(buf.buf, offset=0, max_len=buf.buf.length())
   if n == 0 {
     return None
@@ -183,14 +183,14 @@ impl Reader with read_until_sync(self, sep) {
       let remaining = @encoding/utf8.decode(
         buf_bytes[buf.start:buf.start + buf.len],
       )
-      buf.0.drop(buf.len)
+      buf.drop(buf.len)
       Some(remaining)
     }
     None => None
     Some(index) => {
       let buf_bytes = buf.buf.unsafe_reinterpret_as_bytes()
       let result = @encoding/utf8.decode(buf_bytes[buf.start:buf.start + index])
-      buf.0.drop(index + sep.length())
+      buf.drop(index + sep.length())
       Some(result)
     }
   }

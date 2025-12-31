@@ -1,8 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "peter-jerry-ye/wasi/async/stdio"
+package "peter-jerry-ye/wasi/stdio"
 
 import(
   "peter-jerry-ye/wasi/async/io"
+  "peter-jerry-ye/wasi/internal/io_buffer"
+  "peter-jerry-ye/wasi/sync_io"
 )
 
 // Values
@@ -17,9 +19,11 @@ pub let stdout : Output
 // Types and methods
 type Input
 pub impl @io.Reader for Input
+pub impl @sync_io.Reader for Input
 
 type Output
 pub impl @io.Writer for Output
+pub impl @sync_io.Writer for Output
 
 // Type aliases
 

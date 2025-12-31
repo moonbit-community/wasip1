@@ -56,7 +56,10 @@ pub fn[W : Writer] BufferedWriter::flush(
 
 ///|
 /// Writer implementation that buffers writes.
-pub impl[W : Writer] Writer for BufferedWriter[W] with write_once(self, buf) {
+pub impl[W : Writer] Writer for BufferedWriter[W] with write_once_sync(
+  self,
+  buf,
+) {
   if self.len >= self.buf.length() {
     self.flush()
   }

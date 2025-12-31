@@ -7,7 +7,7 @@ pub fn start() -> Unit {
     sort=true,
   ) catch {
     e => {
-      try! @sync_stdio.stderr.write_sync("\{e}\n")
+      try! @stdio.stderr.write_sync("\{e}\n")
       @wasi.proc_exit(1)
       []
     }

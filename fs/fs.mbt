@@ -28,18 +28,6 @@ pub(all) enum SyncMode {
 }
 
 ///|
-fn normalize_path(path : StringView) -> String {
-  path.to_string()
-}
-
-///|
-fn decode_utf8_view(view : BytesView) -> String raise @wasi.Errno {
-  @encoding/utf8.decode(view.to_bytes()) catch {
-    _ => raise @wasi.Ilseq
-  }
-}
-
-///|
 fn get_preopened_dirs() -> Array[(String, @wasi.Fd)] raise @wasi.Errno {
   let dirs = []
   for fd = 3; ; fd = fd + 1 {
@@ -59,25 +47,22 @@ fn get_preopened_dirs() -> Array[(String, @wasi.Fd)] raise @wasi.Errno {
 ///|
 /// Resolve a WASI path against preopened directories.
 pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
-  let normalized = normalize_path(path)
-  let normalized_bytes = @encoding/utf8.encode(normalized)
   let preopened_dirs = get_preopened_dirs()
-  let is_absolute = normalized.has_prefix("/")
   let mut best_fd = @wasi.Fd(0)
   let mut best_path : String = ""
-  let mut best_len = if is_absolute { 0 } else { -1 }
+  let mut best_len = -1
   for i in 0..<preopened_dirs.length() {
     let dir_name = preopened_dirs[i].0
     let fd = preopened_dirs[i].1
-    if is_absolute {
+    if path is ['/', .. path] {
       if dir_name == "/" {
-        if normalized_bytes.length() == 1 {
+        if path is "" {
           best_fd = fd
           best_path = "."
           best_len = 1
         } else {
           best_fd = fd
-          best_path = decode_utf8_view(normalized_bytes[1:])
+          best_path = path.to_string()
           best_len = 1
         }
         continue
@@ -92,27 +77,24 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
       if dir_name == "." {
         if best_len < 0 {
           best_fd = fd
-          best_path = if normalized == "" { "." } else { normalized }
+          best_path = if path == "" { "." } else { path.to_string() }
           best_len = 0
         }
         continue
       }
     }
-    if normalized == dir_name {
+    if path == dir_name {
       let len = dir_name.length()
       if len > best_len {
         best_fd = fd
         best_path = "."
         best_len = len
       }
-    } else if normalized.has_prefix(dir_name + "/") {
+    } else if path.has_prefix(dir_name + "/") {
       let len = dir_name.length()
       if len > best_len {
         best_fd = fd
-        let dir_bytes = @encoding/utf8.encode(dir_name)
-        best_path = decode_utf8_view(
-          normalized_bytes[dir_bytes.length() + 1:],
-        )
+        best_path = try! path[dir_name.length() + 1:].to_string()
         best_len = len
       }
     }
@@ -540,15 +522,9 @@ pub fn symlink(
 }
 
 ///|
-/// Normalize and return a path string.
-pub fn realpath(path : StringView) -> String {
-  normalize_path(path)
-}
-
-///|
 async fn walk_inner(
-  path : String,
-  visitor : async (String, Array[String]) -> Unit,
+  path : StringView,
+  visitor : async (StringView, Array[String]) -> Unit,
   allow_failure : Bool,
 ) -> Unit {
   let entries = readdir(
@@ -580,7 +556,7 @@ async fn walk_inner(
 /// Walk a directory tree and invoke `visitor` for each directory.
 pub async fn walk(
   path : StringView,
-  visitor : async (String, Array[String]) -> Unit,
+  visitor : async (StringView, Array[String]) -> Unit,
   max_concurrency? : Int,
   allow_failure? : Bool,
 ) -> Unit {
@@ -589,8 +565,7 @@ pub async fn walk(
     Some(value) => value
     None => false
   }
-  let normalized = normalize_path(path)
-  walk_inner(normalized, visitor, allow_failure)
+  walk_inner(path, visitor, allow_failure)
 }
 
 ///|

@@ -30,7 +30,7 @@ Deno.test("core wasi", async (t) => {
 
     await t.step("fd_fdstat_get", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fd_fdstat_get/fd_fdstat_get.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fd_fdstat_get/fd_fdstat_get.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()
@@ -126,7 +126,7 @@ Deno.test("core wasi", async (t) => {
 Deno.test("extensions", async (t) => {
     await t.step("fs_exists", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_exists/fs_exists.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fs_exists/fs_exists.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()
@@ -137,7 +137,7 @@ Deno.test("extensions", async (t) => {
 
     await t.step("fs_can_read", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_can_read/fs_can_read.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fs_can_read/fs_can_read.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()
@@ -148,7 +148,7 @@ Deno.test("extensions", async (t) => {
 
     await t.step("fs_can_write", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_can_write/fs_can_write.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fs_can_write/fs_can_write.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()
@@ -159,7 +159,7 @@ Deno.test("extensions", async (t) => {
 
     await t.step("fs_can_execute", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_can_execute/fs_can_execute.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fs_can_execute/fs_can_execute.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()
@@ -170,7 +170,7 @@ Deno.test("extensions", async (t) => {
 
     await t.step("fs_chmod", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_chmod/fs_chmod.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fs_chmod/fs_chmod.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()
@@ -181,7 +181,7 @@ Deno.test("extensions", async (t) => {
 
     await t.step("fs_atime", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_atime/fs_atime.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fs_atime/fs_atime.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()
@@ -192,7 +192,7 @@ Deno.test("extensions", async (t) => {
 
     await t.step("fs_realpath", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_realpath/fs_realpath.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fs_realpath/fs_realpath.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()
@@ -203,7 +203,7 @@ Deno.test("extensions", async (t) => {
 
     await t.step("fs_kind", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_kind/fs_kind.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fs_kind/fs_kind.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()
@@ -214,7 +214,7 @@ Deno.test("extensions", async (t) => {
 
     await t.step("fs_readdir", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_readdir/fs_readdir.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fs_readdir/fs_readdir.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()
@@ -225,7 +225,7 @@ Deno.test("extensions", async (t) => {
 
     await t.step("fs_read_text", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_read_text/fs_read_text.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fs_read_text/fs_read_text.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()
@@ -236,7 +236,7 @@ Deno.test("extensions", async (t) => {
 
     await t.step("fs_walk", async (t) => {
         const output = await new Deno.Command("wasmtime", {
-            args: ['--dir', 'test', 'test/target/wasm/debug/build/fs_walk/fs_walk.wasm'],
+            args: ['--dir', 'test::.', 'test/target/wasm/debug/build/fs_walk/fs_walk.wasm'],
             stdout: 'piped',
             stderr: 'piped',
         }).spawn().output()

@@ -107,12 +107,12 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
 
 ///|
 /// Open a file using WASI preopen path resolution.
-pub fn open_sync(
+pub fn open(
   path : StringView,
   mode? : Mode = ReadOnly,
   sync? : SyncMode = NoSync,
   append? : Bool = false,
-  create? : Int,
+  create? : Bool = false,
   truncate? : Bool = false,
 ) -> File raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
@@ -138,7 +138,7 @@ pub fn open_sync(
     |> @wasi.Rights::set(@wasi.Right::Fd_read)
     |> @wasi.Rights::set(@wasi.Right::Fd_write)
   let mut oflags = @wasi.OpenFlags::new()
-  if create is Some(_) {
+  if create {
     oflags = oflags |> @wasi.OpenFlags::set(@wasi.OpenFlag::Create)
   }
   if truncate {
@@ -172,30 +172,12 @@ struct File {
 }
 
 ///|
-/// Open a file with the requested mode and options.
-pub fn open(
-  path : StringView,
-  mode~ : Mode,
-  sync? : SyncMode = NoSync,
-  append? : Bool = false,
-  create? : Int,
-  truncate? : Bool = false,
-) -> File raise @wasi.Errno {
-  match create {
-    Some(value) =>
-      open_sync(path, mode~, sync~, append~, create=value, truncate~)
-    None => open_sync(path, mode~, sync~, append~, truncate~)
-  }
-}
-
-///|
 /// Create or truncate a file with read/write access.
 pub fn create(
   path : StringView,
-  permission~ : Int,
   sync? : SyncMode = NoSync,
 ) -> File raise @wasi.Errno {
-  open(path, mode=ReadWrite, sync~, create=permission, truncate=true)
+  open(path, mode=ReadWrite, sync~, create=true, truncate=true)
 }
 
 ///|
@@ -327,14 +309,10 @@ pub async fn write_file(
   data : &@async_io.Data,
   sync? : SyncMode = NoSync,
   append? : Bool = false,
-  create? : Int,
+  create? : Bool = false,
   truncate? : Bool = false,
 ) -> Unit {
-  let file = match create {
-    Some(value) =>
-      open(path, mode=WriteOnly, sync~, append~, create=value, truncate~)
-    None => open(path, mode=WriteOnly, sync~, append~, truncate~)
-  }
+  let file = open(path, mode=WriteOnly, sync~, append~, create~, truncate~)
   defer file.close()
   @async_io.Writer::write(file, data)
 }
@@ -588,7 +566,7 @@ pub fn chmod(path : StringView, mode : Int) -> Unit {
 /// Best-effort check for executable access by opening the path.
 pub fn can_execute(path : StringView) -> Bool {
   try {
-    let file = open_sync(path, mode=ReadOnly)
+    let file = open(path, mode=ReadOnly)
     file.close()
     true
   } catch {
@@ -600,7 +578,7 @@ pub fn can_execute(path : StringView) -> Bool {
 /// Check if a path can be opened for reading.
 pub fn can_read(path : StringView) -> Bool {
   try {
-    let file = open_sync(path, mode=ReadOnly)
+    let file = open(path, mode=ReadOnly)
     file.close()
     true
   } catch {
@@ -612,7 +590,7 @@ pub fn can_read(path : StringView) -> Bool {
 /// Check if a path can be opened for writing.
 pub fn can_write(path : StringView) -> Bool {
   try {
-    let file = open_sync(path, mode=WriteOnly)
+    let file = open(path, mode=WriteOnly)
     file.close()
     true
   } catch {
@@ -623,7 +601,7 @@ pub fn can_write(path : StringView) -> Bool {
 ///|
 /// Read the entire file synchronously.
 pub fn read_file_sync(path : StringView) -> &@sync_io.Data raise {
-  let file = open_sync(path, mode=ReadOnly)
+  let file = open(path, mode=ReadOnly)
   defer file.close()
   @sync_io.Reader::read_all_sync(file)
 }
@@ -635,14 +613,10 @@ pub fn write_file_sync(
   data : &@sync_io.Data,
   sync? : SyncMode = NoSync,
   append? : Bool = false,
-  create? : Int,
+  create? : Bool = false,
   truncate? : Bool = false,
 ) -> Unit raise {
-  let file = match create {
-    Some(value) =>
-      open_sync(path, mode=WriteOnly, sync~, append~, create=value, truncate~)
-    None => open_sync(path, mode=WriteOnly, sync~, append~, truncate~)
-  }
+  let file = open(path, mode=WriteOnly, sync~, append~, create~, truncate~)
   defer file.close()
   @sync_io.Writer::write_sync(file, data)
 }

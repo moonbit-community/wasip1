@@ -229,8 +229,7 @@ pub impl @async_io.Writer for File with write_once(self, data, offset~, len~) {
 ///|
 /// Sync reader implementation for `File`.
 pub impl @sync_io.Reader for File with _get_internal_buffer(self) {
-  let _ = self
-  @io_buffer.Buffer::new(0)
+  self.read_buf
 }
 
 ///|
@@ -292,11 +291,7 @@ pub fn Directory::close(self : Directory) -> Unit {
 
 ///|
 /// Read the entire file asynchronously.
-pub async fn read_file(
-  path : StringView,
-  sync_timestamp? : Bool,
-) -> &@async_io.Data {
-  let _ = sync_timestamp
+pub async fn read_file(path : StringView) -> &@async_io.Data {
   let file = open(path, mode=ReadOnly)
   defer file.close()
   @async_io.Reader::read_all(file)
@@ -407,9 +402,8 @@ pub fn kind(
 
 ///|
 /// Create a directory.
-pub fn mkdir(path : StringView, permission~ : Int) -> Unit raise @wasi.Errno {
+pub fn mkdir(path : StringView) -> Unit raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
-  let _permission = permission
   base_fd.path_create_directory(relative_path)
 }
 
@@ -535,10 +529,8 @@ async fn walk_inner(
 pub async fn walk(
   path : StringView,
   visitor : async (StringView, Array[String]) -> Unit,
-  max_concurrency? : Int,
   allow_failure? : Bool,
 ) -> Unit {
-  let _ = max_concurrency
   let allow_failure = match allow_failure {
     Some(value) => value
     None => false
@@ -552,14 +544,6 @@ pub fn readlink(path : StringView) -> String raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
   let size = base_fd.path_readlink(relative_path)
   size.to_string()
-}
-
-///|
-/// Change file permissions (no-op on WASI preview1).
-pub fn chmod(path : StringView, mode : Int) -> Unit {
-  let _ = path
-  let _ = mode
-
 }
 
 ///|

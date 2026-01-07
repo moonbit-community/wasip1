@@ -488,7 +488,11 @@ pub fn Fd::fd_prestat_dir_name(self : Fd) -> String raise Errno {
   if ret != Success {
     raise ret
   }
-  buffer |> @encoding/utf8.decode_lossy()
+  if buffer is [.. rest, b'\x00'] {
+    @encoding/utf8.decode_lossy(rest)
+  } else {
+    @encoding/utf8.decode_lossy(buffer)
+  }
 }
 
 ///|

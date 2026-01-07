@@ -8,7 +8,6 @@ pub fn start() -> Unit {
     e => {
       try! @stdio.stderr.write_sync("\{e}\n")
       @wasi.proc_exit(1)
-      b""
     }
   }
   try! @stdio.stdout.write_sync(bytes)

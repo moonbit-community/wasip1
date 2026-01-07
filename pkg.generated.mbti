@@ -14,7 +14,7 @@ pub fn path_symlink(String, Fd, String) -> Unit raise Errno
 
 pub fn poll_oneoff(Array[Subscription]) -> Array[Event] raise Errno
 
-pub fn proc_exit(UInt) -> Unit
+pub fn[T] proc_exit(UInt) -> T
 
 pub fn proc_raise(Signal) -> Unit raise Errno
 

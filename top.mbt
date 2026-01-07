@@ -1215,8 +1215,9 @@ fn proc_exit_ffi(rval : UInt) = "wasi_snapshot_preview1" "proc_exit"
 /// Note: the accepted range may depend on the runtime, meaning that it may
 /// become an error to return a value outside the accepted range of exit codes,
 /// making the actual error code environment-dependent.
-pub fn proc_exit(rval : UInt) -> Unit {
+pub fn[T] proc_exit(rval : UInt) -> T {
   proc_exit_ffi(rval)
+  panic()
 }
 
 ///|

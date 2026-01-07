@@ -9,7 +9,6 @@ pub fn start() -> Unit {
     e => {
       try! @stdio.stderr.write_sync("\{e}\n")
       @wasi.proc_exit(1)
-      []
     }
   }
   let output = "\{entries}\n"

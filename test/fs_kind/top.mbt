@@ -4,14 +4,12 @@ pub fn start() -> Unit {
     e => {
       try! @stdio.stderr.write_sync("\{e}\n")
       @wasi.proc_exit(1)
-      @fs.FileKind::Unknown
     }
   }
   let dir_kind = @fs.kind("fixtures") catch {
     e => {
       try! @stdio.stderr.write_sync("\{e}\n")
       @wasi.proc_exit(1)
-      @fs.FileKind::Unknown
     }
   }
   let output = "file=\{file_kind},dir=\{dir_kind}\n"

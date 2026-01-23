@@ -13,6 +13,7 @@
       "alias": "event_loop"
     },
     "peter-jerry-ye/wasi",
-    "peter-jerry-ye/wasi/internal/io_buffer"
+    "peter-jerry-ye/wasi/internal/io_buffer",
+    "moonbitlang/core/cmp"
   ]
 }

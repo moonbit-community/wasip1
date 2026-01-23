@@ -1,12 +1,12 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "peter-jerry-ye/wasi/fs"
 
-import(
-  "peter-jerry-ye/wasi"
-  "peter-jerry-ye/wasi/async/io"
-  "peter-jerry-ye/wasi/internal/io_buffer"
-  "peter-jerry-ye/wasi/sync_io"
-)
+import {
+  "peter-jerry-ye/wasi",
+  "peter-jerry-ye/wasi/async/io",
+  "peter-jerry-ye/wasi/internal/io_buffer",
+  "peter-jerry-ye/wasi/sync_io",
+}
 
 // Values
 pub fn atime(StringView, follow_symlink? : Bool) -> (Int64, Int) raise @wasi.Errno

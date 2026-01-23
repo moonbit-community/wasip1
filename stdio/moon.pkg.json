@@ -4,6 +4,7 @@
     "peter-jerry-ye/wasi/async/io",
     "peter-jerry-ye/wasi",
     "peter-jerry-ye/wasi/internal/io_buffer",
-    "peter-jerry-ye/wasi/internal/event_loop"
+    "peter-jerry-ye/wasi/internal/event_loop",
+    "moonbitlang/core/cmp"
   ]
 }

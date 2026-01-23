@@ -1,11 +1,11 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "peter-jerry-ye/wasi/stdio"
 
-import(
-  "peter-jerry-ye/wasi/async/io"
-  "peter-jerry-ye/wasi/internal/io_buffer"
-  "peter-jerry-ye/wasi/sync_io"
-)
+import {
+  "peter-jerry-ye/wasi/async/io",
+  "peter-jerry-ye/wasi/internal/io_buffer",
+  "peter-jerry-ye/wasi/sync_io",
+}
 
 // Values
 pub let stderr : Output

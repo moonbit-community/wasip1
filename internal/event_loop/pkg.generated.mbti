@@ -1,9 +1,9 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "peter-jerry-ye/wasi/internal/event_loop"
 
-import(
-  "peter-jerry-ye/wasi"
-)
+import {
+  "peter-jerry-ye/wasi",
+}
 
 // Values
 pub fn async_run(async () -> Unit) -> Unit raise

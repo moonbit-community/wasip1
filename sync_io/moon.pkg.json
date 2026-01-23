@@ -1,5 +1,8 @@
 {
   "import": [
-    "peter-jerry-ye/wasi/internal/io_buffer"
+    "peter-jerry-ye/wasi/internal/io_buffer",
+    "moonbitlang/core/cmp",
+    { "path": "moonbitlang/core/encoding/utf8", "alias": "encoding/utf8" },
+    "moonbitlang/core/json"
   ]
 }

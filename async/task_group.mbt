@@ -50,14 +50,14 @@ fn[X] TaskGroup::spawn_coroutine(
   guard self.state is Running else {
     abort("trying to spawn from a terminated task group")
   }
-  if not(no_wait) {
+  if !no_wait {
     self.waiting += 1
   }
   async fn worker() {
     let coro = @coroutine.current_coroutine()
     defer {
       self.children.remove(coro)
-      if not(no_wait) {
+      if !no_wait {
         self.waiting -= 1
         if self.waiting == 0 && self.state is Running {
           for child in self.children {
@@ -79,7 +79,7 @@ fn[X] TaskGroup::spawn_coroutine(
             child.cancel()
           }
           self.state = Fail(err)
-        } else if not(err is @coroutine.Cancelled) {
+        } else if !(err is @coroutine.Cancelled) {
           self.state = Fail(err)
         }
         raise err
@@ -192,7 +192,7 @@ pub async fn[X] with_task_group(f : async (TaskGroup[X]) -> X) -> X {
       tg.result = Some(value)
     }
   })
-  if not(tg.children.is_empty()) {
+  if !tg.children.is_empty() {
     @coroutine.suspend() catch {
       err =>
         if tg.state is Running {
@@ -203,7 +203,7 @@ pub async fn[X] with_task_group(f : async (TaskGroup[X]) -> X) -> X {
         }
     }
   }
-  if not(tg.children.is_empty()) {
+  if !tg.children.is_empty() {
     protect_from_cancel(@coroutine.suspend) catch {
       _ => ()
     }

@@ -822,7 +822,7 @@ pub fn Directory::read_all(
 /// Treat the file handle as a directory.
 pub fn File::as_dir(self : File) -> Directory raise @wasi.Errno {
   let stat = self.fd.fd_filestat_get()
-  if not(stat.filetype is @wasi.FileType::Directory) {
+  if !(stat.filetype is @wasi.FileType::Directory) {
     raise @wasi.Notdir
   }
   Directory::{ fd: self.fd }

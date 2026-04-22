@@ -2,6 +2,7 @@
 package "peter-jerry-ye/wasi/fs"
 
 import {
+  "moonbitlang/core/debug",
   "peter-jerry-ye/wasi",
   "peter-jerry-ye/wasi/async/io",
   "peter-jerry-ye/wasi/internal/io_buffer",
@@ -89,9 +90,7 @@ pub(all) enum FileKind {
   Pipe
   BlockDevice
   CharDevice
-}
-pub impl Eq for FileKind
-pub impl Show for FileKind
+} derive(Eq, @debug.Debug)
 
 pub(all) enum Mode {
   ReadOnly

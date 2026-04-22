@@ -2,15 +2,14 @@
 package "peter-jerry-ye/wasi/sync_io"
 
 import {
+  "moonbitlang/core/debug",
   "peter-jerry-ye/wasi/internal/io_buffer",
 }
 
 // Values
 
 // Errors
-pub(all) suberror ReaderClosed
-pub impl Show for ReaderClosed
-pub impl ToJson for ReaderClosed
+pub(all) suberror ReaderClosed derive(ToJson, @debug.Debug)
 
 // Types and methods
 type BufferedWriter[W]

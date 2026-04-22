@@ -2,6 +2,7 @@
 package "peter-jerry-ye/wasi/async"
 
 import {
+  "moonbitlang/core/debug",
   "peter-jerry-ye/wasi/async/aqueue",
   "peter-jerry-ye/wasi/async/semaphore",
 }
@@ -30,11 +31,14 @@ pub async fn[X] with_timeout(Int, async () -> X, error? : Error) -> X
 pub async fn[X] with_timeout_opt(Int, async () -> X) -> X?
 
 // Errors
-pub suberror TimeoutError
-pub impl Show for TimeoutError
-pub impl ToJson for TimeoutError
+pub suberror TimeoutError derive(ToJson, @debug.Debug)
 
 // Types and methods
+pub(all) enum LoopResult {
+  LoopContinue
+  LoopEnd
+} derive(Eq, @debug.Debug)
+
 pub(all) enum RetryMethod {
   Immediate
   FixedDelay(Int)
@@ -51,7 +55,7 @@ pub fn[X] TaskGroup::add_defer(Self[X], async () -> Unit) -> Unit
 pub fn[X] TaskGroup::return_immediately(Self[X], X) -> Unit raise
 pub fn[G, X] TaskGroup::spawn(Self[G], async () -> X, no_wait? : Bool, allow_failure? : Bool) -> Task[X]
 pub fn[X] TaskGroup::spawn_bg(Self[X], async () -> Unit, no_wait? : Bool, allow_failure? : Bool) -> Unit
-pub fn[X] TaskGroup::spawn_loop(Self[X], async () -> IterResult, no_wait? : Bool, allow_failure? : Bool, retry? : RetryMethod, max_retry? : Int, fatal_error? : (Error) -> Bool) -> Unit
+pub fn[X] TaskGroup::spawn_loop(Self[X], async () -> LoopResult, no_wait? : Bool, allow_failure? : Bool, retry? : RetryMethod, max_retry? : Int, fatal_error? : (Error) -> Bool) -> Unit
 
 // Type aliases
 pub using @aqueue {type Queue}

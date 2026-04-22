@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "peter-jerry-ye/wasi/internal/coroutine"
 
+import {
+  "moonbitlang/core/debug",
+}
+
 // Values
 pub fn current_coroutine() -> Coroutine
 
@@ -21,8 +25,7 @@ pub fn spawn(async () -> Unit) -> Coroutine
 pub async fn suspend() -> Unit
 
 // Errors
-pub(all) suberror Cancelled
-pub impl Show for Cancelled
+pub(all) suberror Cancelled derive(@debug.Debug)
 
 // Types and methods
 type Coroutine

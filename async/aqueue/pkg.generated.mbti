@@ -1,12 +1,14 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "peter-jerry-ye/wasi/async/aqueue"
 
+import {
+  "moonbitlang/core/debug",
+}
+
 // Values
 
 // Errors
-pub suberror QueueAlreadyClosed
-pub impl Show for QueueAlreadyClosed
-pub impl ToJson for QueueAlreadyClosed
+pub suberror QueueAlreadyClosed derive(ToJson, @debug.Debug)
 
 // Types and methods
 pub(all) enum Kind {

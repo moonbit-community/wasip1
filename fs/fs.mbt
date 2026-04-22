@@ -678,7 +678,7 @@ pub async fn File::read_exactly_at(
   position~ : Int64,
 ) -> Bytes {
   if len <= 0 {
-    return ""
+    return b""
   }
   let buffer = FixedArray::make(len, b'\x00')
   let mut read_total = 0

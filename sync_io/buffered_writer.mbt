@@ -75,7 +75,7 @@ pub impl[W : Writer] Writer for BufferedWriter[W] with write_reader_sync(
   self,
   reader,
 ) {
-  for {
+  for ;; {
     if self.len >= self.buf.length() {
       self.flush()
     }

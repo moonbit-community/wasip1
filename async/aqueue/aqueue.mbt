@@ -163,31 +163,33 @@ pub fn[X] Queue::try_put(self : Queue[X], data : X) -> Bool raise {
   if self.closed is Some(err) {
     raise err
   }
-  loop self.readers.pop_front() {
-    None =>
-      match self.kind {
-        Unbounded => {
-          self.buffer.push_back(data)
-          true
-        }
-        Blocking(n) | DiscardOldest(n) | DiscardLatest(n) =>
-          if self.buffer.length() < n {
+  for next_reader = self.readers.pop_front() {
+    match next_reader {
+      None =>
+        break match self.kind {
+          Unbounded => {
             self.buffer.push_back(data)
             true
-          } else {
-            false
           }
+          Blocking(n) | DiscardOldest(n) | DiscardLatest(n) =>
+            if self.buffer.length() < n {
+              self.buffer.push_back(data)
+              true
+            } else {
+              false
+            }
+        }
+      Some({ coro: None, .. }) => continue self.readers.pop_front()
+      Some({ coro: Some(coro), .. } as reader) => {
+        // after waking the reader, it may not start execution immediately.
+        // And a lot of things could happen in the middle.
+        // So instead of using `self.buffer`,
+        // we pass `data` to the woker reader in a point-to-point manner
+        // to avoid some edge cases.
+        reader.value = Some(data)
+        coro.wake()
+        break true
       }
-    Some({ coro: None, .. }) => continue self.readers.pop_front()
-    Some({ coro: Some(coro), .. } as reader) => {
-      // after waking the reader, it may not start execution immediately.
-      // And a lot of things could happen in the middle.
-      // So instead of using `self.buffer`,
-      // we pass `data` to the woker reader in a point-to-point manner
-      // to avoid some edge cases.
-      reader.value = Some(data)
-      coro.wake()
-      true
     }
   }
 }
@@ -249,13 +251,16 @@ pub async fn[X] Queue::get(self : Queue[X]) -> X {
 pub fn[X] Queue::try_get(self : Queue[X]) -> X? raise {
   let result = self.buffer.pop_front()
   if result is Some(_) {
-    loop self.writers.pop_front() {
-      None => ()
-      Some({ coro: None, .. }) => continue self.writers.pop_front()
-      Some({ coro: Some(coro), value } as writer) => {
-        self.buffer.push_back(value)
-        coro.wake()
-        writer.coro = None
+    for next_writer = self.writers.pop_front() {
+      match next_writer {
+        None => break
+        Some({ coro: None, .. }) => continue self.writers.pop_front()
+        Some({ coro: Some(coro), value } as writer) => {
+          self.buffer.push_back(value)
+          coro.wake()
+          writer.coro = None
+          break
+        }
       }
     }
   } else if self.closed is Some(err) {

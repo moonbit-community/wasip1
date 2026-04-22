@@ -94,7 +94,7 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
       let len = dir_name.length()
       if len > best_len {
         best_fd = fd
-        best_path = try! path[dir_name.length() + 1:].to_string()
+        best_path = path[dir_name.length() + 1:].to_string()
         best_len = len
       }
     }

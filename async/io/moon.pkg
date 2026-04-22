@@ -1,0 +1,9 @@
+import {
+  "peter-jerry-ye/wasi/internal/coroutine",
+  "peter-jerry-ye/wasi/internal/io_buffer",
+  "moonbitlang/core/encoding/utf8" @encoding/utf8,
+  "moonbitlang/core/cmp",
+  "moonbitlang/core/json",
+}
+
+supported_targets = "wasm"

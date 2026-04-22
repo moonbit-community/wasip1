@@ -1,0 +1,11 @@
+import {
+  "peter-jerry-ye/wasi/sync_io" @sync_io,
+  "peter-jerry-ye/wasi/async/io" @async_io,
+  "peter-jerry-ye/wasi/internal/event_loop" @event_loop,
+  "peter-jerry-ye/wasi",
+  "peter-jerry-ye/wasi/internal/io_buffer",
+  "moonbitlang/core/cmp",
+  "moonbitlang/core/debug" @debug,
+}
+
+supported_targets = "wasm"

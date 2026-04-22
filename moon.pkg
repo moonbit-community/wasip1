@@ -1,0 +1,6 @@
+import {
+  "peter-jerry-ye/wasi/internal/ffi",
+  "moonbitlang/core/encoding/utf8" @encoding/utf8,
+}
+
+supported_targets = "wasm"

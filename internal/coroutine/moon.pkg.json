@@ -1,6 +1,0 @@
-{
-  "supported-targets": "wasm",
-  "import": [
-    "moonbitlang/core/deque"
-  ]
-}

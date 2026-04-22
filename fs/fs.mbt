@@ -744,7 +744,6 @@ pub async fn File::write_at(
   }
   try {
     let _ = self.fd.fd_seek(@wasi.FileDelta(position), @wasi.Whence::Set)
-
   } catch {
     e => fail("write_at failed: \{@debug.to_string(e)}")
   }
@@ -778,7 +777,6 @@ pub async fn File::write_at(
   }
   try {
     let _ = self.fd.fd_seek(restore, @wasi.Whence::Set)
-
   } catch {
     _ => ()
   }

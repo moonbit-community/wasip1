@@ -1,7 +1,0 @@
-{
-  "supported-targets": "wasm",
-  "import": [
-    "peter-jerry-ye/wasi",
-    "peter-jerry-ye/wasi/internal/coroutine"
-  ]
-}

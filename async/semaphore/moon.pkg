@@ -1,0 +1,6 @@
+import {
+  "peter-jerry-ye/wasi/internal/coroutine",
+  "moonbitlang/core/deque",
+}
+
+supported_targets = "wasm"

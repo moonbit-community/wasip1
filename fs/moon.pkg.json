@@ -15,6 +15,7 @@
     },
     "peter-jerry-ye/wasi",
     "peter-jerry-ye/wasi/internal/io_buffer",
-    "moonbitlang/core/cmp"
+    "moonbitlang/core/cmp",
+    { "path": "moonbitlang/core/debug", "alias": "debug" }
   ]
 }

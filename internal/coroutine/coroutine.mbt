@@ -57,7 +57,7 @@ pub fn is_being_cancelled() -> Bool {
 
 ///|
 /// Cancellation error raised when a coroutine is cancelled.
-pub(all) suberror Cancelled derive(Show)
+pub(all) suberror Cancelled derive(Debug)
 
 ///|
 /// Mark a coroutine as cancelled and wake it if needed.

@@ -1,4 +1,4 @@
 {
-  "supported-targets": ["wasm"],
+  "supported-targets": "wasm",
   "warn-list": "-44"
 }

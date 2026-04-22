@@ -244,9 +244,16 @@ pub fn[X] TaskGroup::return_immediately(
 }
 
 ///|
+/// Result returned from a spawned loop body.
+pub(all) enum LoopResult {
+  LoopContinue
+  LoopEnd
+} derive(Eq, Debug)
+
+///|
 /// Similar to `spawn_bg`, but the spawn a loop,
 /// i.e. the spawned task will be restarted after it terminates.
-/// The spawned task can terminate the loop by returning `IterEnd`.
+/// The spawned task can terminate the loop by returning `LoopEnd`.
 ///
 /// If `retry_method` is set, within each loop,
 /// the spawned task will be automatically restarted on failure.
@@ -257,7 +264,7 @@ pub fn[X] TaskGroup::return_immediately(
 /// The meaning of `no_wait` and `allow_failure` is the same as `spawn_bg`.
 pub fn[X] TaskGroup::spawn_loop(
   self : TaskGroup[X],
-  f : async () -> IterResult,
+  f : async () -> LoopResult,
   no_wait? : Bool = false,
   allow_failure? : Bool = false,
   retry? : RetryMethod,
@@ -271,7 +278,7 @@ pub fn[X] TaskGroup::spawn_loop(
         Some(strategy) =>
           moonbitlang_async_retry(strategy, f, max_retry?, fatal_error?)
       }
-      guard result is IterContinue else { break }
+      guard result is LoopContinue else { break }
     }
   })
 }

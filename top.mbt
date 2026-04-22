@@ -595,7 +595,7 @@ pub fn Fd::fd_readdir(
       ),
     )
     continue i + 24 + namlen
-  } else {
+  } nobreak {
     (entries, buf_used == buf_len)
   }
 }

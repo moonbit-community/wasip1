@@ -58,12 +58,18 @@ pub fn Semaphore::release(self : Semaphore) -> Unit {
   if self.value >= self.size {
     abort("semaphore: too many release")
   }
-  loop self.waiters.pop_front() {
-    None => self.value += 1
-    Some({ coro: None, .. }) => continue self.waiters.pop_front()
-    Some({ coro: Some(coro), .. } as waiter) => {
-      waiter.acquired = true
-      coro.wake()
+  for next_waiter = self.waiters.pop_front() {
+    match next_waiter {
+      None => {
+        self.value += 1
+        break
+      }
+      Some({ coro: None, .. }) => continue self.waiters.pop_front()
+      Some({ coro: Some(coro), .. } as waiter) => {
+        waiter.acquired = true
+        coro.wake()
+        break
+      }
     }
   }
 }

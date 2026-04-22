@@ -30,7 +30,7 @@ fn[R : Reader] @io_buffer.Buffer::try_ensure(
       return false
     }
     self.len += n
-  } else {
+  } nobreak {
     true
   }
 }

@@ -1,13 +1,13 @@
 ///|
-pub(all) struct Size(UInt) derive(Eq, Show)
+pub(all) struct Size(UInt) derive(Eq, Debug)
 
 ///|
 /// Non-negative file size or length of a region within a file.
-pub(all) struct FileSize(UInt64) derive(Eq, Show)
+pub(all) struct FileSize(UInt64) derive(Eq, Debug)
 
 ///|
 /// Timestamp in nanoseconds.
-pub(all) struct TimeStamp(UInt64) derive(Eq, Show)
+pub(all) struct TimeStamp(UInt64) derive(Eq, Debug)
 
 ///|
 /// Identifiers for clocks.
@@ -24,7 +24,7 @@ pub(all) enum ClockId {
   Monotonic
   ProcessCPUTimeId
   ThreadCPUTimeId
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric clock id value.
@@ -211,7 +211,7 @@ pub(all) suberror Errno {
   Xdev
   /// Extension: Capabilities insufficient
   Notcapable
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric errno value.
@@ -392,7 +392,7 @@ test "errno" {
 
 ///|
 ///  File descriptor rights, determining which actions may be performed.
-pub(all) struct Rights(UInt64) derive(Eq, Show)
+pub(all) struct Rights(UInt64) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of rights.
@@ -433,7 +433,7 @@ pub(all) enum Right {
   Poll_fd_readwrite
   Sock_shutdown
   Sock_accept
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for a single right.
@@ -492,7 +492,7 @@ pub fn Rights::is_set(self : Rights, right : Right) -> Bool {
 
 ///|
 /// A file descriptor handle
-pub(all) struct Fd(Int) derive(Eq, Show)
+pub(all) struct Fd(Int) derive(Eq, Debug)
 
 ///|
 /// A region of memory for scatter/gather reads.
@@ -502,7 +502,7 @@ pub(all) struct Fd(Int) derive(Eq, Show)
 pub(all) struct IOVec {
   buf : Int
   buf_len : Size
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// A region of memory for scatter/gather writes.
@@ -512,11 +512,11 @@ pub(all) struct IOVec {
 pub(all) struct CIOVec {
   buf : Int
   buf_len : Size
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Relative offset within a file.
-pub(all) struct FileDelta(Int64) derive(Eq, Show)
+pub(all) struct FileDelta(Int64) derive(Eq, Debug)
 
 ///|
 /// The position relative to which to set the offset of the file descriptor
@@ -524,7 +524,7 @@ pub(all) enum Whence {
   Set
   Cur
   End
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric whence value.
@@ -551,15 +551,15 @@ pub fn Whence::from_value(value : UInt) -> Whence? {
 /// A reference to the offset of a directory entry.
 /// 
 /// The value 0 signifies the start of the directory.
-pub(all) struct DirCookie(UInt64) derive(Eq, Show)
+pub(all) struct DirCookie(UInt64) derive(Eq, Debug)
 
 ///|
 /// The type for the `dirent::d_namlen` field of `dirent` struct.
-pub(all) struct DirNamlen(UInt) derive(Eq, Show)
+pub(all) struct DirNamlen(UInt) derive(Eq, Debug)
 
 ///|
 /// File serial number that is unique within its file system.
-pub(all) struct Inode(UInt64) derive(Eq, Show)
+pub(all) struct Inode(UInt64) derive(Eq, Debug)
 
 ///|
 /// The type of a file descriptor or file.
@@ -581,7 +581,7 @@ pub(all) enum FileType {
   Socket_dgram
   Socket_stream
   Symbolic_link
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric file type value.
@@ -626,7 +626,7 @@ pub(all) struct DirEnt {
   d_ino : Inode
   d_namlen : DirNamlen
   d_type : FileType
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// File or memory access pattern advisory information.
@@ -644,7 +644,7 @@ pub(all) enum Advice {
   Willneed
   Dontneed
   Noreuse
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric advice value.
@@ -675,7 +675,7 @@ pub fn Advice::from_value(value : UInt) -> Advice? {
 
 ///|
 /// File descriptor flag.
-pub(all) struct FdFlags(UInt) derive(Eq, Show)
+pub(all) struct FdFlags(UInt) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of fd flags.
@@ -697,7 +697,7 @@ pub(all) enum FdFlag {
   Nonblock
   Rsync
   Sync
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for a single fd flag.
@@ -741,16 +741,16 @@ pub(all) struct FdStat {
   fs_flags : FdFlags
   fs_rights_base : Rights
   fs_rights_inheriting : Rights
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Identifier for a device containing a file system. Can be used in combination
 /// with `inode` to uniquely identify a file or directory in the filesystem.
-pub(all) struct Device(UInt64) derive(Eq, Show)
+pub(all) struct Device(UInt64) derive(Eq, Debug)
 
 ///|
 /// Which file time attributes to adjust
-pub(all) struct FstFlags(UInt) derive(Eq, Show)
+pub(all) struct FstFlags(UInt) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of filestat flags.
@@ -770,7 +770,7 @@ pub(all) enum FstFlag {
   Atim_now
   Mtim
   Mtim_now
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for a filestat flag.
@@ -803,7 +803,7 @@ pub fn FstFlags::is_set(self : FstFlags, flag : FstFlag) -> Bool {
 
 ///|
 /// Flags dermining the method of how paths are resolved.
-pub(all) struct LookupFlags(UInt) derive(Eq, Show)
+pub(all) struct LookupFlags(UInt) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of lookup flags.
@@ -814,7 +814,7 @@ pub fn LookupFlags::new() -> LookupFlags {
 ///|
 pub(all) enum LookupFlag {
   Symlink_follow
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for a lookup flag.
@@ -844,7 +844,7 @@ pub fn LookupFlags::is_set(self : LookupFlags, flag : LookupFlag) -> Bool {
 
 ///|
 /// Open flags used by `path_open`.
-pub(all) struct OpenFlags(UInt) derive(Eq, Show)
+pub(all) struct OpenFlags(UInt) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of open flags.
@@ -864,7 +864,7 @@ pub(all) enum OpenFlag {
   Directory
   Excl
   Trunc
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for an open flag.
@@ -897,7 +897,7 @@ pub fn OpenFlags::is_set(self : OpenFlags, flag : OpenFlag) -> Bool {
 
 ///|
 /// Number of hard links to an inode.
-pub(all) struct LinkCount(UInt64) derive(Eq, Show)
+pub(all) struct LinkCount(UInt64) derive(Eq, Debug)
 
 ///|
 /// File attributes.
@@ -919,12 +919,12 @@ pub(all) struct FileStat {
   atim : TimeStamp
   mtim : TimeStamp
   ctim : TimeStamp
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// User-provided value that may be attached to objects that is retained when
 /// extracted from the implementation.
-pub(all) struct Userdata(UInt64) derive(Eq, Show)
+pub(all) struct Userdata(UInt64) derive(Eq, Debug)
 
 ///|
 /// Type of a subscription to an event or its occurrence.
@@ -936,7 +936,7 @@ pub(all) enum EventType {
   Clock
   Fd_read
   Fd_write
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for an event type.
@@ -961,7 +961,7 @@ pub fn EventType::from_value(value : UInt) -> EventType? {
 
 ///|
 /// The state of the file descriptor subscribed to with `eventtype::fd_read` or `eventtype::fd_write`.
-pub(all) struct EventRWFlags(UInt) derive(Eq, Show)
+pub(all) struct EventRWFlags(UInt) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of event read/write flags.
@@ -975,7 +975,7 @@ pub fn EventRWFlags::new() -> EventRWFlags {
 /// - Fd_readwrite_hangup: The peer of this socket has closed or disconnected.
 pub(all) enum EventRWFlag {
   Fd_readwrite_hangup
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for an event read/write flag.
@@ -1018,7 +1018,7 @@ pub fn EventRWFlags::is_set(self : EventRWFlags, flag : EventRWFlag) -> Bool {
 pub(all) struct Event_fd_readwrite {
   nbytes : FileSize
   flags : EventRWFlags
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// An event that occurred.
@@ -1032,11 +1032,11 @@ pub(all) struct Event {
   error : Errno
   type_ : EventType
   fd_readwrite : Event_fd_readwrite
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Flags determining how to interpret the timestamp provided in `subscription::timeout`.
-pub(all) struct SubclockFlags(UInt) derive(Eq, Show)
+pub(all) struct SubclockFlags(UInt) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of subclock flags.
@@ -1055,7 +1055,7 @@ pub fn SubclockFlags::new() -> SubclockFlags {
 ///   current time value of clock `subscription_clock::id`.
 pub(all) enum SubclockFlag {
   Subscription_clock_abstime
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for a subclock flag.
@@ -1101,7 +1101,7 @@ pub(all) struct Subscription_clock {
   timeout : TimeStamp
   precision : TimeStamp
   flags : SubclockFlags
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// The contents of a `subscription` when type is `eventtype::fd_read` or `eventtype::fd_write`.
@@ -1109,7 +1109,7 @@ pub(all) struct Subscription_clock {
 /// - `file_descriptor`: The file descriptor on which to wait for it to become ready for reading or writing.
 pub(all) struct Subscription_fd_readwrite {
   file_descriptor : Fd
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// The contents of a `subscription`.
@@ -1117,7 +1117,7 @@ pub(all) enum Subscription_u {
   Clock(Subscription_clock)
   Fd_read(Subscription_fd_readwrite)
   Fd_write(Subscription_fd_readwrite)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Subscription to an event.
@@ -1127,11 +1127,11 @@ pub(all) enum Subscription_u {
 pub(all) struct Subscription {
   userdata : Userdata
   u : Subscription_u
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Exit code generated by a process when exiting.
-pub(all) struct ExitCode(UInt) derive(Eq, Show)
+pub(all) struct ExitCode(UInt) derive(Eq, Debug)
 
 ///|
 /// Signal condition.
@@ -1198,7 +1198,7 @@ pub(all) enum Signal {
   Poll
   Pwr
   Sys
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for a signal.
@@ -1279,7 +1279,7 @@ pub fn Signal::from_value(value : UInt) -> Signal? {
 
 ///|
 /// Flags provided to `sock_recv`.
-pub(all) struct RiFlags(UInt) derive(Eq, Show)
+pub(all) struct RiFlags(UInt) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of recv flags.
@@ -1295,7 +1295,7 @@ pub fn RiFlags::new() -> RiFlags {
 pub(all) enum RiFlag {
   Recv_peek
   Recv_waitall
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for a recv flag.
@@ -1326,7 +1326,7 @@ pub fn RiFlags::is_set(self : RiFlags, flag : RiFlag) -> Bool {
 
 ///|
 /// Flags returned by `sock_recv`.
-pub(all) struct RoFlags(UInt) derive(Eq, Show)
+pub(all) struct RoFlags(UInt) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of recv open flags.
@@ -1340,7 +1340,7 @@ pub fn RoFlags::new() -> RoFlags {
 /// - Recv_data_truncated: Returned by `sock_recv`: Message data has been truncated.
 pub(all) enum RoFlag {
   Recv_data_truncated
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for a recv open flag.
@@ -1370,7 +1370,7 @@ pub fn RoFlags::is_set(self : RoFlags, flag : RoFlag) -> Bool {
 
 ///|
 /// Flags provided to `sock_send`. As there are currently no flags defined, it must be set to zero.
-pub(all) struct SiFlags(UInt) derive(Eq, Show)
+pub(all) struct SiFlags(UInt) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of send flags.
@@ -1380,7 +1380,7 @@ pub fn SiFlags::new() -> SiFlags {
 
 ///|
 /// Flags returned by `sock_send`. As there are currently no flags defined, it must be set to zero.
-pub(all) enum SiFlag {} derive(Eq, Show)
+pub(all) enum SiFlag {} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for a send flag.
@@ -1410,7 +1410,7 @@ pub fn SiFlags::is_set(self : SiFlags, flag : SiFlag) -> Bool {
 
 ///|
 /// Which channels on a socket to shut down.
-pub(all) struct SdFlags(UInt) derive(Eq, Show)
+pub(all) struct SdFlags(UInt) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of shutdown flags.
@@ -1426,7 +1426,7 @@ pub fn SdFlags::new() -> SdFlags {
 pub(all) enum SdFlag {
   Rd
   Wr
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for a shutdown flag.
@@ -1461,7 +1461,7 @@ pub fn SdFlags::is_set(self : SdFlags, flag : SdFlag) -> Bool {
 /// - Dir: A pre-opened directory.
 pub(all) enum PreOpenType {
   Dir
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Return the numeric preopen type value.
@@ -1486,13 +1486,13 @@ pub fn PreOpenType::from_value(value : UInt) -> PreOpenType? {
 /// - `pr_name_len`: The length of the directory name for use with `fd_prestat_dir_name`.
 pub(all) struct PreStat_dir {
   pr_name_len : Size
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Information about a pre-opened capability.
 pub(all) enum PreStat {
   Dir(PreStat_dir)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Standard input file descriptor.

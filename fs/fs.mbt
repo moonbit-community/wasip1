@@ -9,7 +9,7 @@ pub(all) enum FileKind {
   Pipe
   BlockDevice
   CharDevice
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// File open modes used by `open` and `open_sync`.
@@ -505,7 +505,12 @@ async fn walk_inner(
     include_special=true,
     sort=false,
   ) catch {
-    e => if allow_failure { return } else { fail("walk failed: \{e}") }
+    e =>
+      if allow_failure {
+        return
+      } else {
+        fail("walk failed: \{@debug.to_string(e)}")
+      }
   }
   visitor(path, entries)
   for entry in entries {
@@ -515,7 +520,7 @@ async fn walk_inner(
         if allow_failure {
           FileKind::Unknown
         } else {
-          fail("walk failed: \{e}")
+          fail("walk failed: \{@debug.to_string(e)}")
         }
     }
     if entry_kind is FileKind::Directory {
@@ -543,7 +548,7 @@ pub async fn walk(
 pub fn readlink(path : StringView) -> String raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
   let size = base_fd.path_readlink(relative_path)
-  size.to_string()
+  size.0.to_string()
 }
 
 ///|
@@ -734,12 +739,14 @@ pub async fn File::write_at(
   if len <= 0 {
     return
   }
-  let current = self.fd.fd_tell() catch { e => fail("write_at failed: \{e}") }
+  let current = self.fd.fd_tell() catch {
+    e => fail("write_at failed: \{@debug.to_string(e)}")
+  }
   try {
     let _ = self.fd.fd_seek(@wasi.FileDelta(position), @wasi.Whence::Set)
 
   } catch {
-    e => fail("write_at failed: \{e}")
+    e => fail("write_at failed: \{@debug.to_string(e)}")
   }
   let restore = @wasi.FileDelta(current.0.reinterpret_as_int64())
   let mut err : Error? = None

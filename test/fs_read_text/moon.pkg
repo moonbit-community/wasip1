@@ -1,0 +1,14 @@
+import {
+  "peter-jerry-ye/wasi",
+  "peter-jerry-ye/wasi/fs",
+  "peter-jerry-ye/wasi/sync_io",
+  "peter-jerry-ye/wasi/stdio",
+}
+
+supported_targets = "wasm"
+
+options(
+  link: {
+    "wasm": { "export-memory-name": "memory", "exports": [ "start:_start" ] },
+  },
+)

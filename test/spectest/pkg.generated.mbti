@@ -1,8 +1,8 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "peter-jerry-ye/wasi-test/proc_exit"
+package "peter-jerry-ye/wasi-test/spectest"
 
 // Values
-pub fn start() -> Unit
+pub fn print_char(UInt16) -> Unit
 
 // Errors
 

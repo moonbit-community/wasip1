@@ -14,9 +14,7 @@ pub fn start() -> Unit {
     buffer2.blit_to(buffer, len=len.0.reinterpret_as_int() - 64, dst_offset=64)
     (try? @wasi.Fd(1).fd_write([Bytes::from_array(buffer)])) |> ignore
   } else {
-    (try? @wasi.Fd(1).fd_write([
-      "Input too long\n" |> @encoding/utf8.encode(),
-    ]))
+    (try? @wasi.Fd(1).fd_write(["Input too long\n" |> @utf8.encode()]))
     |> ignore
   }
 }

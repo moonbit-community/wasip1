@@ -2,7 +2,7 @@
 package "peter-jerry-ye/wasi-test/poll_oneoff"
 
 // Values
-fn start() -> Unit
+pub fn start() -> Unit
 
 // Errors
 

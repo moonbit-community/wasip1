@@ -2,7 +2,7 @@
 package "peter-jerry-ye/wasi-test/args_get"
 
 // Values
-fn start() -> Unit
+pub fn start() -> Unit
 
 // Errors
 

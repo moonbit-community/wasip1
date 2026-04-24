@@ -1,7 +1,7 @@
 ///|
 pub async fn run() -> Unit {
   let paths : Array[String] = []
-  @fs.walk("fixtures/walk", async fn(dir, entries) {
+  @fs.walk("fixtures/walk", (dir, entries) => {
     let names = entries
     names.sort()
     for entry in names {
@@ -14,7 +14,7 @@ pub async fn run() -> Unit {
 
 ///|
 pub fn start() -> Unit {
-  @async.with_event_loop(fn(_) { run() }) catch {
+  @async.with_event_loop(async fn(_) { run() }) catch {
     e => {
       try! @stdio.stderr.write_sync("\{e}\n")
       @wasi.proc_exit(1)

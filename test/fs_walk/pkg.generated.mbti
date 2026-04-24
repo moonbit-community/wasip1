@@ -1,7 +1,9 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "peter-jerry-ye/wasi-test/proc_exit"
+package "peter-jerry-ye/wasi-test/fs_walk"
 
 // Values
+pub async fn run() -> Unit
+
 pub fn start() -> Unit
 
 // Errors

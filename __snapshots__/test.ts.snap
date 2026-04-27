@@ -5,8 +5,18 @@ snapshot[`core wasi > arg_get 1`] = `""`;
 snapshot[`core wasi > environ_get 1`] = `""`;
 
 snapshot[`core wasi > fd_fdstat_get 1`] = `
-"{fs_filetype: Unknown, fs_flags: FdFlags(0), fs_rights_base: Rights(64), fs_rights_inheriting: Rights(64)}
-{fs_filetype: Directory, fs_flags: FdFlags(0), fs_rights_base: Rights(129498624), fs_rights_inheriting: Rights(267911167)}
+"{
+  fs_filetype: Unknown,
+  fs_flags: FdFlags(0),
+  fs_rights_base: Rights(64),
+  fs_rights_inheriting: Rights(64),
+}
+{
+  fs_filetype: Directory,
+  fs_flags: FdFlags(0),
+  fs_rights_base: Rights(129498624),
+  fs_rights_inheriting: Rights(267911167),
+}
 "
 `;
 
@@ -22,7 +32,7 @@ snapshot[`core wasi > fd_read 1`] = `"hello"`;
 snapshot[`core wasi > fd_read 2`] = `"hello, this is a longer sentence, as a quick brown fox jumps ove"`;
 
 snapshot[`core wasi > fd_readdir 1`] = `
-'[". ~> Directory", ".. ~> Directory", "top.mbt ~> Regular_file", "moon.pkg.json ~> Regular_file", "pkg.generated.mbti ~> Regular_file"]
+'[". ~> Directory", ".. ~> Directory", "top.mbt ~> Regular_file", "moon.pkg ~> Regular_file", "pkg.generated.mbti ~> Regular_file"]
 '
 `;
 

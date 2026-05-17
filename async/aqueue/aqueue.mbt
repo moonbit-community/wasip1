@@ -77,9 +77,9 @@ pub fn[X] Queue::new(kind? : Kind = Unbounded) -> Queue[X] {
   }
   {
     kind,
-    writers: @deque.new(),
-    readers: @deque.new(),
-    buffer: @deque.new(),
+    writers: @deque.Deque([]),
+    readers: @deque.Deque([]),
+    buffer: @deque.Deque([]),
     closed: None,
   }
 }

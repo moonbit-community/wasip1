@@ -179,7 +179,7 @@ pub fn[X] TaskGroup::add_defer(
 /// `with_task_group` will return the result of `f`.
 pub async fn[X] with_task_group(f : async (TaskGroup[X]) -> X) -> X {
   let tg = {
-    children: Set::new(),
+    children: Set([]),
     parent: @coroutine.current_coroutine(),
     waiting: 0,
     state: Running,

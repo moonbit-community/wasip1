@@ -32,7 +32,13 @@ snapshot[`core wasi > fd_read 1`] = `"hello"`;
 snapshot[`core wasi > fd_read 2`] = `"hello, this is a longer sentence, as a quick brown fox jumps ove"`;
 
 snapshot[`core wasi > fd_readdir 1`] = `
-'[". ~> Directory", ".. ~> Directory", "top.mbt ~> Regular_file", "moon.pkg ~> Regular_file", "pkg.generated.mbti ~> Regular_file"]
+'[
+  ". ~> Directory",
+  ".. ~> Directory",
+  "top.mbt ~> Regular_file",
+  "moon.pkg ~> Regular_file",
+  "pkg.generated.mbti ~> Regular_file",
+]
 '
 `;
 

@@ -20,5 +20,6 @@ pub fn start() -> Unit {
     }
   }
   entries.sort()
-  (try? @wasi.stdout.fd_write(["\{entries}\n" |> @utf8.encode()])) |> ignore
+  let output = "\{Debug::to_repr(entries)}\n"
+  (try? @wasi.stdout.fd_write([output |> @utf8.encode()])) |> ignore
 }

@@ -11,7 +11,7 @@ pub fn start() -> Unit {
       @wasi.proc_exit(1)
     }
   }
-  let output = "\{entries}\n"
+  let output = "\{Debug::to_repr(entries)}\n"
   let bytes = @utf8.encode(output)
   (try? @wasi.stdout.fd_write([bytes])) |> ignore
 }

@@ -5,6 +5,6 @@
   },
   "tasks": {
     "test:build": "moon -C test build --debug",
-    "test": "deno test -A test.ts"
+    "test": "deno task test:build && deno test -A test.ts"
   }
 }

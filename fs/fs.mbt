@@ -62,7 +62,7 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
           best_len = 1
         } else {
           best_fd = fd
-          best_path = path.to_string()
+          best_path = path.to_owned()
           best_len = 1
         }
         continue
@@ -77,7 +77,7 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
       if dir_name == "." {
         if best_len < 0 {
           best_fd = fd
-          best_path = if path == "" { "." } else { path.to_string() }
+          best_path = if path == "" { "." } else { path.to_owned() }
           best_len = 0
         }
         continue
@@ -94,7 +94,7 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
       let len = dir_name.length()
       if len > best_len {
         best_fd = fd
-        best_path = path[dir_name.length() + 1:].to_string()
+        best_path = path[dir_name.length() + 1:].to_owned()
         best_len = len
       }
     }
@@ -433,7 +433,7 @@ pub fn rmdir(
       sort=false,
     )
     for entry in entries {
-      let entry_path = path.to_string() + "/" + entry
+      let entry_path = path.to_owned() + "/" + entry
       remove(entry_path) catch {
         _ => ()
       }
@@ -463,7 +463,7 @@ pub fn readdir(
       continue
     }
     if !include_special {
-      let entry_path = path.to_string() + "/" + name
+      let entry_path = path.to_owned() + "/" + name
       let entry_kind = kind(entry_path, follow_symlink=false) catch {
         _ => FileKind::Unknown
       }
@@ -490,7 +490,7 @@ pub fn symlink(
   path : StringView,
 ) -> Unit raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
-  @wasi.path_symlink(target.to_string(), base_fd, relative_path)
+  @wasi.path_symlink(target.to_owned(), base_fd, relative_path)
 }
 
 ///|

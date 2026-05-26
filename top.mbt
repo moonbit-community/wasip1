@@ -122,7 +122,7 @@ pub fn environ_get() -> Array[(String, String)] raise Errno {
       |> @encoding/utf8.decode_lossy()
     guard str.split("=").collect() is [key, .. value]
     envs.push(
-      (key.to_string(), value.iter().map(StringView::to_string).join("=")),
+      (key.to_owned(), value.iter().map(StringView::to_owned).join("=")),
     )
   }
   envs

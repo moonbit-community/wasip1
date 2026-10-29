@@ -18,17 +18,17 @@ pub async fn pause() -> Unit
 
 pub async fn protect_from_cancel(async () -> Unit) -> Unit
 
-pub async fn[X] retry(RetryMethod, max_retry? : Int, fatal_error? : (Error) -> Bool, async () -> X) -> X
+pub async fn[X] retry(RetryMethod, max_retry? : Int32, fatal_error? : (Error) -> Bool, async () -> X) -> X
 
-pub async fn sleep(Int) -> Unit
+pub async fn sleep(Int32) -> Unit
 
 pub fn with_event_loop(async (TaskGroup[Unit]) -> Unit) -> Unit raise
 
 pub async fn[X] with_task_group(async (TaskGroup[X]) -> X) -> X
 
-pub async fn[X] with_timeout(Int, async () -> X, error? : Error) -> X
+pub async fn[X] with_timeout(Int32, async () -> X, error? : Error) -> X
 
-pub async fn[X] with_timeout_opt(Int, async () -> X) -> X?
+pub async fn[X] with_timeout_opt(Int32, async () -> X) -> X?
 
 // Errors
 pub suberror TimeoutError derive(ToJson, @debug.Debug)
@@ -41,8 +41,8 @@ pub(all) enum LoopResult {
 
 pub(all) enum RetryMethod {
   Immediate
-  FixedDelay(Int)
-  ExponentialDelay(initial~ : Int, factor~ : Double, maximum~ : Int)
+  FixedDelay(Int32)
+  ExponentialDelay(initial~ : Int32, factor~ : Double, maximum~ : Int32)
 }
 
 type Task[X]
@@ -55,7 +55,7 @@ pub fn[X] TaskGroup::add_defer(Self[X], async () -> Unit) -> Unit
 pub fn[X] TaskGroup::return_immediately(Self[X], X) -> Unit raise
 pub fn[G, X] TaskGroup::spawn(Self[G], async () -> X, no_wait? : Bool, allow_failure? : Bool) -> Task[X]
 pub fn[X] TaskGroup::spawn_bg(Self[X], async () -> Unit, no_wait? : Bool, allow_failure? : Bool) -> Unit
-pub fn[X] TaskGroup::spawn_loop(Self[X], async () -> LoopResult, no_wait? : Bool, allow_failure? : Bool, retry? : RetryMethod, max_retry? : Int, fatal_error? : (Error) -> Bool) -> Unit
+pub fn[X] TaskGroup::spawn_loop(Self[X], async () -> LoopResult, no_wait? : Bool, allow_failure? : Bool, retry? : RetryMethod, max_retry? : Int32, fatal_error? : (Error) -> Bool) -> Unit
 
 // Type aliases
 pub using @aqueue {type Queue}
@@ -63,4 +63,3 @@ pub using @aqueue {type Queue}
 pub using @semaphore {type Semaphore}
 
 // Traits
-

@@ -23,7 +23,7 @@ priv enum State {
 ///|
 /// Coroutine handle for async scheduling.
 struct Coroutine {
-  coro_id : Int
+  coro_id : Int32
   mut state : State
   mut shielded : Bool
   mut cancelled : Bool
@@ -32,12 +32,12 @@ struct Coroutine {
 }
 
 ///|
-pub impl Eq for Coroutine with equal(c1, c2) {
+pub impl Eq for Coroutine with fn equal(c1, c2) {
   c1.coro_id == c2.coro_id
 }
 
 ///|
-pub impl Hash for Coroutine with hash_combine(self, hasher) {
+pub impl Hash for Coroutine with fn hash_combine(self, hasher) {
   self.coro_id.hash_combine(hasher)
 }
 
@@ -193,6 +193,6 @@ pub async fn protect_from_cancel(f : async () -> Unit) -> Unit {
 
 ///|
 /// Return the coroutine id.
-pub fn Coroutine::id(coroutine : Coroutine) -> Int {
+pub fn Coroutine::id(coroutine : Coroutine) -> Int32 {
   coroutine.coro_id
 }

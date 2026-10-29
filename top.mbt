@@ -1,11 +1,11 @@
 ///|
-fn args_sizes_get_ffi(argc : Int, size : Int) -> UInt = "wasi_snapshot_preview1" "args_sizes_get"
+fn args_sizes_get_ffi(argc : Int32, size : Int32) -> UInt32 = "wasi_snapshot_preview1" "args_sizes_get"
 
 ///|
 /// Return command-line argument data sizes.
 /// 
 /// @return Returns the number of arguments and the size of the argument string data, or an error.
-pub fn args_sizes_get() -> (Int, Int) raise Errno {
+pub fn args_sizes_get() -> (Int32, Int32) raise Errno {
   let argc_ptr = @ffi.malloc(4)
   defer @ffi.free(argc_ptr)
   let size_ptr = @ffi.malloc(4)
@@ -21,7 +21,7 @@ pub fn args_sizes_get() -> (Int, Int) raise Errno {
 }
 
 ///|
-fn args_get_ffi(argv : Int, argv_buf : Int) -> UInt = "wasi_snapshot_preview1" "args_get"
+fn args_get_ffi(argv : Int32, argv_buf : Int32) -> UInt32 = "wasi_snapshot_preview1" "args_get"
 
 ///|
 /// Read command-line argument data.
@@ -66,13 +66,13 @@ pub fn args_get() -> Array[String] raise Errno {
 }
 
 ///|
-fn environ_sizes_get_ffi(argc : Int, size : Int) -> UInt = "wasi_snapshot_preview1" "environ_sizes_get"
+fn environ_sizes_get_ffi(argc : Int32, size : Int32) -> UInt32 = "wasi_snapshot_preview1" "environ_sizes_get"
 
 ///|
 /// Return environment variable data sizes.
 /// 
 /// @return Returns the number of environment variables arguments and the size of the environment variable data.
-pub fn environ_sizes_get() -> (Int, Int) raise Errno {
+pub fn environ_sizes_get() -> (Int32, Int32) raise Errno {
   let argc_ptr = @ffi.malloc(4)
   defer @ffi.free(argc_ptr)
   let size_ptr = @ffi.malloc(4)
@@ -88,7 +88,7 @@ pub fn environ_sizes_get() -> (Int, Int) raise Errno {
 }
 
 ///|
-fn environ_get_ffi(environ : Int, environ_buf : Int) -> UInt = "wasi_snapshot_preview1" "environ_get"
+fn environ_get_ffi(environ : Int32, environ_buf : Int32) -> UInt32 = "wasi_snapshot_preview1" "environ_get"
 
 ///|
 /// Read environment variable data.
@@ -129,7 +129,7 @@ pub fn environ_get() -> Array[(String, String)] raise Errno {
 }
 
 ///|
-fn clock_res_get_ffi(clock_id : UInt, resolution : Int) -> UInt = "wasi_snapshot_preview1" "clock_res_get"
+fn clock_res_get_ffi(clock_id : UInt32, resolution : Int32) -> UInt32 = "wasi_snapshot_preview1" "clock_res_get"
 
 ///|
 /// Return the resolution of a clock.
@@ -154,7 +154,11 @@ pub fn ClockId::clock_res_get(self : ClockId) -> TimeStamp raise Errno {
 }
 
 ///|
-fn clock_time_get_ffi(clock_id : UInt, precision : UInt64, time : Int) -> UInt = "wasi_snapshot_preview1" "clock_time_get"
+fn clock_time_get_ffi(
+  clock_id : UInt32,
+  precision : UInt64,
+  time : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "clock_time_get"
 
 ///|
 /// Return the time value of a clock
@@ -181,11 +185,11 @@ pub fn ClockId::clock_time_get(
 
 ///|
 fn fd_advise_ffi(
-  fd : Int,
+  fd : Int32,
   offset : UInt64,
   len : UInt64,
-  advice : UInt,
-) -> UInt = "wasi_snapshot_preview1" "fd_advise"
+  advice : UInt32,
+) -> UInt32 = "wasi_snapshot_preview1" "fd_advise"
 
 ///|
 /// Provide file advisory information on a file ddescriptor
@@ -209,7 +213,7 @@ pub fn Fd::fd_advise(
 }
 
 ///|
-fn fd_allocate_ffi(fd : Int, offset : UInt64, len : UInt64) -> UInt = "wasi_snapshot_preview1" "fd_allocate"
+fn fd_allocate_ffi(fd : Int32, offset : UInt64, len : UInt64) -> UInt32 = "wasi_snapshot_preview1" "fd_allocate"
 
 ///|
 /// Force the allocaiton of space in a file.
@@ -232,7 +236,7 @@ pub fn Fd::fd_allocate(
 }
 
 ///|
-fn fd_close_ffi(fd : Int) -> UInt = "wasi_snapshot_preview1" "fd_close"
+fn fd_close_ffi(fd : Int32) -> UInt32 = "wasi_snapshot_preview1" "fd_close"
 
 ///|
 /// Close a file descriptor.
@@ -247,7 +251,7 @@ pub fn Fd::fd_close(self : Fd) -> Unit raise Errno {
 }
 
 ///|
-fn fd_datasync_ffi(fd : Int) -> UInt = "wasi_snapshot_preview1" "fd_datasync"
+fn fd_datasync_ffi(fd : Int32) -> UInt32 = "wasi_snapshot_preview1" "fd_datasync"
 
 ///|
 /// Synchronize the data of a file to disk.
@@ -262,7 +266,7 @@ pub fn Fd::fd_datasync(self : Fd) -> Unit raise Errno {
 }
 
 ///|
-fn fd_fdstat_get_ffi(fd : Int, buf : Int) -> UInt = "wasi_snapshot_preview1" "fd_fdstat_get"
+fn fd_fdstat_get_ffi(fd : Int32, buf : Int32) -> UInt32 = "wasi_snapshot_preview1" "fd_fdstat_get"
 
 ///|
 /// Get the attributes of a file descriptor.
@@ -292,7 +296,7 @@ pub fn Fd::fd_fdstat_get(self : Fd) -> FdStat raise Errno {
 }
 
 ///|
-fn fd_fdstat_set_flags_ffi(fd : Int, flags : UInt) -> UInt = "wasi_snapshot_preview1" "fd_fdstat_set_flags"
+fn fd_fdstat_set_flags_ffi(fd : Int32, flags : UInt32) -> UInt32 = "wasi_snapshot_preview1" "fd_fdstat_set_flags"
 
 ///|
 /// Adjust the flags associated with a file descriptor.
@@ -310,10 +314,10 @@ pub fn Fd::fd_fdstat_set_flags(self : Fd, flags : FdFlags) -> Unit raise Errno {
 
 ///|
 fn fd_fdstat_set_rights_ffi(
-  fd : Int,
+  fd : Int32,
   fs_rights_base : UInt64,
   fs_rights_inheriting : UInt64,
-) -> UInt = "wasi_snapshot_preview1" "fd_fdstat_set_rights"
+) -> UInt32 = "wasi_snapshot_preview1" "fd_fdstat_set_rights"
 
 ///|
 /// Adjust the rights associated with a file descriptor.
@@ -338,7 +342,7 @@ pub fn Fd::fd_fdstat_set_rights(
 }
 
 ///|
-fn fd_filestat_get_ffi(fd : Int, buf : Int) -> UInt = "wasi_snapshot_preview1" "fd_filestat_get"
+fn fd_filestat_get_ffi(fd : Int32, buf : Int32) -> UInt32 = "wasi_snapshot_preview1" "fd_filestat_get"
 
 ///|
 /// Return the attributes of an open file
@@ -360,12 +364,12 @@ pub fn Fd::fd_filestat_get(self : Fd) -> FileStat raise Errno {
   let atim : TimeStamp = @ffi.load64_u(buf_ptr + 40)
   let mtim : TimeStamp = @ffi.load64_u(buf_ptr + 48)
   let ctim : TimeStamp = @ffi.load64_u(buf_ptr + 56)
-  let buf = FileStat::{ dev, ino, filetype, nlink, size, atim, mtim, ctim }
+  let buf = FileStat::{ dev, ino, filetype, nlink, size, atim, mtim, ctim, }
   buf
 }
 
 ///|
-fn fd_filestat_set_size_ffi(ffi : Int, size : UInt64) -> UInt = "wasi_snapshot_preview1" "fd_filestat_set_size"
+fn fd_filestat_set_size_ffi(ffi : Int32, size : UInt64) -> UInt32 = "wasi_snapshot_preview1" "fd_filestat_set_size"
 
 ///|
 /// Adjust the size of an open file. If this increases the file's size, the extra bytes are filled with zeros.
@@ -383,11 +387,11 @@ pub fn Fd::fd_filestat_set_size(self : Fd, size : FileSize) -> Unit raise Errno 
 
 ///|
 fn fd_filestat_set_times_ffi(
-  fd : Int,
+  fd : Int32,
   atim : UInt64,
   mtim : UInt64,
-  fst_flags : UInt,
-) -> UInt = "wasi_snapshot_preview1" "fd_filestat_set_times"
+  fst_flags : UInt32,
+) -> UInt32 = "wasi_snapshot_preview1" "fd_filestat_set_times"
 
 ///|
 /// Adjust the timestamps of an open file or directory.
@@ -412,12 +416,12 @@ pub fn Fd::fd_filestat_set_times(
 
 ///|
 fn fd_pread_ffi(
-  fd : Int,
-  iovs : Int,
-  iovs_len : Int,
+  fd : Int32,
+  iovs : Int32,
+  iovs_len : Int32,
   offset : UInt64,
-  nread : Int,
-) -> UInt = "wasi_snapshot_preview1" "fd_pread"
+  nread : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "fd_pread"
 
 ///|
 /// Read from a file descriptor, without using and updating the file descriptor's offset.
@@ -451,7 +455,7 @@ pub fn Fd::fd_pread(
 }
 
 ///|
-fn fd_prestat_get_ffi(fd : Int, buf : Int) -> UInt = "wasi_snapshot_preview1" "fd_prestat_get"
+fn fd_prestat_get_ffi(fd : Int32, buf : Int32) -> UInt32 = "wasi_snapshot_preview1" "fd_prestat_get"
 
 ///|
 /// Return a description of the given preopened file descriptor.
@@ -468,18 +472,22 @@ pub fn Fd::fd_prestat_get(self : Fd) -> PreStat raise Errno {
   // There's no other possibility of tag...
   guard @ffi.load8_u(buf_ptr) is 0
   let size : Size = @ffi.load32_u(buf_ptr + 4)
-  let buf = PreStat::Dir(PreStat_dir::{ pr_name_len: size })
+  let buf = PreStat::Dir(PreStat_dir::{ pr_name_len: size, })
   buf
 }
 
 ///|
-fn fd_prestat_dir_name_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wasi_snapshot_preview1" "fd_prestat_dir_name"
+fn fd_prestat_dir_name_ffi(
+  fd : Int32,
+  path : Int32,
+  path_len : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "fd_prestat_dir_name"
 
 ///|
 /// Return a description of the given preopened file descriptor.
 pub fn Fd::fd_prestat_dir_name(self : Fd) -> String raise Errno {
   let prestat = self.fd_prestat_get()
-  guard prestat is Dir({ pr_name_len: Size(size) })
+  guard prestat is Dir({ pr_name_len: Size(size), })
   let buffer = Bytes::make(size.reinterpret_as_int(), b'\x00')
   let buf_ptr = @ffi.bytes2ptr(buffer)
   defer @ffi.free(buf_ptr)
@@ -496,7 +504,12 @@ pub fn Fd::fd_prestat_dir_name(self : Fd) -> String raise Errno {
 }
 
 ///|
-fn fd_read_ffi(fd : Int, iovs : Int, iovs_len : Int, nread : Int) -> UInt = "wasi_snapshot_preview1" "fd_read"
+fn fd_read_ffi(
+  fd : Int32,
+  iovs : Int32,
+  iovs_len : Int32,
+  nread : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "fd_read"
 
 ///|
 /// Read from a file descriptor.
@@ -530,12 +543,12 @@ pub fn Fd::fd_read(
 
 ///|
 fn fd_readdir_ffi(
-  fd : Int,
-  buf : Int,
-  buf_len : Int,
+  fd : Int32,
+  buf : Int32,
+  buf_len : Int32,
   cookie : UInt64,
-  buf_used : Int,
-) -> UInt = "wasi_snapshot_preview1" "fd_readdir"
+  buf_used : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "fd_readdir"
 
 ///|
 /// Read directory entries from a directory.
@@ -557,8 +570,8 @@ fn fd_readdir_ffi(
 /// @return The entries untruncated and whether there's still other entries.
 pub fn Fd::fd_readdir(
   self : Fd,
-  cookie? : DirCookie = DirCookie(0),
-  buffer? : Bytes = Bytes::make(4096, 0),
+  cookie~ : DirCookie = DirCookie(0),
+  buffer~ : Bytes = Bytes::make(4096, 0),
 ) -> (Array[(String, DirEnt)], Bool) raise Errno {
   let buf_len = buffer.length()
   let buf_ptr = @ffi.bytes2ptr(buffer)
@@ -591,7 +604,7 @@ pub fn Fd::fd_readdir(
     entries.push(
       (
         buffer[i + 24:i + 24 + namlen] |> @encoding/utf8.decode_lossy(),
-        DirEnt::{ d_next, d_ino, d_namlen, d_type },
+        DirEnt::{ d_next, d_ino, d_namlen, d_type, },
       ),
     )
     continue i + 24 + namlen
@@ -601,7 +614,7 @@ pub fn Fd::fd_readdir(
 }
 
 ///|
-fn fd_renumber_ffi(fd : Int, to : Int) -> UInt = "wasi_snapshot_preview1" "fd_renumber"
+fn fd_renumber_ffi(fd : Int32, to : Int32) -> UInt32 = "wasi_snapshot_preview1" "fd_renumber"
 
 ///|
 /// Atomically replace a file descriptor by renumbering another file descriptor.
@@ -624,11 +637,11 @@ pub fn Fd::fd_renumber(self : Fd, to : Fd) -> Unit raise Errno {
 
 ///|
 fn fd_seek_ffi(
-  fd : Int,
+  fd : Int32,
   offset : Int64,
-  whence : UInt,
-  newoffset : Int,
-) -> UInt = "wasi_snapshot_preview1" "fd_seek"
+  whence : UInt32,
+  newoffset : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "fd_seek"
 
 ///|
 /// Move the offset of a file descriptor.
@@ -655,7 +668,7 @@ pub fn Fd::fd_seek(
 }
 
 ///|
-fn fd_sync_ffi(fd : Int) -> UInt = "wasi_snapshot_preview1" "fd_sync"
+fn fd_sync_ffi(fd : Int32) -> UInt32 = "wasi_snapshot_preview1" "fd_sync"
 
 ///|
 /// Synchronize the data and metadata of a file to disk.
@@ -670,7 +683,7 @@ pub fn Fd::fd_sync(self : Fd) -> Unit raise Errno {
 }
 
 ///|
-fn fd_tell_ffi(fd : Int, newoffset : Int) -> UInt = "wasi_snapshot_preview1" "fd_tell"
+fn fd_tell_ffi(fd : Int32, newoffset : Int32) -> UInt32 = "wasi_snapshot_preview1" "fd_tell"
 
 ///|
 /// Return the current offset of a file descriptor.
@@ -691,7 +704,12 @@ pub fn Fd::fd_tell(self : Fd) -> FileSize raise Errno {
 }
 
 ///|
-fn fd_write_ffi(fd : Int, iovs : Int, iovs_len : Int, nwritten : Int) -> UInt = "wasi_snapshot_preview1" "fd_write"
+fn fd_write_ffi(
+  fd : Int32,
+  iovs : Int32,
+  iovs_len : Int32,
+  nwritten : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "fd_write"
 
 ///|
 /// Write to a file descriptor.
@@ -729,7 +747,11 @@ pub fn Fd::fd_write(self : Fd, contents : Array[BytesView]) -> Size raise Errno 
 }
 
 ///|
-fn path_create_directory_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wasi_snapshot_preview1" "path_create_directory"
+fn path_create_directory_ffi(
+  fd : Int32,
+  path : Int32,
+  path_len : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "path_create_directory"
 
 ///|
 /// Create a directory.
@@ -751,12 +773,12 @@ pub fn Fd::path_create_directory(self : Fd, path : String) -> Unit raise Errno {
 
 ///|
 fn path_filestat_get_ffi(
-  fd : Int,
-  flags : UInt,
-  path : Int,
-  path_len : Int,
-  buf : Int,
-) -> UInt = "wasi_snapshot_preview1" "path_filestat_get"
+  fd : Int32,
+  flags : UInt32,
+  path : Int32,
+  path_len : Int32,
+  buf : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "path_filestat_get"
 
 ///|
 /// Return the attributes of a file or directory.
@@ -791,20 +813,20 @@ pub fn Fd::path_filestat_get(
   let atim : TimeStamp = @ffi.load64_u(buf_ptr + 40)
   let mtim : TimeStamp = @ffi.load64_u(buf_ptr + 48)
   let ctim : TimeStamp = @ffi.load64_u(buf_ptr + 56)
-  let buf = FileStat::{ dev, ino, filetype, nlink, size, atim, mtim, ctim }
+  let buf = FileStat::{ dev, ino, filetype, nlink, size, atim, mtim, ctim, }
   buf
 }
 
 ///|
 fn path_filestat_set_times_ffi(
-  fd : Int,
-  flags : UInt,
-  path : Int,
-  path_len : Int,
+  fd : Int32,
+  flags : UInt32,
+  path : Int32,
+  path_len : Int32,
   atim : UInt64,
   mtim : UInt64,
-  fst_flags : UInt,
-) -> UInt = "wasi_snapshot_preview1" "path_filestat_set_times"
+  fst_flags : UInt32,
+) -> UInt32 = "wasi_snapshot_preview1" "path_filestat_set_times"
 
 ///|
 /// Adjust the timestamps of a file or directory.
@@ -845,14 +867,14 @@ pub fn Fd::path_filestat_set_times(
 
 ///|
 fn path_link_ffi(
-  old_fd : Int,
-  old_flags : UInt,
-  old_path : Int,
-  old_path_len : Int,
-  new_fd : Int,
-  new_path : Int,
-  new_path_len : Int,
-) -> UInt = "wasi_snapshot_preview1" "path_link"
+  old_fd : Int32,
+  old_flags : UInt32,
+  old_path : Int32,
+  old_path_len : Int32,
+  new_fd : Int32,
+  new_path : Int32,
+  new_path_len : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "path_link"
 
 ///|
 /// Create a hard link.
@@ -895,16 +917,16 @@ pub fn Fd::path_link(
 
 ///|
 fn path_open_ffi(
-  dirfd : Int,
-  dirflags : UInt,
-  path : Int,
-  path_len : Int,
-  oflags : UInt,
+  dirfd : Int32,
+  dirflags : UInt32,
+  path : Int32,
+  path_len : Int32,
+  oflags : UInt32,
   fs_rights_base : UInt64,
   fs_rights_inheriting : UInt64,
-  fs_flags : UInt,
-  fd : Int,
-) -> UInt = "wasi_snapshot_preview1" "path_open"
+  fs_flags : UInt32,
+  fd : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "path_open"
 
 ///|
 /// Open a file or directory.
@@ -967,13 +989,13 @@ pub fn Fd::path_open(
 
 ///|
 fn path_readlink_ffi(
-  fd : Int,
-  path : Int,
-  path_len : Int,
-  buf : Int,
-  buf_len : Int,
-  buf_used : Int,
-) -> UInt = "wasi_snapshot_preview1" "path_readlink"
+  fd : Int32,
+  path : Int32,
+  path_len : Int32,
+  buf : Int32,
+  buf_len : Int32,
+  buf_used : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "path_readlink"
 
 ///|
 /// Read the contents of a symbolic link.
@@ -984,7 +1006,7 @@ fn path_readlink_ffi(
 pub fn Fd::path_readlink(
   self : Fd,
   path : String,
-  buffer? : FixedArray[Byte] = FixedArray::make(4096, 0),
+  buffer~ : FixedArray[Byte] = FixedArray::make(4096, 0),
 ) -> Size raise Errno {
   let path_bytes = path |> @encoding/utf8.encode()
   let path_len = path_bytes.length()
@@ -1012,7 +1034,11 @@ pub fn Fd::path_readlink(
 }
 
 ///|
-fn path_remove_directory_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wasi_snapshot_preview1" "path_remove_directory"
+fn path_remove_directory_ffi(
+  fd : Int32,
+  path : Int32,
+  path_len : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "path_remove_directory"
 
 ///|
 /// Remove a directory.
@@ -1034,13 +1060,13 @@ pub fn Fd::path_remove_directory(self : Fd, path : String) -> Unit raise Errno {
 
 ///|
 fn path_rename_ffi(
-  old_fd : Int,
-  old_path : Int,
-  old_path_len : Int,
-  new_fd : Int,
-  new_path : Int,
-  new_path_len : Int,
-) -> UInt = "wasi_snapshot_preview1" "path_rename"
+  old_fd : Int32,
+  old_path : Int32,
+  old_path_len : Int32,
+  new_fd : Int32,
+  new_path : Int32,
+  new_path_len : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "path_rename"
 
 ///|
 /// Rename a file or directory.
@@ -1080,12 +1106,12 @@ pub fn Fd::path_rename(
 
 ///|
 fn path_symlink_ffi(
-  old_path : Int,
-  old_path_len : Int,
-  fd : Int,
-  new_path : Int,
-  new_path_len : Int,
-) -> UInt = "wasi_snapshot_preview1" "path_symlink"
+  old_path : Int32,
+  old_path_len : Int32,
+  fd : Int32,
+  new_path : Int32,
+  new_path_len : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "path_symlink"
 
 ///|
 /// Create a symbolic link.
@@ -1118,7 +1144,7 @@ pub fn path_symlink(
 }
 
 ///|
-fn path_unlink_file_ffi(fd : Int, path : Int, path_len : Int) -> UInt = "wasi_snapshot_preview1" "path_unlink_file"
+fn path_unlink_file_ffi(fd : Int32, path : Int32, path_len : Int32) -> UInt32 = "wasi_snapshot_preview1" "path_unlink_file"
 
 ///|
 /// Unlink a file.
@@ -1140,11 +1166,11 @@ pub fn Fd::path_unlink_file(self : Fd, path : String) -> Unit raise Errno {
 
 ///|
 fn poll_oneoff_ffi(
-  in_ : Int,
-  out : Int,
-  nsubscriptions : Int,
-  nevents : Int,
-) -> UInt = "wasi_snapshot_preview1" "poll_oneoff"
+  in_ : Int32,
+  out : Int32,
+  nsubscriptions : Int32,
+  nevents : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "poll_oneoff"
 
 ///|
 /// Concurrently poll for the occurrence of a set of events.
@@ -1162,18 +1188,18 @@ pub fn poll_oneoff(in_ : Array[Subscription]) -> Array[Event] raise Errno {
   for i, sub in in_ {
     @ffi.store64_u(in_ptr + i * 48, sub.userdata.0)
     match sub.u {
-      Clock({ id, timeout, precision, flags }) => {
+      Clock({ id, timeout, precision, flags, }) => {
         @ffi.store32(in_ptr + i * 48 + 8, 0)
         @ffi.store32_u(in_ptr + i * 48 + 8 + 8 + 0, id.value())
         @ffi.store64_u(in_ptr + i * 48 + 8 + 8 + 8, timeout.0)
         @ffi.store64_u(in_ptr + i * 48 + 8 + 8 + 16, precision.0)
         @ffi.store32_u(in_ptr + i * 48 + 8 + 8 + 24, flags.0)
       }
-      Fd_read({ file_descriptor }) => {
+      Fd_read({ file_descriptor, }) => {
         @ffi.store32(in_ptr + i * 48 + 8, 1)
         @ffi.store32(in_ptr + i * 48 + 16, file_descriptor.0)
       }
-      Fd_write({ file_descriptor }) => {
+      Fd_write({ file_descriptor, }) => {
         @ffi.store32(in_ptr + i * 48 + 8, 2)
         @ffi.store32(in_ptr + i * 48 + 16, file_descriptor.0)
       }
@@ -1198,14 +1224,14 @@ pub fn poll_oneoff(in_ : Array[Subscription]) -> Array[Event] raise Errno {
       |> Option::unwrap
     let nbytes : FileSize = @ffi.load64_u(out_ptr + i * 32 + 16)
     let flags : EventRWFlags = @ffi.load32_u(out_ptr + i * 32 + 16 + 8)
-    let fd_readwrite : Event_fd_readwrite = { nbytes, flags }
-    events.push(Event::{ userdata, error: errno, type_, fd_readwrite })
+    let fd_readwrite : Event_fd_readwrite = { nbytes, flags, }
+    events.push(Event::{ userdata, error: errno, type_, fd_readwrite, })
   }
   events
 }
 
 ///|
-fn proc_exit_ffi(rval : UInt) = "wasi_snapshot_preview1" "proc_exit"
+fn proc_exit_ffi(rval : UInt32) = "wasi_snapshot_preview1" "proc_exit"
 
 ///|
 /// Terminate the process normally. An exit code of 0 indicates successful
@@ -1215,13 +1241,13 @@ fn proc_exit_ffi(rval : UInt) = "wasi_snapshot_preview1" "proc_exit"
 /// Note: the accepted range may depend on the runtime, meaning that it may
 /// become an error to return a value outside the accepted range of exit codes,
 /// making the actual error code environment-dependent.
-pub fn[T] proc_exit(rval : UInt) -> T {
+pub fn[T] proc_exit(rval : UInt32) -> T {
   proc_exit_ffi(rval)
   panic()
 }
 
 ///|
-fn proc_raise_ffi(sig : UInt) -> UInt = "wasi_snapshot_preview1" "proc_raise"
+fn proc_raise_ffi(sig : UInt32) -> UInt32 = "wasi_snapshot_preview1" "proc_raise"
 
 ///|
 /// Send a signal to the process of the calling thread.
@@ -1238,7 +1264,7 @@ pub fn proc_raise(sig : Signal) -> Unit raise Errno {
 }
 
 ///|
-fn sched_yield_ffi() -> UInt = "wasi_snapshot_preview1" "sched_yield"
+fn sched_yield_ffi() -> UInt32 = "wasi_snapshot_preview1" "sched_yield"
 
 ///|
 /// Temporarily yield execution of the calling thread.
@@ -1253,7 +1279,7 @@ pub fn sched_yield() -> Unit raise Errno {
 }
 
 ///|
-fn random_get_ffi(buf : Int, buf_len : Int) -> UInt = "wasi_snapshot_preview1" "random_get"
+fn random_get_ffi(buf : Int32, buf_len : Int32) -> UInt32 = "wasi_snapshot_preview1" "random_get"
 
 ///|
 /// Write high-quality random data into a buffer.
@@ -1276,7 +1302,7 @@ pub fn random_get(buf : FixedArray[Byte]) -> Unit raise Errno {
 }
 
 ///|
-fn sock_accept_ffi(sock : Int, flags : UInt, fd : Int) -> UInt = "wasi_snapshot_preview1" "sock_accept"
+fn sock_accept_ffi(sock : Int32, flags : UInt32, fd : Int32) -> UInt32 = "wasi_snapshot_preview1" "sock_accept"
 
 ///|
 /// Accept a new incoming connection on a socket.
@@ -1300,13 +1326,13 @@ pub fn Fd::sock_accept(self : Fd, flags : FdFlags) -> Fd raise Errno {
 
 ///|
 fn sock_recv_ffi(
-  sock : Int,
-  ri_data : Int,
-  ri_data_len : Int,
-  ri_flags : UInt,
-  size : Int,
-  ro_flags : Int,
-) -> UInt = "wasi_snapshot_preview1" "sock_recv"
+  sock : Int32,
+  ri_data : Int32,
+  ri_data_len : Int32,
+  ri_flags : UInt32,
+  size : Int32,
+  ro_flags : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "sock_recv"
 
 ///|
 /// Receive a message from a socket.
@@ -1357,12 +1383,12 @@ pub fn Fd::sock_recv(
 
 ///|
 fn sock_send_ffi(
-  sock : Int,
-  si_data : Int,
-  si_data_len : Int,
-  si_flags : UInt,
-  size : Int,
-) -> UInt = "wasi_snapshot_preview1" "sock_send"
+  sock : Int32,
+  si_data : Int32,
+  si_data_len : Int32,
+  si_flags : UInt32,
+  size : Int32,
+) -> UInt32 = "wasi_snapshot_preview1" "sock_send"
 
 ///|
 /// Send a message on a socket.
@@ -1403,7 +1429,7 @@ pub fn Fd::sock_send(
 }
 
 ///|
-fn sock_shutdown_ffi(sock : Int, how : UInt) -> UInt = "wasi_snapshot_preview1" "sock_shutdown"
+fn sock_shutdown_ffi(sock : Int32, how : UInt32) -> UInt32 = "wasi_snapshot_preview1" "sock_shutdown"
 
 ///|
 /// Shut down socket send and receive channels.

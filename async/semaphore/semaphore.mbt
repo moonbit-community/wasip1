@@ -31,8 +31,8 @@ priv struct Waiter {
 
 ///|
 struct Semaphore {
-  mut value : Int
-  size : Int
+  mut value : Int32
+  size : Int32
   waiters : @deque.Deque[Waiter]
 }
 
@@ -40,9 +40,9 @@ struct Semaphore {
 /// Create a semaphore of size `size`,
 /// the initial value of the semaphore
 /// will be set to `initial_value` (`size` by default)
-pub fn Semaphore::new(size : Int, initial_value? : Int = size) -> Semaphore {
+pub fn Semaphore::new(size : Int32, initial_value~ : Int32 = size) -> Semaphore {
   guard initial_value >= 0 && initial_value <= size
-  { value: initial_value, size, waiters: @deque.new() }
+  { value: initial_value, size, waiters: @deque.new(), }
 }
 
 ///|
@@ -89,7 +89,10 @@ pub async fn Semaphore::acquire(self : Semaphore) -> Unit {
   if self.value > 0 {
     self.value -= 1
   } else {
-    let waiter = { coro: Some(@coroutine.current_coroutine()), acquired: false }
+    let waiter = {
+      coro: Some(@coroutine.current_coroutine()),
+      acquired: false,
+    }
     self.waiters.push_back(waiter)
     @coroutine.suspend() catch {
       _ if waiter.acquired => ()

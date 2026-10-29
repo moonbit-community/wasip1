@@ -43,9 +43,9 @@ priv struct Writer[X] {
 ///   will be silently discarded.
 pub(all) enum Kind {
   Unbounded
-  Blocking(Int)
-  DiscardOldest(Int)
-  DiscardLatest(Int)
+  Blocking(Int32)
+  DiscardOldest(Int32)
+  DiscardLatest(Int32)
 }
 
 ///|
@@ -67,7 +67,7 @@ struct Queue[X] {
 /// see the type `@aqueue.Kind` for more details.
 #as_free_fn
 #callsite(migration(kind, fill=true, msg="specify the kind of queue explicitly via `kind=...`"))
-pub fn[X] Queue::new(kind? : Kind = Unbounded) -> Queue[X] {
+pub fn[X] Queue::new(kind~ : Kind = Unbounded) -> Queue[X] {
   match kind {
     Unbounded => ()
     Blocking(n) | DiscardOldest(n) | DiscardLatest(n) =>
@@ -255,7 +255,7 @@ pub fn[X] Queue::try_get(self : Queue[X]) -> X? raise {
       match next_writer {
         None => break
         Some({ coro: None, .. }) => continue self.writers.pop_front()
-        Some({ coro: Some(coro), value } as writer) => {
+        Some({ coro: Some(coro), value, } as writer) => {
           self.buffer.push_back(value)
           coro.wake()
           writer.coro = None
@@ -290,8 +290,8 @@ pub suberror QueueAlreadyClosed derive(Debug, ToJson)
 /// But this error can be customized via the `error` parameter.
 pub fn[X] Queue::close(
   self : Queue[X],
-  error? : Error = QueueAlreadyClosed,
-  clear? : Bool = false,
+  error~ : Error = QueueAlreadyClosed,
+  clear~ : Bool = false,
 ) -> Unit {
   self.closed = Some(error)
   for writer in self.writers {

@@ -34,7 +34,7 @@ priv enum TaskGroupState {
 struct TaskGroup[X] {
   children : Set[@coroutine.Coroutine]
   parent : @coroutine.Coroutine
-  mut waiting : Int
+  mut waiting : Int32
   mut state : TaskGroupState
   mut result : X?
   group_defer : Array[async () -> Unit]
@@ -110,8 +110,8 @@ fn[X] TaskGroup::spawn_coroutine(
 pub fn[X] TaskGroup::spawn_bg(
   self : TaskGroup[X],
   f : async () -> Unit,
-  no_wait? : Bool = false,
-  allow_failure? : Bool = false,
+  no_wait~ : Bool = false,
+  allow_failure~ : Bool = false,
 ) -> Unit {
   ignore(self.spawn_coroutine(f, no_wait~, allow_failure~))
 }
@@ -136,8 +136,8 @@ pub fn[X] TaskGroup::spawn_bg(
 pub fn[G, X] TaskGroup::spawn(
   self : TaskGroup[G],
   f : async () -> X,
-  no_wait? : Bool = false,
-  allow_failure? : Bool = false,
+  no_wait~ : Bool = false,
+  allow_failure~ : Bool = false,
 ) -> Task[X] {
   let value = @ref.new(None)
   let coro = self.spawn_coroutine(
@@ -145,7 +145,7 @@ pub fn[G, X] TaskGroup::spawn(
     no_wait~,
     allow_failure~,
   )
-  { value, coro }
+  { value, coro, }
 }
 
 ///|
@@ -265,10 +265,10 @@ pub(all) enum LoopResult {
 pub fn[X] TaskGroup::spawn_loop(
   self : TaskGroup[X],
   f : async () -> LoopResult,
-  no_wait? : Bool = false,
-  allow_failure? : Bool = false,
+  no_wait~ : Bool = false,
+  allow_failure~ : Bool = false,
   retry? : RetryMethod,
-  max_retry? : Int,
+  max_retry? : Int32,
   fatal_error? : (Error) -> Bool,
 ) -> Unit {
   self.spawn_bg(no_wait~, allow_failure~, () => {

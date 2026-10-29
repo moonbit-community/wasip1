@@ -1,5 +1,5 @@
 ///|
-let event_loop : Map[Int, Subscribe] = {}
+let event_loop : Map[Int32, Subscribe] = {}
 
 ///|
 priv struct Subscribe {
@@ -16,7 +16,7 @@ pub async fn suspend_for_write(fd : @wasi.Fd) -> UInt64 {
     event: None,
     sub: @wasi.Subscription::{
       userdata: coro.id().to_uint64(),
-      u: @wasi.Subscription_u::Fd_write({ file_descriptor: fd }),
+      u: @wasi.Subscription_u::Fd_write({ file_descriptor: fd, }),
     },
     coro,
   }
@@ -38,7 +38,7 @@ pub async fn suspend_for_read(fd : @wasi.Fd) -> UInt64 {
     event: None,
     sub: @wasi.Subscription::{
       userdata: coro.id().to_uint64(),
-      u: @wasi.Subscription_u::Fd_read({ file_descriptor: fd }),
+      u: @wasi.Subscription_u::Fd_read({ file_descriptor: fd, }),
     },
     coro,
   }
@@ -54,7 +54,7 @@ pub async fn suspend_for_read(fd : @wasi.Fd) -> UInt64 {
 
 ///|
 /// Sleep for the given duration in milliseconds.
-pub async fn sleep(time : Int) -> Unit {
+pub async fn sleep(time : Int32) -> Unit {
   let coro = @coroutine.current_coroutine()
   let subscribe = {
     event: None,

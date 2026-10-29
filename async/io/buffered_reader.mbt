@@ -15,7 +15,7 @@
 ///|
 async fn[R : Reader] @io_buffer.Buffer::try_ensure(
   self : Self,
-  len : Int,
+  len : Int32,
   reader~ : R,
 ) -> Bool {
   if self.len >= len {
@@ -40,7 +40,7 @@ async fn[R : Reader] @io_buffer.Buffer::find_opt(
   self : Self,
   target : Bytes,
   reader~ : R,
-) -> Int? {
+) -> Int32? {
   let target_len = target.length()
   for searched = 0 {
     guard self.try_ensure(searched + target_len, reader~) else { return None }

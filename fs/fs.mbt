@@ -109,11 +109,11 @@ pub fn resolve_path(path : StringView) -> (@wasi.Fd, String) raise @wasi.Errno {
 /// Open a file using WASI preopen path resolution.
 pub fn open(
   path : StringView,
-  mode? : Mode = ReadOnly,
-  sync? : SyncMode = NoSync,
-  append? : Bool = false,
-  create? : Bool = false,
-  truncate? : Bool = false,
+  mode~ : Mode = ReadOnly,
+  sync~ : SyncMode = NoSync,
+  append~ : Bool = false,
+  create~ : Bool = false,
+  truncate~ : Bool = false,
 ) -> File raise @wasi.Errno {
   let (base_fd, relative_path) = resolve_path(path)
   let rights = match mode {
@@ -161,7 +161,7 @@ pub fn open(
     rights_inheriting,
     fdflags,
   )
-  File::{ fd, read_buf: @io_buffer.Buffer::new(0) }
+  File::{ fd, read_buf: @io_buffer.Buffer::new(0), }
 }
 
 ///|
@@ -175,7 +175,7 @@ struct File {
 /// Create or truncate a file with read/write access.
 pub fn create(
   path : StringView,
-  sync? : SyncMode = NoSync,
+  sync~ : SyncMode = NoSync,
 ) -> File raise @wasi.Errno {
   open(path, mode=ReadWrite, sync~, create=true, truncate=true)
 }
@@ -190,19 +190,19 @@ pub fn File::close(self : File) -> Unit {
 
 ///|
 /// Return the raw WASI file descriptor number.
-pub fn File::fd(self : File) -> Int {
+pub fn File::fd(self : File) -> Int32 {
   self.fd.0
 }
 
 ///|
 /// Async reader implementation for `File`.
-pub impl @async_io.Reader for File with _get_internal_buffer(self) {
+pub impl @async_io.Reader for File with fn _get_internal_buffer(self) {
   self.read_buf
 }
 
 ///|
 /// Async read implementation for `File`.
-pub impl @async_io.Reader for File with _direct_read(
+pub impl @async_io.Reader for File with fn _direct_read(
   self,
   buf,
   offset~,
@@ -218,7 +218,7 @@ pub impl @async_io.Reader for File with _direct_read(
 
 ///|
 /// Async write implementation for `File`.
-pub impl @async_io.Writer for File with write_once(self, data, offset~, len~) {
+pub impl @async_io.Writer for File with fn write_once(self, data, offset~, len~) {
   let available = @event_loop.suspend_for_write(self.fd)
   let write_len = @cmp.minimum(available, len.to_uint64()).to_int()
   let iovs = [data[offset:offset + write_len]]
@@ -228,13 +228,13 @@ pub impl @async_io.Writer for File with write_once(self, data, offset~, len~) {
 
 ///|
 /// Sync reader implementation for `File`.
-pub impl @sync_io.Reader for File with _get_internal_buffer(self) {
+pub impl @sync_io.Reader for File with fn _get_internal_buffer(self) {
   self.read_buf
 }
 
 ///|
 /// Sync read implementation for `File`.
-pub impl @sync_io.Reader for File with _direct_read(
+pub impl @sync_io.Reader for File with fn _direct_read(
   self,
   buf,
   offset~,
@@ -249,7 +249,7 @@ pub impl @sync_io.Reader for File with _direct_read(
 
 ///|
 /// Sync write implementation for `File`.
-pub impl @sync_io.Writer for File with write_once_sync(self, data) {
+pub impl @sync_io.Writer for File with fn write_once_sync(self, data) {
   let iovs = [data]
   let result = self.fd.fd_write(iovs)
   result.0.reinterpret_as_int()
@@ -302,10 +302,10 @@ pub async fn read_file(path : StringView) -> &@async_io.Data {
 pub async fn write_file(
   path : StringView,
   data : &@async_io.Data,
-  sync? : SyncMode = NoSync,
-  append? : Bool = false,
-  create? : Bool = false,
-  truncate? : Bool = false,
+  sync~ : SyncMode = NoSync,
+  append~ : Bool = false,
+  create~ : Bool = false,
+  truncate~ : Bool = false,
 ) -> Unit {
   let file = open(path, mode=WriteOnly, sync~, append~, create~, truncate~)
   defer file.close()
@@ -313,7 +313,7 @@ pub async fn write_file(
 }
 
 ///|
-fn convert_timestamp(ts : @wasi.TimeStamp) -> (Int64, Int) {
+fn convert_timestamp(ts : @wasi.TimeStamp) -> (Int64, Int32) {
   let nanos = ts.0
   let secs = nanos / 1000000000UL
   let remainder = nanos % 1000000000UL
@@ -353,8 +353,8 @@ fn get_filestat(
 /// Get access time for a path.
 pub fn atime(
   path : StringView,
-  follow_symlink? : Bool = true,
-) -> (Int64, Int) raise @wasi.Errno {
+  follow_symlink~ : Bool = true,
+) -> (Int64, Int32) raise @wasi.Errno {
   let stat = get_filestat(path, follow_symlink)
   convert_timestamp(stat.atim)
 }
@@ -363,8 +363,8 @@ pub fn atime(
 /// Get creation/change time for a path.
 pub fn ctime(
   path : StringView,
-  follow_symlink? : Bool = true,
-) -> (Int64, Int) raise @wasi.Errno {
+  follow_symlink~ : Bool = true,
+) -> (Int64, Int32) raise @wasi.Errno {
   let stat = get_filestat(path, follow_symlink)
   convert_timestamp(stat.ctim)
 }
@@ -373,8 +373,8 @@ pub fn ctime(
 /// Get modification time for a path.
 pub fn mtime(
   path : StringView,
-  follow_symlink? : Bool = true,
-) -> (Int64, Int) raise @wasi.Errno {
+  follow_symlink~ : Bool = true,
+) -> (Int64, Int32) raise @wasi.Errno {
   let stat = get_filestat(path, follow_symlink)
   convert_timestamp(stat.mtim)
 }
@@ -394,7 +394,7 @@ pub fn exists(path : StringView) -> Bool {
 /// Get the file kind for a path.
 pub fn kind(
   path : StringView,
-  follow_symlink? : Bool = true,
+  follow_symlink~ : Bool = true,
 ) -> FileKind raise @wasi.Errno {
   let stat = get_filestat(path, follow_symlink)
   filetype_to_filekind(stat.filetype)
@@ -423,7 +423,7 @@ pub fn remove(path : StringView) -> Unit raise @wasi.Errno {
 /// Remove a directory, optionally recursively.
 pub fn rmdir(
   path : StringView,
-  recursive? : Bool = false,
+  recursive~ : Bool = false,
 ) -> Unit raise @wasi.Errno {
   if recursive {
     let entries = readdir(
@@ -447,9 +447,9 @@ pub fn rmdir(
 /// Read directory entries.
 pub fn readdir(
   path : StringView,
-  include_hidden? : Bool = true,
-  include_special? : Bool = false,
-  sort? : Bool = false,
+  include_hidden~ : Bool = true,
+  include_special~ : Bool = false,
+  sort~ : Bool = false,
 ) -> Array[String] raise @wasi.Errno {
   let dir = opendir(path)
   let result : Array[String] = []
@@ -600,10 +600,10 @@ pub fn read_file_sync(path : StringView) -> &@sync_io.Data raise {
 pub fn write_file_sync(
   path : StringView,
   data : &@sync_io.Data,
-  sync? : SyncMode = NoSync,
-  append? : Bool = false,
-  create? : Bool = false,
-  truncate? : Bool = false,
+  sync~ : SyncMode = NoSync,
+  append~ : Bool = false,
+  create~ : Bool = false,
+  truncate~ : Bool = false,
 ) -> Unit raise {
   let file = open(path, mode=WriteOnly, sync~, append~, create~, truncate~)
   defer file.close()
@@ -612,21 +612,21 @@ pub fn write_file_sync(
 
 ///|
 /// Get access time for an open file.
-pub fn File::atime(self : File) -> (Int64, Int) raise @wasi.Errno {
+pub fn File::atime(self : File) -> (Int64, Int32) raise @wasi.Errno {
   let stat = self.fd.fd_filestat_get()
   convert_timestamp(stat.atim)
 }
 
 ///|
 /// Get creation/change time for an open file.
-pub fn File::ctime(self : File) -> (Int64, Int) raise @wasi.Errno {
+pub fn File::ctime(self : File) -> (Int64, Int32) raise @wasi.Errno {
   let stat = self.fd.fd_filestat_get()
   convert_timestamp(stat.ctim)
 }
 
 ///|
 /// Get modification time for an open file.
-pub fn File::mtime(self : File) -> (Int64, Int) raise @wasi.Errno {
+pub fn File::mtime(self : File) -> (Int64, Int32) raise @wasi.Errno {
   let stat = self.fd.fd_filestat_get()
   convert_timestamp(stat.mtim)
 }
@@ -637,9 +637,9 @@ pub async fn File::read_at(
   self : File,
   buf : FixedArray[Byte],
   position~ : Int64,
-  offset? : Int,
-  len? : Int,
-) -> Int {
+  offset? : Int32,
+  len? : Int32,
+) -> Int32 {
   let start = match offset {
     Some(value) => value
     None => 0
@@ -674,7 +674,7 @@ pub async fn File::read_at(
 /// Read exactly `len` bytes starting at a byte offset.
 pub async fn File::read_exactly_at(
   self : File,
-  len : Int,
+  len : Int32,
   position~ : Int64,
 ) -> Bytes {
   if len <= 0 {
@@ -719,7 +719,7 @@ pub fn File::kind(self : File) -> FileKind {
 /// Flush file contents to storage.
 pub fn File::sync(
   self : File,
-  only_data? : Bool = false,
+  only_data~ : Bool = false,
 ) -> Unit raise @wasi.Errno {
   if only_data {
     self.fd.fd_datasync()
@@ -789,8 +789,8 @@ pub async fn File::write_at(
 /// Read all entries from an open directory.
 pub fn Directory::read_all(
   self : Directory,
-  include_hidden? : Bool = true,
-  include_special? : Bool = false,
+  include_hidden~ : Bool = true,
+  include_special~ : Bool = false,
 ) -> Array[String] raise @wasi.Errno {
   let result : Array[String] = []
   let entries_tuple = self.fd.fd_readdir()
@@ -823,5 +823,5 @@ pub fn File::as_dir(self : File) -> Directory raise @wasi.Errno {
   if !(stat.filetype is @wasi.FileType::Directory) {
     raise @wasi.Notdir
   }
-  Directory::{ fd: self.fd }
+  Directory::{ fd: self.fd, }
 }

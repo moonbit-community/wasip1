@@ -31,7 +31,7 @@ pub(all) suberror Cancelled derive(@debug.Debug)
 type Coroutine
 pub fn Coroutine::cancel(Self) -> Unit
 pub fn Coroutine::check_error(Self) -> Unit raise
-pub fn Coroutine::id(Self) -> Int
+pub fn Coroutine::id(Self) -> Int32
 pub fn Coroutine::unwrap(Self) -> Unit raise
 pub async fn Coroutine::wait(Self) -> Unit
 pub fn Coroutine::wake(Self) -> Unit
@@ -41,4 +41,3 @@ pub impl Hash for Coroutine
 // Type aliases
 
 // Traits
-

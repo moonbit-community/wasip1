@@ -10,7 +10,7 @@ import {
 }
 
 // Values
-pub fn atime(StringView, follow_symlink? : Bool) -> (Int64, Int) raise @wasi.Errno
+pub fn atime(StringView, follow_symlink? : Bool) -> (Int64, Int32) raise @wasi.Errno
 
 pub fn can_execute(StringView) -> Bool
 
@@ -20,7 +20,7 @@ pub fn can_write(StringView) -> Bool
 
 pub fn create(StringView, sync? : SyncMode) -> File raise @wasi.Errno
 
-pub fn ctime(StringView, follow_symlink? : Bool) -> (Int64, Int) raise @wasi.Errno
+pub fn ctime(StringView, follow_symlink? : Bool) -> (Int64, Int32) raise @wasi.Errno
 
 pub fn exists(StringView) -> Bool
 
@@ -28,7 +28,7 @@ pub fn kind(StringView, follow_symlink? : Bool) -> FileKind raise @wasi.Errno
 
 pub fn mkdir(StringView) -> Unit raise @wasi.Errno
 
-pub fn mtime(StringView, follow_symlink? : Bool) -> (Int64, Int) raise @wasi.Errno
+pub fn mtime(StringView, follow_symlink? : Bool) -> (Int64, Int32) raise @wasi.Errno
 
 pub fn open(StringView, mode? : Mode, sync? : SyncMode, append? : Bool, create? : Bool, truncate? : Bool) -> File raise @wasi.Errno
 
@@ -65,14 +65,14 @@ pub fn Directory::read_all(Self, include_hidden? : Bool, include_special? : Bool
 
 type File
 pub fn File::as_dir(Self) -> Directory raise @wasi.Errno
-pub fn File::atime(Self) -> (Int64, Int) raise @wasi.Errno
+pub fn File::atime(Self) -> (Int64, Int32) raise @wasi.Errno
 pub fn File::close(Self) -> Unit
-pub fn File::ctime(Self) -> (Int64, Int) raise @wasi.Errno
-pub fn File::fd(Self) -> Int
+pub fn File::ctime(Self) -> (Int64, Int32) raise @wasi.Errno
+pub fn File::fd(Self) -> Int32
 pub fn File::kind(Self) -> FileKind
-pub fn File::mtime(Self) -> (Int64, Int) raise @wasi.Errno
-pub async fn File::read_at(Self, FixedArray[Byte], position~ : Int64, offset? : Int, len? : Int) -> Int
-pub async fn File::read_exactly_at(Self, Int, position~ : Int64) -> Bytes
+pub fn File::mtime(Self) -> (Int64, Int32) raise @wasi.Errno
+pub async fn File::read_at(Self, FixedArray[Byte], position~ : Int64, offset? : Int32, len? : Int32) -> Int32
+pub async fn File::read_exactly_at(Self, Int32, position~ : Int64) -> Bytes
 pub fn File::size(Self) -> Int64 raise @wasi.Errno
 pub fn File::sync(Self, only_data? : Bool) -> Unit raise @wasi.Errno
 pub async fn File::write_at(Self, BytesView, position~ : Int64) -> Unit
@@ -107,4 +107,3 @@ pub(all) enum SyncMode {
 // Type aliases
 
 // Traits
-

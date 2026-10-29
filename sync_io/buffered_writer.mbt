@@ -25,21 +25,21 @@
 struct BufferedWriter[W] {
   writer : W
   buf : FixedArray[Byte]
-  mut len : Int
+  mut len : Int32
 }
 
 ///|
 /// Create a buffered writer with fixed buffer size `size`.
 pub fn[W] BufferedWriter::new(
   writer : W,
-  size? : Int = 1024,
+  size~ : Int32 = 1024,
 ) -> BufferedWriter[W] {
-  { writer, buf: FixedArray::make(size, 0), len: 0 }
+  { writer, buf: FixedArray::make(size, 0), len: 0, }
 }
 
 ///|
 /// Return the internal buffer size of a buffered writer.
-pub fn[W] BufferedWriter::capacity(self : BufferedWriter[W]) -> Int {
+pub fn[W] BufferedWriter::capacity(self : BufferedWriter[W]) -> Int32 {
   self.buf.length()
 }
 
@@ -56,7 +56,7 @@ pub fn[W : Writer] BufferedWriter::flush(
 
 ///|
 /// Writer implementation that buffers writes.
-pub impl[W : Writer] Writer for BufferedWriter[W] with write_once_sync(
+pub impl[W : Writer] Writer for BufferedWriter[W] with fn write_once_sync(
   self,
   buf,
 ) {
@@ -71,7 +71,7 @@ pub impl[W : Writer] Writer for BufferedWriter[W] with write_once_sync(
 
 ///|
 /// Writer implementation that consumes a reader into the buffer.
-pub impl[W : Writer] Writer for BufferedWriter[W] with write_reader_sync(
+pub impl[W : Writer] Writer for BufferedWriter[W] with fn write_reader_sync(
   self,
   reader,
 ) {

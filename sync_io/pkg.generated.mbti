@@ -13,9 +13,9 @@ pub(all) suberror ReaderClosed derive(ToJson, @debug.Debug)
 
 // Types and methods
 type BufferedWriter[W]
-pub fn[W] BufferedWriter::capacity(Self[W]) -> Int
+pub fn[W] BufferedWriter::capacity(Self[W]) -> Int32
 pub fn[W : Writer] BufferedWriter::flush(Self[W]) -> Unit raise
-pub fn[W] BufferedWriter::new(W, size? : Int) -> Self[W]
+pub fn[W] BufferedWriter::new(W, size? : Int32) -> Self[W]
 pub impl[W : Writer] Writer for BufferedWriter[W]
 
 pub(all) enum Encoding {
@@ -36,19 +36,18 @@ pub fn &Data::json(Self) -> Json raise
 pub fn &Data::text(Self) -> String raise
 
 pub(open) trait Reader {
-  _get_internal_buffer(Self) -> @io_buffer.Buffer
-  _direct_read(Self, FixedArray[Byte], offset~ : Int, max_len~ : Int) -> Int raise
-  read_sync(Self, FixedArray[Byte], offset? : Int, max_len? : Int) -> Int raise = _
-  drop(Self, Int) -> Int raise = _
-  read_exactly_sync(Self, Int) -> Bytes raise = _
-  read_some_sync(Self, max_len? : Int) -> Bytes? raise = _
-  read_all_sync(Self) -> &Data raise = _
-  read_until_sync(Self, StringView) -> String? raise = _
+  fn _get_internal_buffer(Self) -> @io_buffer.Buffer
+  fn _direct_read(Self, FixedArray[Byte], offset~ : Int32, max_len~ : Int32) -> Int32 raise
+  fn read_sync(Self, FixedArray[Byte], offset? : Int32, max_len? : Int32) -> Int32 raise = _
+  fn drop(Self, Int32) -> Int32 raise = _
+  fn read_exactly_sync(Self, Int32) -> Bytes raise = _
+  fn read_some_sync(Self, max_len? : Int32) -> Bytes? raise = _
+  fn read_all_sync(Self) -> &Data raise = _
+  fn read_until_sync(Self, StringView) -> String? raise = _
 }
 
 pub(open) trait Writer {
-  write_once_sync(Self, BytesView) -> Int raise
-  write_sync(Self, &Data) -> Unit raise = _
-  write_reader_sync(Self, &Reader) -> Unit raise = _
+  fn write_once_sync(Self, BytesView) -> Int32 raise
+  fn write_sync(Self, &Data) -> Unit raise = _
+  fn write_reader_sync(Self, &Reader) -> Unit raise = _
 }
-

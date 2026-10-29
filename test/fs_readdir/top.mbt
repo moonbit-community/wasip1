@@ -13,5 +13,5 @@ pub fn start() -> Unit {
   }
   let output = "\{Debug::to_repr(entries)}\n"
   let bytes = @utf8.encode(output)
-  (try? @wasi.stdout.fd_write([bytes])) |> ignore
+  (Ok(@wasi.stdout.fd_write([bytes])) catch { e => Err(e) }) |> ignore
 }

@@ -4,5 +4,5 @@ pub fn start() -> Unit {
   let b = @fs.can_read("fixtures/missing.txt")
   let output = "\{a},\{b}\n"
   let bytes = @utf8.encode(output)
-  (try? @wasi.stdout.fd_write([bytes])) |> ignore
+  (Ok(@wasi.stdout.fd_write([bytes])) catch { e => Err(e) }) |> ignore
 }

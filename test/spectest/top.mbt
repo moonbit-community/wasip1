@@ -1,5 +1,5 @@
 ///|
-let buffer : Ref[UInt16] = { val: 0 }
+let buffer : Ref[UInt16] = { val: 0, }
 
 ///|
 pub fn print_char(ch : UInt16) -> Unit {

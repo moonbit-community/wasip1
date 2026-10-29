@@ -8,7 +8,7 @@ import {
 // Values
 pub fn async_run(async () -> Unit) -> Unit raise
 
-pub async fn sleep(Int) -> Unit
+pub async fn sleep(Int32) -> Unit
 
 pub async fn suspend_for_read(@wasi.Fd) -> UInt64
 
@@ -21,4 +21,3 @@ pub async fn suspend_for_write(@wasi.Fd) -> UInt64
 // Type aliases
 
 // Traits
-

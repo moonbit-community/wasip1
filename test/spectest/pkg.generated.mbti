@@ -11,4 +11,3 @@ pub fn print_char(UInt16) -> Unit
 // Type aliases
 
 // Traits
-

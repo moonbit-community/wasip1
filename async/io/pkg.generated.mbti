@@ -16,9 +16,9 @@ pub(all) suberror ReaderClosed derive(ToJson, @debug.Debug)
 
 // Types and methods
 type BufferedWriter[W]
-pub fn[W] BufferedWriter::capacity(Self[W]) -> Int
+pub fn[W] BufferedWriter::capacity(Self[W]) -> Int32
 pub async fn[W : Writer] BufferedWriter::flush(Self[W]) -> Unit
-pub fn[W] BufferedWriter::new(W, size? : Int) -> Self[W]
+pub fn[W] BufferedWriter::new(W, size? : Int32) -> Self[W]
 pub impl[W : Writer] Writer for BufferedWriter[W]
 
 pub(all) enum Encoding {
@@ -47,19 +47,18 @@ pub fn &Data::json(Self) -> Json raise
 pub fn &Data::text(Self) -> String raise
 
 pub(open) trait Reader {
-  _get_internal_buffer(Self) -> @io_buffer.Buffer
-  async _direct_read(Self, FixedArray[Byte], offset~ : Int, max_len~ : Int) -> Int
-  async read(Self, FixedArray[Byte], offset? : Int, max_len? : Int) -> Int = _
-  async drop(Self, Int) -> Int = _
-  async read_exactly(Self, Int) -> Bytes = _
-  async read_some(Self, max_len? : Int) -> Bytes? = _
-  async read_all(Self) -> &Data = _
-  async read_until(Self, StringView) -> String? = _
+  fn _get_internal_buffer(Self) -> @io_buffer.Buffer
+  async fn _direct_read(Self, FixedArray[Byte], offset~ : Int32, max_len~ : Int32) -> Int32
+  async fn read(Self, FixedArray[Byte], offset? : Int32, max_len? : Int32) -> Int32 = _
+  async fn drop(Self, Int32) -> Int32 = _
+  async fn read_exactly(Self, Int32) -> Bytes = _
+  async fn read_some(Self, max_len? : Int32) -> Bytes? = _
+  async fn read_all(Self) -> &Data = _
+  async fn read_until(Self, StringView) -> String? = _
 }
 
 pub(open) trait Writer {
-  async write_once(Self, Bytes, offset~ : Int, len~ : Int) -> Int
-  async write(Self, &Data) -> Unit = _
-  async write_reader(Self, &Reader) -> Unit = _
+  async fn write_once(Self, Bytes, offset~ : Int32, len~ : Int32) -> Int32
+  async fn write(Self, &Data) -> Unit = _
+  async fn write_reader(Self, &Reader) -> Unit = _
 }
-

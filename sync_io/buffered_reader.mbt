@@ -15,7 +15,7 @@
 ///|
 fn[R : Reader] @io_buffer.Buffer::try_ensure(
   self : @io_buffer.Buffer,
-  len : Int,
+  len : Int32,
   reader~ : R,
 ) -> Bool raise {
   if self.len >= len {
@@ -40,7 +40,7 @@ fn[R : Reader] @io_buffer.Buffer::find_opt(
   self : @io_buffer.Buffer,
   target : Bytes,
   reader~ : R,
-) -> Int? raise {
+) -> Int32? raise {
   let target_len = target.length()
   for searched = 0 {
     guard self.try_ensure(searched + target_len, reader~) else { return None }

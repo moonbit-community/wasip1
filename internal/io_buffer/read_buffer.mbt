@@ -16,15 +16,15 @@
 /// Mutable byte buffer used by readers.
 pub(all) struct Buffer {
   mut buf : FixedArray[Byte]
-  mut start : Int
-  mut len : Int
+  mut start : Int32
+  mut len : Int32
 }
 
 ///|
 /// Create a buffer with the given initial size.
 #as_free_fn
-pub fn Buffer::new(size : Int) -> Buffer {
-  { buf: FixedArray::make(size, 0), start: 0, len: 0 }
+pub fn Buffer::new(size : Int32) -> Buffer {
+  { buf: FixedArray::make(size, 0), start: 0, len: 0, }
 }
 
 ///|
@@ -40,7 +40,7 @@ const SEGMENT_SIZE = 1024
 
 ///|
 /// Ensure the buffer has capacity for at least `n` bytes.
-pub fn Buffer::enlarge_to(self : Buffer, n : Int) -> Unit {
+pub fn Buffer::enlarge_to(self : Buffer, n : Int32) -> Unit {
   let capacity = self.buf.length()
   if self.start + n <= capacity {
     return
@@ -60,7 +60,7 @@ pub fn Buffer::enlarge_to(self : Buffer, n : Int) -> Unit {
 
 ///|
 /// Drop the first `n` bytes from the buffer.
-pub fn Buffer::drop(self : Buffer, n : Int) -> Unit {
+pub fn Buffer::drop(self : Buffer, n : Int32) -> Unit {
   guard n <= self.len
   self.len -= n
   if self.len == 0 {

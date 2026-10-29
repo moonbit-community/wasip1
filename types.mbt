@@ -1,5 +1,5 @@
 ///|
-pub(all) struct Size(UInt) derive(Eq, Debug)
+pub(all) struct Size(UInt32) derive(Eq, Debug)
 
 ///|
 /// Non-negative file size or length of a region within a file.
@@ -28,7 +28,7 @@ pub(all) enum ClockId {
 
 ///|
 /// Return the numeric clock id value.
-pub fn ClockId::value(self : ClockId) -> UInt {
+pub fn ClockId::value(self : ClockId) -> UInt32 {
   match self {
     RealTime => 0
     Monotonic => 1
@@ -39,7 +39,7 @@ pub fn ClockId::value(self : ClockId) -> UInt {
 
 ///|
 /// Convert a numeric clock id into `ClockId`.
-pub fn ClockId::from_value(value : UInt) -> ClockId? {
+pub fn ClockId::from_value(value : UInt32) -> ClockId? {
   match value {
     0 => Some(RealTime)
     1 => Some(Monotonic)
@@ -215,7 +215,7 @@ pub(all) suberror Errno {
 
 ///|
 /// Return the numeric errno value.
-pub fn Errno::value(self : Errno) -> UInt {
+pub fn Errno::value(self : Errno) -> UInt32 {
   match self {
     Success => 0
     TooBig => 1
@@ -299,7 +299,7 @@ pub fn Errno::value(self : Errno) -> UInt {
 
 ///|
 /// Convert a numeric errno into `Errno`.
-pub fn Errno::from_value(value : UInt) -> Errno? {
+pub fn Errno::from_value(value : UInt32) -> Errno? {
   match value {
     0 => Some(Success)
     1 => Some(TooBig)
@@ -492,7 +492,7 @@ pub fn Rights::is_set(self : Rights, right : Right) -> Bool {
 
 ///|
 /// A file descriptor handle
-pub(all) struct Fd(Int) derive(Eq, Debug)
+pub(all) struct Fd(Int32) derive(Eq, Debug)
 
 ///|
 /// A region of memory for scatter/gather reads.
@@ -500,7 +500,7 @@ pub(all) struct Fd(Int) derive(Eq, Debug)
 /// - `buf`: The address of the buffer to be filled.
 /// - `buf_len`: The length of the buffer to be filled.
 pub(all) struct IOVec {
-  buf : Int
+  buf : Int32
   buf_len : Size
 } derive(Eq, Debug)
 
@@ -510,7 +510,7 @@ pub(all) struct IOVec {
 /// - `buf`: The address of the buffer to be written.
 /// - `buf_len`: The length of the buffer to be written.
 pub(all) struct CIOVec {
-  buf : Int
+  buf : Int32
   buf_len : Size
 } derive(Eq, Debug)
 
@@ -528,7 +528,7 @@ pub(all) enum Whence {
 
 ///|
 /// Return the numeric whence value.
-pub fn Whence::value(self : Whence) -> UInt {
+pub fn Whence::value(self : Whence) -> UInt32 {
   match self {
     Set => 0
     Cur => 1
@@ -538,7 +538,7 @@ pub fn Whence::value(self : Whence) -> UInt {
 
 ///|
 /// Convert a numeric whence into `Whence`.
-pub fn Whence::from_value(value : UInt) -> Whence? {
+pub fn Whence::from_value(value : UInt32) -> Whence? {
   match value {
     0 => Some(Set)
     1 => Some(Cur)
@@ -555,7 +555,7 @@ pub(all) struct DirCookie(UInt64) derive(Eq, Debug)
 
 ///|
 /// The type for the `dirent::d_namlen` field of `dirent` struct.
-pub(all) struct DirNamlen(UInt) derive(Eq, Debug)
+pub(all) struct DirNamlen(UInt32) derive(Eq, Debug)
 
 ///|
 /// File serial number that is unique within its file system.
@@ -585,7 +585,7 @@ pub(all) enum FileType {
 
 ///|
 /// Return the numeric file type value.
-pub fn FileType::value(self : FileType) -> Int {
+pub fn FileType::value(self : FileType) -> Int32 {
   match self {
     Unknown => 0
     Block_device => 1
@@ -600,7 +600,7 @@ pub fn FileType::value(self : FileType) -> Int {
 
 ///|
 /// Convert a numeric file type into `FileType`.
-pub fn FileType::from_value(value : Int) -> FileType? {
+pub fn FileType::from_value(value : Int32) -> FileType? {
   match value {
     0 => Some(Unknown)
     1 => Some(Block_device)
@@ -648,7 +648,7 @@ pub(all) enum Advice {
 
 ///|
 /// Return the numeric advice value.
-pub fn Advice::value(self : Advice) -> UInt {
+pub fn Advice::value(self : Advice) -> UInt32 {
   match self {
     Normal => 0
     Sequential => 1
@@ -661,7 +661,7 @@ pub fn Advice::value(self : Advice) -> UInt {
 
 ///|
 /// Convert a numeric advice value into `Advice`.
-pub fn Advice::from_value(value : UInt) -> Advice? {
+pub fn Advice::from_value(value : UInt32) -> Advice? {
   match value {
     0 => Some(Normal)
     1 => Some(Sequential)
@@ -675,7 +675,7 @@ pub fn Advice::from_value(value : UInt) -> Advice? {
 
 ///|
 /// File descriptor flag.
-pub(all) struct FdFlags(UInt) derive(Eq, Debug)
+pub(all) struct FdFlags(UInt32) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of fd flags.
@@ -701,7 +701,7 @@ pub(all) enum FdFlag {
 
 ///|
 /// Return the numeric value for a single fd flag.
-pub fn FdFlag::value(self : FdFlag) -> UInt {
+pub fn FdFlag::value(self : FdFlag) -> UInt32 {
   match self {
     Append => 1
     Dsync => 2
@@ -750,7 +750,7 @@ pub(all) struct Device(UInt64) derive(Eq, Debug)
 
 ///|
 /// Which file time attributes to adjust
-pub(all) struct FstFlags(UInt) derive(Eq, Debug)
+pub(all) struct FstFlags(UInt32) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of filestat flags.
@@ -774,7 +774,7 @@ pub(all) enum FstFlag {
 
 ///|
 /// Return the numeric value for a filestat flag.
-pub fn FstFlag::value(self : FstFlag) -> UInt {
+pub fn FstFlag::value(self : FstFlag) -> UInt32 {
   match self {
     Atim => 1
     Atim_now => 2
@@ -803,7 +803,7 @@ pub fn FstFlags::is_set(self : FstFlags, flag : FstFlag) -> Bool {
 
 ///|
 /// Flags dermining the method of how paths are resolved.
-pub(all) struct LookupFlags(UInt) derive(Eq, Debug)
+pub(all) struct LookupFlags(UInt32) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of lookup flags.
@@ -818,7 +818,7 @@ pub(all) enum LookupFlag {
 
 ///|
 /// Return the numeric value for a lookup flag.
-pub fn LookupFlag::value(self : LookupFlag) -> UInt {
+pub fn LookupFlag::value(self : LookupFlag) -> UInt32 {
   match self {
     Symlink_follow => 1
   }
@@ -844,7 +844,7 @@ pub fn LookupFlags::is_set(self : LookupFlags, flag : LookupFlag) -> Bool {
 
 ///|
 /// Open flags used by `path_open`.
-pub(all) struct OpenFlags(UInt) derive(Eq, Debug)
+pub(all) struct OpenFlags(UInt32) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of open flags.
@@ -868,7 +868,7 @@ pub(all) enum OpenFlag {
 
 ///|
 /// Return the numeric value for an open flag.
-pub fn OpenFlag::value(self : OpenFlag) -> UInt {
+pub fn OpenFlag::value(self : OpenFlag) -> UInt32 {
   match self {
     Create => 1
     Directory => 2
@@ -940,7 +940,7 @@ pub(all) enum EventType {
 
 ///|
 /// Return the numeric value for an event type.
-pub fn EventType::value(self : EventType) -> UInt {
+pub fn EventType::value(self : EventType) -> UInt32 {
   match self {
     Clock => 0
     Fd_read => 1
@@ -950,7 +950,7 @@ pub fn EventType::value(self : EventType) -> UInt {
 
 ///|
 /// Convert a numeric event type into `EventType`.
-pub fn EventType::from_value(value : UInt) -> EventType? {
+pub fn EventType::from_value(value : UInt32) -> EventType? {
   match value {
     0 => Some(Clock)
     1 => Some(Fd_read)
@@ -961,7 +961,7 @@ pub fn EventType::from_value(value : UInt) -> EventType? {
 
 ///|
 /// The state of the file descriptor subscribed to with `eventtype::fd_read` or `eventtype::fd_write`.
-pub(all) struct EventRWFlags(UInt) derive(Eq, Debug)
+pub(all) struct EventRWFlags(UInt32) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of event read/write flags.
@@ -979,7 +979,7 @@ pub(all) enum EventRWFlag {
 
 ///|
 /// Return the numeric value for an event read/write flag.
-pub fn EventRWFlag::value(self : EventRWFlag) -> UInt {
+pub fn EventRWFlag::value(self : EventRWFlag) -> UInt32 {
   match self {
     Fd_readwrite_hangup => 1
   }
@@ -1036,7 +1036,7 @@ pub(all) struct Event {
 
 ///|
 /// Flags determining how to interpret the timestamp provided in `subscription::timeout`.
-pub(all) struct SubclockFlags(UInt) derive(Eq, Debug)
+pub(all) struct SubclockFlags(UInt32) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of subclock flags.
@@ -1059,7 +1059,7 @@ pub(all) enum SubclockFlag {
 
 ///|
 /// Return the numeric value for a subclock flag.
-pub fn SubclockFlag::value(self : SubclockFlag) -> UInt {
+pub fn SubclockFlag::value(self : SubclockFlag) -> UInt32 {
   match self {
     Subscription_clock_abstime => 1
   }
@@ -1131,7 +1131,7 @@ pub(all) struct Subscription {
 
 ///|
 /// Exit code generated by a process when exiting.
-pub(all) struct ExitCode(UInt) derive(Eq, Debug)
+pub(all) struct ExitCode(UInt32) derive(Eq, Debug)
 
 ///|
 /// Signal condition.
@@ -1202,7 +1202,7 @@ pub(all) enum Signal {
 
 ///|
 /// Return the numeric value for a signal.
-pub fn Signal::value(self : Signal) -> UInt {
+pub fn Signal::value(self : Signal) -> UInt32 {
   match self {
     None => 0
     Hup => 1
@@ -1240,7 +1240,7 @@ pub fn Signal::value(self : Signal) -> UInt {
 
 ///|
 /// Convert a numeric signal into `Signal`.
-pub fn Signal::from_value(value : UInt) -> Signal? {
+pub fn Signal::from_value(value : UInt32) -> Signal? {
   match value {
     0 => Some(None)
     1 => Some(Hup)
@@ -1279,7 +1279,7 @@ pub fn Signal::from_value(value : UInt) -> Signal? {
 
 ///|
 /// Flags provided to `sock_recv`.
-pub(all) struct RiFlags(UInt) derive(Eq, Debug)
+pub(all) struct RiFlags(UInt32) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of recv flags.
@@ -1299,7 +1299,7 @@ pub(all) enum RiFlag {
 
 ///|
 /// Return the numeric value for a recv flag.
-pub fn RiFlag::value(self : RiFlag) -> UInt {
+pub fn RiFlag::value(self : RiFlag) -> UInt32 {
   match self {
     Recv_peek => 1
     Recv_waitall => 2
@@ -1326,7 +1326,7 @@ pub fn RiFlags::is_set(self : RiFlags, flag : RiFlag) -> Bool {
 
 ///|
 /// Flags returned by `sock_recv`.
-pub(all) struct RoFlags(UInt) derive(Eq, Debug)
+pub(all) struct RoFlags(UInt32) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of recv open flags.
@@ -1344,7 +1344,7 @@ pub(all) enum RoFlag {
 
 ///|
 /// Return the numeric value for a recv open flag.
-pub fn RoFlag::value(self : RoFlag) -> UInt {
+pub fn RoFlag::value(self : RoFlag) -> UInt32 {
   match self {
     Recv_data_truncated => 1
   }
@@ -1370,7 +1370,7 @@ pub fn RoFlags::is_set(self : RoFlags, flag : RoFlag) -> Bool {
 
 ///|
 /// Flags provided to `sock_send`. As there are currently no flags defined, it must be set to zero.
-pub(all) struct SiFlags(UInt) derive(Eq, Debug)
+pub(all) struct SiFlags(UInt32) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of send flags.
@@ -1384,7 +1384,7 @@ pub(all) enum SiFlag {} derive(Eq, Debug)
 
 ///|
 /// Return the numeric value for a send flag.
-pub fn SiFlag::value(self : SiFlag) -> UInt {
+pub fn SiFlag::value(self : SiFlag) -> UInt32 {
   match self {
     _ => panic()
   }
@@ -1410,7 +1410,7 @@ pub fn SiFlags::is_set(self : SiFlags, flag : SiFlag) -> Bool {
 
 ///|
 /// Which channels on a socket to shut down.
-pub(all) struct SdFlags(UInt) derive(Eq, Debug)
+pub(all) struct SdFlags(UInt32) derive(Eq, Debug)
 
 ///|
 /// Create an empty set of shutdown flags.
@@ -1430,7 +1430,7 @@ pub(all) enum SdFlag {
 
 ///|
 /// Return the numeric value for a shutdown flag.
-pub fn SdFlag::value(self : SdFlag) -> UInt {
+pub fn SdFlag::value(self : SdFlag) -> UInt32 {
   match self {
     Rd => 1
     Wr => 2
@@ -1465,7 +1465,7 @@ pub(all) enum PreOpenType {
 
 ///|
 /// Return the numeric preopen type value.
-pub fn PreOpenType::value(self : PreOpenType) -> UInt {
+pub fn PreOpenType::value(self : PreOpenType) -> UInt32 {
   match self {
     Dir => 0
   }
@@ -1473,7 +1473,7 @@ pub fn PreOpenType::value(self : PreOpenType) -> UInt {
 
 ///|
 /// Convert a numeric preopen type into `PreOpenType`.
-pub fn PreOpenType::from_value(value : UInt) -> PreOpenType? {
+pub fn PreOpenType::from_value(value : UInt32) -> PreOpenType? {
   match value {
     0 => Some(Dir)
     _ => None

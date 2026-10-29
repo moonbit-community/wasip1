@@ -21,7 +21,7 @@ struct Input {
 
 ///|
 /// Read bytes from stdin into the provided buffer.
-pub impl @sync_io.Reader for Input with _direct_read(
+pub impl @sync_io.Reader for Input with fn _direct_read(
   self,
   buf,
   offset~,
@@ -35,13 +35,13 @@ pub impl @sync_io.Reader for Input with _direct_read(
 
 ///|
 /// Provide a read buffer for stdin.
-pub impl @sync_io.Reader for Input with _get_internal_buffer(self) {
+pub impl @sync_io.Reader for Input with fn _get_internal_buffer(self) {
   self.read_buf
 }
 
 ///|
 /// Read bytes from stdin into the provided buffer.
-pub impl @io.Reader for Input with _direct_read(self, buf, offset~, max_len~) {
+pub impl @io.Reader for Input with fn _direct_read(self, buf, offset~, max_len~) {
   let len = @event_loop.suspend_for_read(self.io)
   let len = @cmp.minimum(len, max_len.to_uint64()).to_int()
   let buffer = FixedArray::make(len, b'\x00')
@@ -52,7 +52,7 @@ pub impl @io.Reader for Input with _direct_read(self, buf, offset~, max_len~) {
 
 ///|
 /// Provide a read buffer for stdin.
-pub impl @io.Reader for Input with _get_internal_buffer(self) {
+pub impl @io.Reader for Input with fn _get_internal_buffer(self) {
   self.read_buf
 }
 
@@ -62,13 +62,13 @@ struct Output(@wasi.Fd)
 
 ///|
 /// Write bytes to stdout/stderr.
-pub impl @sync_io.Writer for Output with write_once_sync(self, buf) {
+pub impl @sync_io.Writer for Output with fn write_once_sync(self, buf) {
   self.0.fd_write([buf]).0.reinterpret_as_int()
 }
 
 ///|
 /// Write bytes to stdout/stderr.
-pub impl @io.Writer for Output with write_once(self, buf, offset~, len~) {
+pub impl @io.Writer for Output with fn write_once(self, buf, offset~, len~) {
   let len = @cmp.minimum(@event_loop.suspend_for_write(self.0), len.to_uint64()).to_int()
   self.0.fd_write([buf[offset:offset + len]]).0.reinterpret_as_int()
 }
@@ -77,7 +77,10 @@ pub impl @io.Writer for Output with write_once(self, buf, offset~, len~) {
 /// The standard input channel.
 /// Using this value will result in standard input being set to non-blocking mode.
 /// The standard input will be reset to its original state after the program exits.
-pub let stdin : Input = { io: @wasi.Fd(0), read_buf: @io_buffer.Buffer::new(0) }
+pub let stdin : Input = {
+  io: @wasi.Fd(0),
+  read_buf: @io_buffer.Buffer::new(0),
+}
 
 ///|
 /// The standard output channel.

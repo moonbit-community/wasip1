@@ -14,9 +14,9 @@
 
 ///|
 priv struct Scheduler {
-  mut coro_id : Int
+  mut coro_id : Int32
   mut curr_coro : Coroutine?
-  mut blocking : Int
+  mut blocking : Int32
   run_later : @deque.Deque[Coroutine]
 }
 

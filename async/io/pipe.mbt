@@ -19,9 +19,9 @@ priv enum PipeReader {
   HasReader(
     coro~ : @coroutine.Coroutine,
     buf~ : FixedArray[Byte],
-    offset~ : Int,
-    max_len~ : Int,
-    mut result~ : Int
+    offset~ : Int32,
+    max_len~ : Int32,
+    mut result~ : Int32
   )
 }
 
@@ -32,9 +32,9 @@ priv enum PipeWriter {
   HasWriter(
     coro~ : @coroutine.Coroutine,
     buf~ : Bytes,
-    offset~ : Int,
-    len~ : Int,
-    mut result~ : Int
+    offset~ : Int32,
+    len~ : Int32,
+    mut result~ : Int32
   )
 }
 
@@ -96,7 +96,7 @@ pub fn PipeWrite::close(self : PipeWrite) -> Unit {
 /// Reader implementation for the read end of a pipe.
 /// Read data from a pipe. The data come from the write end of the pipe.
 /// Data transfer only happen when reader and writer are present at the same time.
-pub impl Reader for PipeRead with _direct_read(self, dst, offset~, max_len~) {
+pub impl Reader for PipeRead with fn _direct_read(self, dst, offset~, max_len~) {
   let PipeRead(self) = self
   guard self.reader is NoReader
   match self.writer {
@@ -123,7 +123,7 @@ pub impl Reader for PipeRead with _direct_read(self, dst, offset~, max_len~) {
 
 ///|
 /// Provide a read buffer for the pipe reader.
-pub impl Reader for PipeRead with _get_internal_buffer(self) {
+pub impl Reader for PipeRead with fn _get_internal_buffer(self) {
   let PipeRead(self) = self
   self.read_buf
 }
@@ -137,7 +137,7 @@ pub suberror PipeClosed derive(Debug, ToJson)
 /// Writer implementation for the write end of a pipe.
 /// Write data to a pipe. The data can be read from the read end of the pipe.
 /// Data transfer only happen when reader and writer are present at the same time.
-pub impl Writer for PipeWrite with write_once(self, buf, offset~, len~) {
+pub impl Writer for PipeWrite with fn write_once(self, buf, offset~, len~) {
   let PipeWrite(self) = self
   guard self.writer is NoWriter
   match self.reader {

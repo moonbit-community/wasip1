@@ -11,7 +11,7 @@ Deno.test("core wasi", async (t) => {
       args: [
         "--argv0",
         "args_get.wasm",
-        "test/_build/wasm/debug/build/args_get/args_get.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/args_get/args_get.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -26,7 +26,7 @@ Deno.test("core wasi", async (t) => {
       args: [
         "--env",
         "hello=world",
-        "test/_build/wasm/debug/build/environ_get/environ_get.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/environ_get/environ_get.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -41,7 +41,7 @@ Deno.test("core wasi", async (t) => {
       args: [
         "--dir",
         "test::.",
-        "test/_build/wasm/debug/build/fd_fdstat_get/fd_fdstat_get.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fd_fdstat_get/fd_fdstat_get.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -58,7 +58,7 @@ Deno.test("core wasi", async (t) => {
         ".",
         "--dir",
         "test",
-        "test/_build/wasm/debug/build/fd_prestat_dir_name/fd_prestat_dir_name.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fd_prestat_dir_name/fd_prestat_dir_name.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -71,7 +71,7 @@ Deno.test("core wasi", async (t) => {
   await t.step("fd_read", async (t) => {
     // Notice that wasmtime may only read into the first buffer.
     let process = new Deno.Command("wasmtime", {
-      args: ["test/_build/wasm/debug/build/fd_read/fd_read.wasm"],
+      args: ["_build/wasm/debug/build/peter-jerry-ye/wasi-test/fd_read/fd_read.wasm"],
       stdin: "piped",
       stdout: "piped",
       stderr: "piped",
@@ -85,7 +85,7 @@ Deno.test("core wasi", async (t) => {
     await assertSnapshot(t, stdout);
 
     process = new Deno.Command("wasmtime", {
-      args: ["test/_build/wasm/debug/build/fd_read/fd_read.wasm"],
+      args: ["_build/wasm/debug/build/peter-jerry-ye/wasi-test/fd_read/fd_read.wasm"],
       stdin: "piped",
       stdout: "piped",
       stderr: "piped",
@@ -108,7 +108,7 @@ Deno.test("core wasi", async (t) => {
       args: [
         "--dir",
         "test/fd_readdir",
-        "test/_build/wasm/debug/build/fd_readdir/fd_readdir.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fd_readdir/fd_readdir.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -121,7 +121,7 @@ Deno.test("core wasi", async (t) => {
   await t.step("fd_write", async (t) => {
     // Notice that wasmtime may only write from the first buffer.
     const output = await new Deno.Command("wasmtime", {
-      args: ["test/_build/wasm/debug/build/fd_write/fd_write.wasm"],
+      args: ["_build/wasm/debug/build/peter-jerry-ye/wasi-test/fd_write/fd_write.wasm"],
       stdout: "piped",
       stderr: "piped",
     }).spawn().output();
@@ -133,7 +133,7 @@ Deno.test("core wasi", async (t) => {
   await t.step("poll_oneoff", async () => {
     const start = performance.now();
     await new Deno.Command("wasmtime", {
-      args: ["test/_build/wasm/debug/build/poll_oneoff/poll_oneoff.wasm"],
+      args: ["_build/wasm/debug/build/peter-jerry-ye/wasi-test/poll_oneoff/poll_oneoff.wasm"],
     }).output();
     const end = performance.now();
     assert(
@@ -144,7 +144,7 @@ Deno.test("core wasi", async (t) => {
 
   await t.step("proc_exit", async () => {
     const output = await new Deno.Command("wasmtime", {
-      args: ["test/_build/wasm/debug/build/proc_exit/proc_exit.wasm"],
+      args: ["_build/wasm/debug/build/peter-jerry-ye/wasi-test/proc_exit/proc_exit.wasm"],
       stdout: "piped",
       stderr: "piped",
     }).spawn().output();
@@ -158,7 +158,7 @@ Deno.test("extensions", async (t) => {
       args: [
         "--dir",
         "test::.",
-        "test/_build/wasm/debug/build/fs_exists/fs_exists.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fs_exists/fs_exists.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -173,7 +173,7 @@ Deno.test("extensions", async (t) => {
       args: [
         "--dir",
         "test::.",
-        "test/_build/wasm/debug/build/fs_can_read/fs_can_read.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fs_can_read/fs_can_read.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -188,7 +188,7 @@ Deno.test("extensions", async (t) => {
       args: [
         "--dir",
         "test::.",
-        "test/_build/wasm/debug/build/fs_can_write/fs_can_write.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fs_can_write/fs_can_write.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -203,7 +203,7 @@ Deno.test("extensions", async (t) => {
       args: [
         "--dir",
         "test::.",
-        "test/_build/wasm/debug/build/fs_can_execute/fs_can_execute.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fs_can_execute/fs_can_execute.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -218,7 +218,7 @@ Deno.test("extensions", async (t) => {
       args: [
         "--dir",
         "test::.",
-        "test/_build/wasm/debug/build/fs_atime/fs_atime.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fs_atime/fs_atime.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -233,7 +233,7 @@ Deno.test("extensions", async (t) => {
       args: [
         "--dir",
         "test::.",
-        "test/_build/wasm/debug/build/fs_kind/fs_kind.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fs_kind/fs_kind.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -248,7 +248,7 @@ Deno.test("extensions", async (t) => {
       args: [
         "--dir",
         "test::.",
-        "test/_build/wasm/debug/build/fs_readdir/fs_readdir.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fs_readdir/fs_readdir.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -263,7 +263,7 @@ Deno.test("extensions", async (t) => {
       args: [
         "--dir",
         "test::.",
-        "test/_build/wasm/debug/build/fs_read_text/fs_read_text.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fs_read_text/fs_read_text.wasm",
       ],
       stdout: "piped",
       stderr: "piped",
@@ -278,7 +278,7 @@ Deno.test("extensions", async (t) => {
       args: [
         "--dir",
         "test::.",
-        "test/_build/wasm/debug/build/fs_walk/fs_walk.wasm",
+        "_build/wasm/debug/build/peter-jerry-ye/wasi-test/fs_walk/fs_walk.wasm",
       ],
       stdout: "piped",
       stderr: "piped",

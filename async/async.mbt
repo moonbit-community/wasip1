@@ -68,9 +68,9 @@ pub suberror TimeoutError derive(Debug, ToJson)
 ///   `with_timeout` will fail with `TimeoutError`,
 ///   or the value of `error`, if explicitly specified.
 pub async fn[X] with_timeout(
-  time : Int,
+  time : Int32,
   f : async () -> X,
-  error? : Error = TimeoutError,
+  error~ : Error = TimeoutError,
 ) -> X {
   with_task_group(group => {
     group.spawn_bg(no_wait=true, () => {
@@ -91,7 +91,7 @@ pub async fn[X] with_timeout(
 ///
 /// - If `f` is still running after `timeout` milliseconds,
 /// ` with_timeout_opt` will return `None` immediately, and `f` will be cancelled.
-pub async fn[X] with_timeout_opt(time : Int, f : async () -> X) -> X? {
+pub async fn[X] with_timeout_opt(time : Int32, f : async () -> X) -> X? {
   with_task_group(group => {
     group.spawn_bg(no_wait=true, () => {
       sleep(time)
@@ -147,8 +147,8 @@ pub using @semaphore {type Semaphore}
 ///   the delay will be multiplied by `factor`, but will never exceed `maximum`.
 pub(all) enum RetryMethod {
   Immediate
-  FixedDelay(Int)
-  ExponentialDelay(initial~ : Int, factor~ : Double, maximum~ : Int)
+  FixedDelay(Int32)
+  ExponentialDelay(initial~ : Int32, factor~ : Double, maximum~ : Int32)
 }
 
 ///|
@@ -172,7 +172,7 @@ pub(all) enum RetryMethod {
 // labelled argument `retry` of `spawn_loop`.
 async fn[X] moonbitlang_async_retry(
   strategy : RetryMethod,
-  max_retry? : Int,
+  max_retry? : Int32,
   fatal_error? : (Error) -> Bool,
   f : async () -> X,
 ) -> X {

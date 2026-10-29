@@ -8,17 +8,17 @@ import {
 // Values
 pub fn args_get() -> Array[String] raise Errno
 
-pub fn args_sizes_get() -> (Int, Int) raise Errno
+pub fn args_sizes_get() -> (Int32, Int32) raise Errno
 
 pub fn environ_get() -> Array[(String, String)] raise Errno
 
-pub fn environ_sizes_get() -> (Int, Int) raise Errno
+pub fn environ_sizes_get() -> (Int32, Int32) raise Errno
 
 pub fn path_symlink(String, Fd, String) -> Unit raise Errno
 
 pub fn poll_oneoff(Array[Subscription]) -> Array[Event] raise Errno
 
-pub fn[T] proc_exit(UInt) -> T
+pub fn[T] proc_exit(UInt32) -> T
 
 pub fn proc_raise(Signal) -> Unit raise Errno
 
@@ -112,8 +112,8 @@ pub(all) suberror Errno {
   Xdev
   Notcapable
 } derive(Eq, @debug.Debug)
-pub fn Errno::from_value(UInt) -> Self?
-pub fn Errno::value(Self) -> UInt
+pub fn Errno::from_value(UInt32) -> Self?
+pub fn Errno::value(Self) -> UInt32
 
 // Types and methods
 pub(all) enum Advice {
@@ -124,11 +124,11 @@ pub(all) enum Advice {
   Dontneed
   Noreuse
 } derive(Eq, @debug.Debug)
-pub fn Advice::from_value(UInt) -> Self?
-pub fn Advice::value(Self) -> UInt
+pub fn Advice::from_value(UInt32) -> Self?
+pub fn Advice::value(Self) -> UInt32
 
 pub(all) struct CIOVec {
-  buf : Int
+  buf : Int32
   buf_len : Size
 } derive(Eq, @debug.Debug)
 
@@ -140,8 +140,8 @@ pub(all) enum ClockId {
 } derive(Eq, @debug.Debug)
 pub fn ClockId::clock_res_get(Self) -> TimeStamp raise Errno
 pub fn ClockId::clock_time_get(Self, TimeStamp) -> TimeStamp raise Errno
-pub fn ClockId::from_value(UInt) -> Self?
-pub fn ClockId::value(Self) -> UInt
+pub fn ClockId::from_value(UInt32) -> Self?
+pub fn ClockId::value(Self) -> UInt32
 
 pub(all) struct Device(UInt64) derive(Eq, @debug.Debug)
 
@@ -154,7 +154,7 @@ pub(all) struct DirEnt {
   d_type : FileType
 } derive(Eq, @debug.Debug)
 
-pub(all) struct DirNamlen(UInt) derive(Eq, @debug.Debug)
+pub(all) struct DirNamlen(UInt32) derive(Eq, @debug.Debug)
 
 pub(all) struct Event {
   userdata : Userdata
@@ -166,9 +166,9 @@ pub(all) struct Event {
 pub(all) enum EventRWFlag {
   Fd_readwrite_hangup
 } derive(Eq, @debug.Debug)
-pub fn EventRWFlag::value(Self) -> UInt
+pub fn EventRWFlag::value(Self) -> UInt32
 
-pub(all) struct EventRWFlags(UInt) derive(Eq, @debug.Debug)
+pub(all) struct EventRWFlags(UInt32) derive(Eq, @debug.Debug)
 pub fn EventRWFlags::is_set(Self, EventRWFlag) -> Bool
 pub fn EventRWFlags::new() -> Self
 pub fn EventRWFlags::set(Self, EventRWFlag) -> Self
@@ -179,17 +179,17 @@ pub(all) enum EventType {
   Fd_read
   Fd_write
 } derive(Eq, @debug.Debug)
-pub fn EventType::from_value(UInt) -> Self?
-pub fn EventType::value(Self) -> UInt
+pub fn EventType::from_value(UInt32) -> Self?
+pub fn EventType::value(Self) -> UInt32
 
 pub(all) struct Event_fd_readwrite {
   nbytes : FileSize
   flags : EventRWFlags
 } derive(Eq, @debug.Debug)
 
-pub(all) struct ExitCode(UInt) derive(Eq, @debug.Debug)
+pub(all) struct ExitCode(UInt32) derive(Eq, @debug.Debug)
 
-pub(all) struct Fd(Int) derive(Eq, @debug.Debug)
+pub(all) struct Fd(Int32) derive(Eq, @debug.Debug)
 pub fn Fd::fd_advise(Self, FileSize, FileSize, Advice) -> Unit raise Errno
 pub fn Fd::fd_allocate(Self, FileSize, FileSize) -> Unit raise Errno
 pub fn Fd::fd_close(Self) -> Unit raise Errno
@@ -231,9 +231,9 @@ pub(all) enum FdFlag {
   Rsync
   Sync
 } derive(Eq, @debug.Debug)
-pub fn FdFlag::value(Self) -> UInt
+pub fn FdFlag::value(Self) -> UInt32
 
-pub(all) struct FdFlags(UInt) derive(Eq, @debug.Debug)
+pub(all) struct FdFlags(UInt32) derive(Eq, @debug.Debug)
 pub fn FdFlags::is_set(Self, FdFlag) -> Bool
 pub fn FdFlags::new() -> Self
 pub fn FdFlags::set(Self, FdFlag) -> Self
@@ -271,8 +271,8 @@ pub(all) enum FileType {
   Socket_stream
   Symbolic_link
 } derive(Eq, @debug.Debug)
-pub fn FileType::from_value(Int) -> Self?
-pub fn FileType::value(Self) -> Int
+pub fn FileType::from_value(Int32) -> Self?
+pub fn FileType::value(Self) -> Int32
 
 pub(all) enum FstFlag {
   Atim
@@ -280,16 +280,16 @@ pub(all) enum FstFlag {
   Mtim
   Mtim_now
 } derive(Eq, @debug.Debug)
-pub fn FstFlag::value(Self) -> UInt
+pub fn FstFlag::value(Self) -> UInt32
 
-pub(all) struct FstFlags(UInt) derive(Eq, @debug.Debug)
+pub(all) struct FstFlags(UInt32) derive(Eq, @debug.Debug)
 pub fn FstFlags::is_set(Self, FstFlag) -> Bool
 pub fn FstFlags::new() -> Self
 pub fn FstFlags::set(Self, FstFlag) -> Self
 pub fn FstFlags::unset(Self, FstFlag) -> Self
 
 pub(all) struct IOVec {
-  buf : Int
+  buf : Int32
   buf_len : Size
 } derive(Eq, @debug.Debug)
 
@@ -300,9 +300,9 @@ pub(all) struct LinkCount(UInt64) derive(Eq, @debug.Debug)
 pub(all) enum LookupFlag {
   Symlink_follow
 } derive(Eq, @debug.Debug)
-pub fn LookupFlag::value(Self) -> UInt
+pub fn LookupFlag::value(Self) -> UInt32
 
-pub(all) struct LookupFlags(UInt) derive(Eq, @debug.Debug)
+pub(all) struct LookupFlags(UInt32) derive(Eq, @debug.Debug)
 pub fn LookupFlags::is_set(Self, LookupFlag) -> Bool
 pub fn LookupFlags::new() -> Self
 pub fn LookupFlags::set(Self, LookupFlag) -> Self
@@ -314,9 +314,9 @@ pub(all) enum OpenFlag {
   Excl
   Trunc
 } derive(Eq, @debug.Debug)
-pub fn OpenFlag::value(Self) -> UInt
+pub fn OpenFlag::value(Self) -> UInt32
 
-pub(all) struct OpenFlags(UInt) derive(Eq, @debug.Debug)
+pub(all) struct OpenFlags(UInt32) derive(Eq, @debug.Debug)
 pub fn OpenFlags::is_set(Self, OpenFlag) -> Bool
 pub fn OpenFlags::new() -> Self
 pub fn OpenFlags::set(Self, OpenFlag) -> Self
@@ -325,8 +325,8 @@ pub fn OpenFlags::unset(Self, OpenFlag) -> Self
 pub(all) enum PreOpenType {
   Dir
 } derive(Eq, @debug.Debug)
-pub fn PreOpenType::from_value(UInt) -> Self?
-pub fn PreOpenType::value(Self) -> UInt
+pub fn PreOpenType::from_value(UInt32) -> Self?
+pub fn PreOpenType::value(Self) -> UInt32
 
 pub(all) enum PreStat {
   Dir(PreStat_dir)
@@ -340,9 +340,9 @@ pub(all) enum RiFlag {
   Recv_peek
   Recv_waitall
 } derive(Eq, @debug.Debug)
-pub fn RiFlag::value(Self) -> UInt
+pub fn RiFlag::value(Self) -> UInt32
 
-pub(all) struct RiFlags(UInt) derive(Eq, @debug.Debug)
+pub(all) struct RiFlags(UInt32) derive(Eq, @debug.Debug)
 pub fn RiFlags::is_set(Self, RiFlag) -> Bool
 pub fn RiFlags::new() -> Self
 pub fn RiFlags::set(Self, RiFlag) -> Self
@@ -391,9 +391,9 @@ pub fn Rights::unset(Self, Right) -> Self
 pub(all) enum RoFlag {
   Recv_data_truncated
 } derive(Eq, @debug.Debug)
-pub fn RoFlag::value(Self) -> UInt
+pub fn RoFlag::value(Self) -> UInt32
 
-pub(all) struct RoFlags(UInt) derive(Eq, @debug.Debug)
+pub(all) struct RoFlags(UInt32) derive(Eq, @debug.Debug)
 pub fn RoFlags::is_set(Self, RoFlag) -> Bool
 pub fn RoFlags::new() -> Self
 pub fn RoFlags::set(Self, RoFlag) -> Self
@@ -403,9 +403,9 @@ pub(all) enum SdFlag {
   Rd
   Wr
 } derive(Eq, @debug.Debug)
-pub fn SdFlag::value(Self) -> UInt
+pub fn SdFlag::value(Self) -> UInt32
 
-pub(all) struct SdFlags(UInt) derive(Eq, @debug.Debug)
+pub(all) struct SdFlags(UInt32) derive(Eq, @debug.Debug)
 pub fn SdFlags::is_set(Self, SdFlag) -> Bool
 pub fn SdFlags::new() -> Self
 pub fn SdFlags::set(Self, SdFlag) -> Self
@@ -413,9 +413,9 @@ pub fn SdFlags::unset(Self, SdFlag) -> Self
 
 pub(all) enum SiFlag {
 } derive(Eq, @debug.Debug)
-pub fn SiFlag::value(Self) -> UInt
+pub fn SiFlag::value(Self) -> UInt32
 
-pub(all) struct SiFlags(UInt) derive(Eq, @debug.Debug)
+pub(all) struct SiFlags(UInt32) derive(Eq, @debug.Debug)
 pub fn SiFlags::is_set(Self, SiFlag) -> Bool
 pub fn SiFlags::new() -> Self
 pub fn SiFlags::set(Self, SiFlag) -> Self
@@ -454,17 +454,17 @@ pub(all) enum Signal {
   Pwr
   Sys
 } derive(Eq, @debug.Debug)
-pub fn Signal::from_value(UInt) -> Self?
-pub fn Signal::value(Self) -> UInt
+pub fn Signal::from_value(UInt32) -> Self?
+pub fn Signal::value(Self) -> UInt32
 
-pub(all) struct Size(UInt) derive(Eq, @debug.Debug)
+pub(all) struct Size(UInt32) derive(Eq, @debug.Debug)
 
 pub(all) enum SubclockFlag {
   Subscription_clock_abstime
 } derive(Eq, @debug.Debug)
-pub fn SubclockFlag::value(Self) -> UInt
+pub fn SubclockFlag::value(Self) -> UInt32
 
-pub(all) struct SubclockFlags(UInt) derive(Eq, @debug.Debug)
+pub(all) struct SubclockFlags(UInt32) derive(Eq, @debug.Debug)
 pub fn SubclockFlags::is_set(Self, SubclockFlag) -> Bool
 pub fn SubclockFlags::new() -> Self
 pub fn SubclockFlags::set(Self, SubclockFlag) -> Self
@@ -501,10 +501,9 @@ pub(all) enum Whence {
   Cur
   End
 } derive(Eq, @debug.Debug)
-pub fn Whence::from_value(UInt) -> Self?
-pub fn Whence::value(Self) -> UInt
+pub fn Whence::from_value(UInt32) -> Self?
+pub fn Whence::value(Self) -> UInt32
 
 // Type aliases
 
 // Traits
-
